@@ -1,0 +1,3911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Box Designer — Box Craft Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300&family=Raleway:wght@300;400;600&family=Bebas+Neue&family=Abril+Fatface&family=Josefin+Sans:wght@300;400;600&family=Cinzel:wght@400;600&family=Dancing+Script:wght@400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/RoundedBoxGeometry.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:   #F5F0E8;
+  --cream2:  #EDE8DC;
+  --cream3:  #E4DDD0;
+  --warm:    #D4C9B0;
+  --brown:   #8B7355;
+  --brown2:  #6B5840;
+  --brown3:  #4A3D2C;
+  --dark:    #1C1510;
+  --text:    #2A2118;
+  --text2:   #5A4E3C;
+  --text3:   #8A7E6E;
+  --gold:    #A8884A;
+  --gold2:   #C9A85C;
+  --gold3:   #E8D4A0;
+  --maroon:  #6B1E2C;
+  --maroon2: #8B2A3A;
+  --border:  rgba(139,115,85,0.2);
+  --border2: rgba(139,115,85,0.4);
+}
+
+html { height: 100%; }
+body { height: 100%; overflow-y: auto; background: var(--cream); color: var(--text); font-family: 'Jost', sans-serif; font-weight: 300; }
+
+/* ── CUSTOM CURSOR (viewport only) ────────────────────────────────────────── */
+#cursor      { position: fixed; width: 8px; height: 8px; background: rgba(28,20,8,0.75); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); opacity: 0; transition: opacity .2s, width .3s, height .3s; }
+#cursor-ring { position: fixed; width: 30px; height: 30px; border: 1px solid rgba(28,20,8,0.32); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); opacity: 0; transition: opacity .2s, width .3s, height .3s; }
+/* ── Force normal cursor outside viewport ────────────────────────────────── */
+#viewport { cursor: none; }
+
+/* ── SCROLLBAR ─────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 3px; }
+::-webkit-scrollbar-track { background: var(--cream2); }
+::-webkit-scrollbar-thumb { background: var(--maroon); }
+
+/* ── ANNOUNCEMENT ──────────────────────────────────────────────────────────── */
+.announcement { background: var(--dark); color: rgba(245,240,232,.55); text-align: center; padding: .5rem 1rem; font-size: .55rem; letter-spacing: .3em; text-transform: uppercase; }
+.announcement em { color: var(--gold2); font-style: normal; }
+
+/* ── NAV ───────────────────────────────────────────────────────────────────── */
+.site-nav { position: sticky; top: 0; z-index: 900; background: var(--cream); border-bottom: 1px solid var(--border); }
+.nav-top { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2.5rem; }
+.nav-logo { font-family: 'EB Garamond', serif; font-size: 1.4rem; letter-spacing: .08em; text-transform: uppercase; color: var(--dark); text-decoration: none; font-weight: 400; }
+.nav-logo-sub { font-size: .42rem; letter-spacing: .35em; text-transform: uppercase; color: var(--text3); display: block; margin-top: .15rem; }
+.nav-tag { font-size: .46rem; letter-spacing: .28em; text-transform: uppercase; color: var(--maroon); display: flex; align-items: center; gap: .6rem; }
+.nav-tag::before { content: ''; width: 20px; height: 1px; background: var(--maroon); }
+.nav-actions { display: flex; align-items: center; gap: .7rem; }
+.btn-nav-outline { background: none; color: var(--text2); border: 1px solid var(--border2); padding: .6rem 1.5rem; font-family: 'Jost', sans-serif; font-size: .52rem; letter-spacing: .18em; text-transform: uppercase; cursor: none; transition: all .25s; }
+.btn-nav-outline:hover { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+.btn-nav-primary { background: var(--dark); color: var(--cream); border: none; padding: .62rem 1.6rem; font-family: 'Jost', sans-serif; font-size: .52rem; letter-spacing: .18em; text-transform: uppercase; cursor: none; transition: background .25s; }
+.btn-nav-primary:hover { background: var(--maroon); }
+.nav-divider { width: 1px; height: 18px; background: var(--border2); }
+.nav-back { display: flex; align-items: center; gap: .5rem; font-size: .5rem; letter-spacing: .2em; text-transform: uppercase; color: var(--text3); text-decoration: none; transition: color .2s; }
+.nav-back:hover { color: var(--dark); }
+.nav-back svg { width: 14px; height: 14px; }
+
+/* ── LAYOUT ────────────────────────────────────────────────────────────────── */
+.designer { display: flex; height: calc(100vh - 97px); overflow: hidden; position: sticky; top: 97px; }
+
+/* ── PANEL ─────────────────────────────────────────────────────────────────── */
+.panel { width: 262px; flex-shrink: 0; background: var(--cream); border-right: 1px solid var(--border); overflow-y: auto; padding: 1.2rem 1rem; display: flex; flex-direction: column; gap: 1.2rem; }
+.panel-right { border-right: none; border-left: 1px solid var(--border); width: 292px; background: var(--cream); }
+.panel::-webkit-scrollbar { width: 3px; }
+.panel::-webkit-scrollbar-thumb { background: var(--maroon); }
+
+/* ── PANEL SECTION LABELS (match index editorial style) ───────────────────── */
+.panel-label {
+  font-size: .46rem; letter-spacing: .38em; text-transform: uppercase; color: var(--maroon);
+  margin-bottom: .65rem; display: flex; align-items: center; gap: .6rem;
+}
+.panel-label::before { content: ''; width: 14px; height: 1px; background: var(--maroon); flex-shrink: 0; }
+.panel-divider { height: 1px; background: var(--border); flex-shrink: 0; }
+
+/* ── VIEWPORT ──────────────────────────────────────────────────────────────── */
+#viewport { flex: 1; position: relative; min-width: 0; background: #F5F0E8; overflow: hidden; }
+#viewport canvas { display: block; }
+.face-label {
+  position: absolute; top: 1.2rem; left: 50%; transform: translateX(-50%);
+  background: rgba(11,14,20,0.75); backdrop-filter: blur(10px);
+  color: rgba(235,245,255,0.92); padding: .32rem 1rem; font-size: .46rem; letter-spacing: .28em;
+  text-transform: uppercase; pointer-events: none; opacity: 0; transition: opacity .18s;
+  white-space: nowrap; border: 1px solid rgba(245,240,232,.10);
+}
+.face-label.show { opacity: 1; }
+.vp-hint {
+  position: absolute; bottom: 1.4rem; left: 50%; transform: translateX(-50%);
+  font-size: .44rem; letter-spacing: .22em; text-transform: uppercase;
+  color: rgba(42,33,24,0.28); pointer-events: none; white-space: nowrap;
+}
+
+/* ── BOX STYLE BUTTONS ─────────────────────────────────────────────────────── */
+.style-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; }
+.style-btn { background: var(--cream2); border: 1px solid var(--border); padding: .6rem .3rem; font-family: 'Jost', sans-serif; font-size: .5rem; color: var(--text); cursor: none; text-align: center; line-height: 1.7; transition: all .2s; }
+.style-btn span { font-size: .42rem; color: var(--text3); display: block; }
+.style-btn:hover, .style-btn.active { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+.style-btn.active span, .style-btn:hover span { color: rgba(245,240,232,.5); }
+
+/* ── PRESETS ───────────────────────────────────────────────────────────────── */
+.preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; }
+.preset-btn { background: var(--cream2); border: 1px solid var(--border); padding: .5rem .3rem; font-family: 'Jost', sans-serif; font-size: .52rem; color: var(--text); cursor: none; text-align: center; line-height: 1.65; transition: all .2s; }
+.preset-btn span { font-size: .42rem; color: var(--text3); display: block; }
+.preset-btn:hover { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+.preset-btn:hover span { color: rgba(245,240,232,.5); }
+
+/* ── DIMS ──────────────────────────────────────────────────────────────────── */
+.dim-row { display: flex; align-items: center; gap: .5rem; margin-bottom: .4rem; }
+.dim-row label { font-size: .5rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); width: 14px; flex-shrink: 0; }
+.dim-row input[type=range] { flex: 1; accent-color: var(--maroon); cursor: none; }
+.dim-row input[type=number] { width: 42px; background: var(--cream2); border: 1px solid var(--border2); color: var(--text); font-family: 'Jost', sans-serif; font-size: .6rem; padding: .25rem .3rem; text-align: center; -moz-appearance: textfield; }
+.dim-row input[type=number]::-webkit-inner-spin-button { opacity: 0; }
+.dim-row span { font-size: .58rem; color: var(--text3); min-width: 20px; text-align: right; }
+
+/* ── FACE BUTTONS ──────────────────────────────────────────────────────────── */
+.face-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .35rem; }
+.face-btn { background: var(--cream2); border: 1px solid var(--border); padding: .4rem .2rem; font-family: 'Jost', sans-serif; font-size: .48rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text2); cursor: none; transition: all .2s; text-align: center; }
+.face-btn:hover { background: var(--cream3); }
+.face-btn.active { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+
+/* ── FOAM INSERT ───────────────────────────────────────────────────────────── */
+.insert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .38rem; }
+.insert-btn { background: var(--cream2); border: 1px solid var(--border); padding: .5rem .3rem; font-family: 'Jost', sans-serif; font-size: .48rem; color: var(--text); cursor: none; text-align: center; line-height: 1.7; transition: all .2s; display: flex; flex-direction: column; align-items: center; gap: .3rem; }
+.insert-btn span { font-size: .4rem; color: var(--text3); }
+.insert-btn svg { width: 36px; height: 28px; }
+.insert-btn:hover { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+.insert-btn:hover span { color: rgba(245,240,232,.5); }
+.insert-btn:hover svg path, .insert-btn:hover svg rect, .insert-btn:hover svg circle { fill: rgba(245,240,232,.7); }
+.insert-btn.active { background: var(--maroon); color: var(--cream); border-color: var(--maroon); }
+.insert-btn.active span { color: rgba(245,240,232,.55); }
+.foam-swatch { width: 20px; height: 20px; border-radius: 2px; border: 2px solid transparent; cursor: none; flex-shrink: 0; transition: transform .15s, border-color .15s; }
+.foam-swatch:hover { transform: scale(1.18); border-color: var(--gold); }
+.foam-swatch.active { border-color: var(--dark); }
+
+/* ── RIGHT PANEL ───────────────────────────────────────────────────────────── */
+.editing-title { font-size: .44rem; letter-spacing: .22em; text-transform: uppercase; color: var(--text3); margin-bottom: .5rem; }
+.editing-title strong { color: var(--maroon); font-weight: 400; }
+#editorCanvas { display: block; width: 100%; aspect-ratio: 1/1; border: 1px solid var(--border2); cursor: crosshair; background: var(--cream2); }
+
+/* ── COLOR MODE TABS ───────────────────────────────────────────────────────── */
+.mode-tabs { display: flex; gap: .35rem; margin-bottom: .7rem; }
+.mode-tab { flex: 1; background: var(--cream2); border: 1px solid var(--border); padding: .42rem; font-family: 'Jost', sans-serif; font-size: .48rem; letter-spacing: .12em; text-transform: uppercase; color: var(--text2); cursor: none; text-align: center; transition: all .2s; }
+.mode-tab.active { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+
+/* ── PALETTE ───────────────────────────────────────────────────────────────── */
+#paletteWrap { display: flex; flex-wrap: wrap; gap: .32rem; max-height: 110px; overflow-y: auto; padding: .15rem 0; }
+#paletteWrap::-webkit-scrollbar { width: 3px; }
+#paletteWrap::-webkit-scrollbar-thumb { background: var(--maroon); }
+.pal-swatch { width: 26px; height: 26px; border-radius: 3px; border: 2px solid transparent; cursor: none; transition: transform .15s, border-color .15s; flex-shrink: 0; position: relative; }
+.pal-swatch:hover { transform: scale(1.18); border-color: var(--gold); }
+.pal-swatch.active { border-color: var(--dark); }
+.pal-add { width: 26px; height: 26px; border-radius: 3px; border: 1px dashed var(--border2); background: var(--cream2); display: flex; align-items: center; justify-content: center; cursor: none; font-size: .85rem; color: var(--text3); transition: all .2s; flex-shrink: 0; }
+.pal-add:hover { border-color: var(--gold); color: var(--dark); background: var(--cream3); }
+.palette-actions { display: flex; gap: .38rem; margin-top: .45rem; }
+.pal-btn { flex: 1; background: var(--cream2); border: 1px solid var(--border); padding: .38rem; font-family: 'Jost', sans-serif; font-size: .44rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text2); cursor: none; transition: all .2s; text-align: center; }
+.pal-btn:hover { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+
+/* ── GRADIENT UI ───────────────────────────────────────────────────────────── */
+#gradientUI { display: none; }
+#gradientUI.show { display: block; }
+.grad-row { display: flex; align-items: center; gap: .6rem; margin-bottom: .5rem; }
+.grad-row label { font-size: .48rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text3); min-width: 36px; }
+.grad-dir { display: flex; gap: .35rem; }
+.grad-dir-btn { background: var(--cream2); border: 1px solid var(--border); padding: .32rem .55rem; font-family: 'Jost', sans-serif; font-size: .46rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text2); cursor: none; transition: all .2s; }
+.grad-dir-btn.active { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+.apply-btn { width: 100%; background: var(--maroon); color: var(--cream); border: none; padding: .58rem; font-family: 'Jost', sans-serif; font-size: .5rem; letter-spacing: .2em; text-transform: uppercase; cursor: none; transition: background .25s; margin-top: .3rem; }
+.apply-btn:hover { background: var(--dark); }
+
+/* ── SOLID COLOR UI ────────────────────────────────────────────────────────── */
+.color-row { display: flex; align-items: center; gap: .6rem; margin-bottom: .5rem; }
+input[type=color] { width: 26px; height: 26px; border-radius: 3px; border: 1px solid var(--border2); padding: 1px; cursor: none; background: none; flex-shrink: 0; }
+
+/* ── TOOLS ─────────────────────────────────────────────────────────────────── */
+.tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .35rem; }
+.tool-btn { background: var(--cream2); border: 1px solid var(--border); padding: .45rem; font-family: 'Jost', sans-serif; font-size: .5rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text2); cursor: none; transition: all .2s; }
+.tool-btn:hover { background: var(--cream3); }
+.tool-btn.active { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+
+/* ── UPLOAD & ACTIONS ──────────────────────────────────────────────────────── */
+.upload-btn { display: block; background: var(--cream2); border: 1px dashed var(--border2); padding: .6rem; text-align: center; font-family: 'Jost', sans-serif; font-size: .48rem; letter-spacing: .16em; text-transform: uppercase; color: var(--text3); cursor: none; transition: all .22s; }
+.upload-btn:hover { background: var(--cream3); border-color: var(--gold); color: var(--text); }
+.action-row { display: flex; gap: .4rem; }
+.action-btn { flex: 1; background: var(--cream2); border: 1px solid var(--border); padding: .48rem; font-family: 'Jost', sans-serif; font-size: .48rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text2); cursor: none; transition: all .2s; }
+.action-btn:hover { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+
+/* ── GALLERY ───────────────────────────────────────────────────────────────── */
+.gallery-section { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); padding: 5rem 4rem 6rem; position: relative; overflow: hidden; }
+.gallery-section::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(245,240,232,.012) 80px, rgba(245,240,232,.012) 81px); pointer-events: none; }
+.gallery-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2.5rem; border-bottom: 1px solid rgba(245,240,232,.07); padding-bottom: 1.5rem; position: relative; }
+.gallery-eyebrow { font-size: .5rem; letter-spacing: .4em; text-transform: uppercase; color: var(--gold2); margin-bottom: .8rem; display: flex; align-items: center; gap: .7rem; }
+.gallery-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--gold); }
+.gallery-title { font-family: 'EB Garamond', serif; font-size: 2.8rem; font-weight: 400; color: var(--cream); letter-spacing: .03em; line-height: 1; }
+.gallery-title em { font-style: italic; color: var(--gold2); }
+.gallery-clear { background: none; border: 1px solid rgba(245,240,232,.12); color: rgba(245,240,232,.3); font-family: 'Jost', sans-serif; font-size: .46rem; letter-spacing: .2em; text-transform: uppercase; padding: .5rem 1.2rem; cursor: none; transition: all .2s; }
+.gallery-clear:hover { background: var(--maroon); color: var(--cream); border-color: var(--maroon); }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1px; background: rgba(245,240,232,.06); position: relative; }
+.gallery-empty { text-align: center; padding: 4rem 0; font-size: .56rem; letter-spacing: .28em; text-transform: uppercase; color: rgba(245,240,232,.2); }
+.gallery-card { background: var(--cream2); overflow: hidden; position: relative; transition: background .3s; }
+.gallery-card:hover { background: var(--cream); }
+.gallery-card img { display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.gallery-card-info { padding: .65rem .8rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); }
+.gallery-card-name { font-size: .46rem; letter-spacing: .16em; text-transform: uppercase; color: var(--text2); }
+.gallery-card-del { background: none; border: none; color: var(--text3); cursor: none; font-size: .75rem; line-height: 1; padding: .1rem .3rem; transition: color .2s; }
+.gallery-card-del:hover { color: var(--maroon); }
+
+/* ── CURSOR FIX: restore pointer for all interactive elements outside viewport ── */
+button, input, label, a, select, textarea { cursor: pointer !important; }
+input[type=range] { cursor: ew-resize !important; }
+input[type=number], input[type=text], input[type=color] { cursor: text !important; }
+#editorCanvas { cursor: crosshair !important; }
+/* viewport and its children keep the custom none cursor */
+#viewport, #viewport * { cursor: none !important; }
+
+/* ── TEXT CONTROLS ──────────────────────────────────────────────────────────── */
+.font-select { width: 100%; background: var(--cream2); border: 1px solid var(--border2); color: var(--text); font-family: 'Jost', sans-serif; font-size: .52rem; padding: .38rem .5rem; letter-spacing: .05em; cursor: pointer; margin-bottom: .4rem; }
+.text-style-row { display: flex; gap: .3rem; flex-wrap: wrap; margin-bottom: .4rem; }
+.txt-btn { flex: 1; min-width: 38px; background: var(--cream2); border: 1px solid var(--border); padding: .32rem .25rem; font-family: 'Jost', sans-serif; font-size: .5rem; color: var(--text2); cursor: pointer; text-align: center; transition: all .2s; white-space: nowrap; }
+.txt-btn:hover { background: var(--cream3); }
+.txt-btn.active { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+.finish-row { display: flex; gap: .35rem; margin-bottom: .4rem; }
+.finish-btn { flex: 1; background: var(--cream2); border: 1px solid var(--border); padding: .38rem; font-family: 'Jost', sans-serif; font-size: .46rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text2); cursor: pointer; text-align: center; transition: all .2s; }
+.finish-btn:hover { background: var(--cream3); }
+.finish-btn.active { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   STUDIO MODE OVERRIDES — Pacdora-style dark minimal rails + collapsible panels
+   ════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --studio-bg:       #FEFDFB;   /* warm white panels                    */
+  --studio-bg2:      #F4EDE1;   /* beige hover / row tint               */
+  --studio-bg3:      #EDE4D4;   /* beige input / button tile            */
+  --studio-border:   rgba(160,130,80,.16);
+  --studio-border2:  rgba(160,130,80,.32);
+  --studio-text:     rgba(28,20,8,.88);
+  --studio-text2:    rgba(28,20,8,.55);
+  --studio-text3:    rgba(28,20,8,.35);
+  --studio-accent:   #B8934A;   /* soft warm gold                       */
+  --studio-floor:    #E8E8E8;   /* light grey matching 3D bg            */
+}
+
+/* ── SIDEBARS — light, warm, collapsible ───────────────────────────────────── */
+.panel { background: var(--studio-bg) !important; border-right: 1px solid var(--studio-border) !important; color: var(--studio-text); width: 248px !important; transition: width .28s cubic-bezier(.4,0,.2,1), padding .28s, opacity .2s; padding: 1rem .9rem !important; scrollbar-width: thin; }
+.panel-right { border-right: none !important; border-left: 1px solid var(--studio-border) !important; width: 278px !important; }
+.panel.collapsed { width: 0 !important; min-width: 0 !important; flex: 0 0 0 !important; padding: 0 !important; opacity: 0; overflow: hidden; pointer-events: none; border-width: 0 !important; }
+.panel::-webkit-scrollbar { width: 4px; }
+.panel::-webkit-scrollbar-track { background: transparent; }
+.panel::-webkit-scrollbar-thumb { background: rgba(160,130,80,.25); border-radius: 2px; }
+
+/* Section labels */
+.panel-label { color: var(--studio-text3) !important; font-size: .44rem !important; letter-spacing: .32em !important; margin-bottom: .55rem !important; }
+.panel-label::before { background: var(--studio-accent) !important; width: 10px !important; opacity: .8; }
+.panel-divider { background: var(--studio-border) !important; }
+
+.editing-title { color: var(--studio-text3) !important; }
+.editing-title strong { color: var(--studio-accent) !important; font-weight: 500 !important; }
+
+/* ── Button tiles ────────────────────────────────────────────────────────────── */
+.style-btn, .preset-btn, .face-btn, .insert-btn, .mode-tab, .tool-btn, .finish-btn, .pal-btn, .action-btn, .txt-btn, .grad-dir-btn {
+  background: var(--studio-bg3) !important;
+  border: 1px solid var(--studio-border) !important;
+  color: var(--studio-text) !important;
+}
+.style-btn span, .preset-btn span, .insert-btn span { color: var(--studio-text3) !important; }
+.style-btn:hover, .preset-btn:hover, .face-btn:hover, .insert-btn:hover, .mode-tab:hover, .tool-btn:hover, .finish-btn:hover, .pal-btn:hover, .action-btn:hover, .txt-btn:hover, .grad-dir-btn:hover {
+  background: var(--studio-bg2) !important;
+  border-color: var(--studio-border2) !important;
+}
+.style-btn.active, .preset-btn.active, .face-btn.active, .insert-btn.active, .mode-tab.active, .tool-btn.active, .finish-btn.active, .txt-btn.active, .grad-dir-btn.active {
+  background: var(--studio-accent) !important;
+  color: #FEFDFB !important;
+  border-color: var(--studio-accent) !important;
+}
+.style-btn.active span, .preset-btn.active span, .insert-btn.active span { color: rgba(254,253,251,.55) !important; }
+
+/* Dim rows */
+.dim-row label { color: var(--studio-text3) !important; }
+.dim-row input[type=number] { background: var(--studio-bg3) !important; border: 1px solid var(--studio-border) !important; color: var(--studio-text) !important; }
+.dim-row span { color: var(--studio-text2) !important; }
+.dim-row input[type=range] { accent-color: var(--studio-accent) !important; }
+
+/* Palette */
+#paletteWrap { background: transparent !important; }
+.pal-add { background: var(--studio-bg3) !important; border: 1px dashed var(--studio-border2) !important; color: var(--studio-text3) !important; }
+.pal-add:hover { border-color: var(--studio-accent) !important; color: var(--studio-accent) !important; }
+
+/* Upload / dashed */
+.upload-btn { background: var(--studio-bg3) !important; border: 1px dashed var(--studio-border2) !important; color: var(--studio-text3) !important; }
+.upload-btn:hover { border-color: var(--studio-accent) !important; color: var(--studio-text) !important; background: var(--studio-bg2) !important; }
+
+/* Font select */
+.font-select { background: var(--studio-bg3) !important; border: 1px solid var(--studio-border) !important; color: var(--studio-text) !important; }
+
+/* Apply button — gold primary */
+.apply-btn { background: var(--studio-accent) !important; color: #FEFDFB !important; font-weight: 600 !important; }
+.apply-btn:hover { background: #C9A55E !important; }
+
+/* Editor canvas */
+#editorCanvas { border: 1px solid var(--studio-border) !important; background: var(--studio-bg3) !important; }
+
+/* ── VIEWPORT — infinite grey studio floor ───────────────────────────────────── */
+#viewport { background: #E8E8E8 !important; }
+.vp-hint { color: rgba(0,0,0,.22) !important; }
+.face-label { background: rgba(254,253,251,.88) !important; color: rgba(28,20,8,.88) !important; border-color: rgba(160,130,80,.22) !important; }
+
+/* ── PANEL TOGGLES (thin edge chips) ────────────────────────────────────────── */
+.panel-toggle {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 22px; height: 56px;
+  background: var(--studio-bg);
+  border: 1px solid var(--studio-border);
+  color: var(--studio-text2);
+  cursor: pointer !important;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50;
+  transition: background .2s, color .2s, left .28s cubic-bezier(.4,0,.2,1), right .28s cubic-bezier(.4,0,.2,1);
+  border-radius: 0 4px 4px 0;
+}
+.panel-toggle.right { border-radius: 4px 0 0 4px; }
+.panel-toggle:hover { background: var(--studio-bg2); color: var(--studio-accent); }
+.panel-toggle svg { width: 11px; height: 11px; transition: transform .28s; }
+.panel-toggle.flipped svg { transform: rotate(180deg); }
+
+/* ── FLOATING ACTION BAR (bottom center) — warm glass ───────────────────────── */
+.float-bar {
+  position: absolute; bottom: 1.6rem; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: .1rem;
+  background: rgba(254,253,251,.90);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid rgba(160,130,80,.22);
+  border-radius: 8px;
+  padding: .35rem .45rem;
+  z-index: 40;
+  box-shadow: 0 8px 32px rgba(100,75,30,.12), 0 2px 8px rgba(100,75,30,.08);
+}
+.fb-btn {
+  background: none; border: none; color: rgba(28,20,8,.60);
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer !important;
+  border-radius: 5px;
+  transition: background .18s, color .18s;
+}
+.fb-btn:hover { background: rgba(160,130,80,.10); color: var(--studio-accent); }
+.fb-btn svg { width: 14px; height: 14px; }
+.fb-sep { width: 1px; height: 18px; background: rgba(160,130,80,.18); margin: 0 .35rem; }
+.fb-label { color: rgba(28,20,8,.40); font-size: .44rem; letter-spacing: .2em; text-transform: uppercase; padding: 0 .35rem; }
+.fb-slider { appearance: none; -webkit-appearance: none; width: 80px; height: 3px; background: rgba(160,130,80,.18); border-radius: 2px; outline: none; cursor: pointer !important; }
+.fb-slider::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 12px; height: 12px; background: var(--studio-accent); border-radius: 50%; cursor: pointer !important; }
+.fb-slider::-moz-range-thumb { width: 12px; height: 12px; background: var(--studio-accent); border-radius: 50%; cursor: pointer !important; border: none; }
+
+/* ── CAMERA GIZMO ────────────────────────────────────────────────────────────── */
+.cam-gizmo {
+  position: absolute; bottom: 1.6rem; right: 1.6rem;
+  width: 56px; height: 56px;
+  pointer-events: none; z-index: 30;
+  opacity: .55;
+}
+.cam-gizmo svg { width: 100%; height: 100%; }
+
+/* ── CAMERA CONTROLS (right-edge vertical rail) — warm glass ────────────────── */
+.cam-rail {
+  position: absolute; top: 50%; right: 1rem; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: .3rem;
+  background: rgba(254,253,251,.90);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(160,130,80,.22);
+  border-radius: 8px; padding: .35rem;
+  z-index: 35;
+  transition: right .28s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 8px 32px rgba(100,75,30,.10);
+}
+.cam-btn {
+  background: none; border: none; color: rgba(28,20,8,.55);
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer !important;
+  border-radius: 5px;
+  transition: background .18s, color .18s;
+}
+.cam-btn:hover { background: rgba(160,130,80,.10); color: var(--studio-accent); }
+.cam-btn svg { width: 13px; height: 13px; }
+
+/* ── NAV ─────────────────────────────────────────────────────────────────────── */
+.site-nav { background: var(--studio-bg) !important; border-bottom-color: var(--studio-border) !important; }
+.nav-logo { color: rgba(28,20,8,.92) !important; }
+.nav-logo-sub { color: rgba(28,20,8,.38) !important; }
+.nav-tag { color: var(--studio-accent) !important; }
+.nav-tag::before { background: var(--studio-accent) !important; }
+.nav-back { color: rgba(28,20,8,.40) !important; }
+.nav-back:hover { color: var(--studio-accent) !important; }
+.btn-nav-outline { color: rgba(28,20,8,.65) !important; border-color: rgba(160,130,80,.28) !important; }
+.btn-nav-outline:hover { background: rgba(160,130,80,.08) !important; color: var(--studio-accent) !important; border-color: rgba(160,130,80,.45) !important; }
+.btn-nav-primary { background: var(--studio-accent) !important; color: #FEFDFB !important; font-weight: 600 !important; }
+.btn-nav-primary:hover { background: #C9A55E !important; }
+
+/* Body background warm white */
+body { background: var(--studio-bg) !important; }
+.designer { background: var(--studio-bg); position: sticky; }
+
+/* Scrollbar everywhere */
+::-webkit-scrollbar-track { background: var(--studio-bg2) !important; }
+::-webkit-scrollbar-thumb { background: rgba(160,130,80,.30) !important; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ICON RAIL + FLOATING DRAWERS  (Pacdora-style)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── The vertical pill rail — warm white glass ───────────────────────────── */
+.icon-rail {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 55;
+  background: rgba(254,253,251,.92);
+  backdrop-filter: blur(18px) saturate(1.1);
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+  border: 1px solid rgba(160,130,80,.20);
+  border-radius: 14px;
+  padding: .5rem .35rem;
+  display: flex;
+  flex-direction: column;
+  gap: .12rem;
+  box-shadow: 0 12px 40px rgba(100,75,30,.14), 0 3px 10px rgba(100,75,30,.08);
+}
+
+/* ── Rail icon buttons ───────────────────────────────────────────────────── */
+.rail-btn {
+  background: none;
+  border: none;
+  color: rgba(28,20,8,.45);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .22rem;
+  cursor: pointer !important;
+  border-radius: 9px;
+  transition: background .16s, color .16s;
+  padding: .28rem;
+  flex-shrink: 0;
+}
+.rail-btn:hover {
+  background: rgba(160,130,80,.10);
+  color: rgba(28,20,8,.88);
+}
+.rail-btn.active {
+  background: rgba(184,147,74,.15);
+  color: var(--studio-accent);
+}
+.rail-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+.rail-btn span {
+  font-size: .33rem; letter-spacing: .13em; text-transform: uppercase;
+  font-family: 'Jost', sans-serif; font-weight: 400; line-height: 1;
+}
+
+/* ── Separator line ──────────────────────────────────────────────────────── */
+.rail-sep { height: 1px; background: rgba(160,130,80,.15); margin: .2rem .3rem; }
+
+/* ── Drawer container ────────────────────────────────────────────────────── */
+#drawerContainer {
+  position: absolute;
+  left: 74px;
+  top: 0;
+  bottom: 0;
+  z-index: 54;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Individual drawer card — warm white ─────────────────────────────────── */
+.drawer {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) translateX(-14px);
+  width: 286px;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(160,130,80,.22) transparent;
+  background: rgba(254,253,251,.97);
+  backdrop-filter: blur(22px) saturate(1.1);
+  -webkit-backdrop-filter: blur(22px) saturate(1.1);
+  border: 1px solid rgba(160,130,80,.20);
+  border-radius: 13px;
+  padding: 1rem 1rem 1.1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s cubic-bezier(.4,0,.2,1), transform .2s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 20px 60px rgba(100,75,30,.15), 0 4px 14px rgba(100,75,30,.08);
+}
+.drawer::-webkit-scrollbar { width: 3px; }
+.drawer::-webkit-scrollbar-thumb { background: rgba(160,130,80,.25); border-radius: 2px; }
+
+.drawer.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* ── Drawer section headings ─────────────────────────────────────────────── */
+.drawer-title {
+  font-size: .48rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--studio-accent);
+  margin-bottom: .75rem;
+  padding-bottom: .55rem;
+  border-bottom: 1px solid rgba(160,130,80,.14);
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.drawer-title::before {
+  content: '';
+  width: 10px; height: 1px;
+  background: var(--studio-accent); opacity: .75; flex-shrink: 0;
+}
+.drawer-sub-title {
+  font-size: .40rem;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: rgba(28,20,8,.35);
+  margin-bottom: .42rem;
+}
+
+/* ── DIMENSIONS POPUP — warm white ──────────────────────────────────────── */
+#dimPopup {
+  display: none;
+  position: absolute;
+  bottom: calc(1.6rem + 52px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(254,253,251,.97);
+  backdrop-filter: blur(18px) saturate(1.1);
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+  border: 1px solid rgba(160,130,80,.20);
+  border-radius: 10px;
+  padding: .85rem 1rem;
+  z-index: 45;
+  min-width: 290px;
+  box-shadow: 0 12px 40px rgba(100,75,30,.14);
+}
+#dimPopup.show { display: block; }
+.dp-title {
+  font-size: .42rem; letter-spacing: .24em; text-transform: uppercase;
+  color: rgba(28,20,8,.35); margin-bottom: .65rem;
+}
+.dp-row {
+  display: flex; align-items: center; gap: .5rem; margin-bottom: .32rem;
+}
+.dp-row label {
+  font-size: .52rem; color: var(--studio-accent); min-width: 12px;
+  letter-spacing: .1em; font-weight: 500;
+}
+.dp-row input[type=range] { flex: 1; accent-color: var(--studio-accent); }
+.dp-row input[type=number] {
+  width: 44px; background: var(--studio-bg3);
+  border: 1px solid var(--studio-border); color: var(--studio-text);
+  border-radius: 4px; padding: .15rem .3rem; font-size: .5rem;
+  text-align: center; font-family: 'Jost', sans-serif;
+}
+.dp-presets {
+  display: flex; gap: .28rem; flex-wrap: wrap; margin-top: .6rem;
+  padding-top: .55rem; border-top: 1px solid rgba(160,130,80,.14);
+}
+.dp-chip {
+  background: var(--studio-bg3); border: 1px solid var(--studio-border);
+  color: var(--studio-text2); border-radius: 4px;
+  padding: .18rem .48rem; font-size: .42rem; cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.dp-chip:hover {
+  background: rgba(184,147,74,.15); color: var(--studio-accent);
+  border-color: rgba(184,147,74,.35);
+}
+
+/* ── FOAM PALETTE ────────────────────────────────────────────────────────── */
+/* ── Viewport text toolbar buttons ─────────────────────────────────────────── */
+.vptb-btn {
+  background: rgba(237,228,212,.70); border: 1px solid rgba(160,130,80,.20);
+  border-radius: 5px; color: rgba(28,20,8,.75);
+  font-size: .65rem; padding: .1rem .45rem;
+  cursor: pointer !important; transition: background .15s;
+  line-height: 1.4;
+}
+.vptb-btn:hover { background: rgba(184,147,74,.18); color: var(--studio-accent); border-color: rgba(184,147,74,.35); }
+
+#foamPaletteWrap {
+  display: flex; flex-wrap: wrap; gap: .3rem;
+  max-height: 80px; overflow-y: auto; padding: .1rem 0;
+  margin-bottom: .38rem;
+}
+#foamPaletteWrap::-webkit-scrollbar { width: 3px; }
+#foamPaletteWrap::-webkit-scrollbar-thumb { background: rgba(160,130,80,.22); }
+
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Announcement -->
+<div class="announcement">3D Box Designer &nbsp;&mdash;&nbsp; <em>Beta Release</em> &nbsp;&mdash;&nbsp; Design your packaging in real time</div>
+
+<!-- Nav -->
+<nav class="site-nav">
+  <div class="nav-top">
+    <a href="Final_index.html" class="nav-logo">
+      Box Craft Studios
+      <span class="nav-logo-sub">Premium Packaging</span>
+    </a>
+    <span class="nav-tag">3D Designer</span>
+    <div class="nav-actions">
+      <a href="Final_index.html" class="nav-back">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 2L4 7l5 5"/></svg>
+        Back to Store
+      </a>
+      <div class="nav-divider"></div>
+      <button class="btn-nav-outline" onclick="saveToGallery()">Save to Gallery</button>
+      <button class="btn-nav-primary" onclick="downloadScreenshot()">Download Preview</button>
+    </div>
+  </div>
+</nav>
+
+<div class="designer">
+
+  <!-- ── ICON RAIL (left edge) ── -->
+  <div class="icon-rail" id="iconRail">
+    <button class="rail-btn" id="rail-style"   onclick="openDrawer('style')"   title="Box Style">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      <span>Style</span>
+    </button>
+    <button class="rail-btn" id="rail-profile" onclick="openDrawer('profile')" title="Side Profile">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"/></svg>
+      <span>Profile</span>
+    </button>
+    <button class="rail-btn" id="rail-finish"  onclick="openDrawer('finish')"  title="Surface Finish">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg>
+      <span>Finish</span>
+    </button>
+    <div class="rail-sep"></div>
+    <button class="rail-btn" id="rail-foam"    onclick="openDrawer('foam')"    title="Foam Insert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><circle cx="8.5" cy="14" r="1.5"/><circle cx="15.5" cy="14" r="1.5"/></svg>
+      <span>Foam</span>
+    </button>
+    <div class="rail-sep"></div>
+    <button class="rail-btn" id="rail-paint"   onclick="openDrawer('paint')"   title="Paint & Text">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      <span>Paint</span>
+    </button>
+  </div>
+
+  <!-- ── DRAWERS ── -->
+  <div id="drawerContainer">
+
+    <!-- Style drawer -->
+    <div class="drawer" id="drawer-style">
+      <div class="drawer-title">Box Style</div>
+      <div class="style-grid">
+        <button class="style-btn active" id="style-open"      onclick="setStyle('open')">Open Box<span>Lid folded back</span></button>
+        <button class="style-btn"        id="style-closed"    onclick="setStyle('closed')">Closed Lid<span>Flat top</span></button>
+        <button class="style-btn"        id="style-magnet"    onclick="setStyle('magnet')">Magnetic<span>Snap-close top</span></button>
+        <button class="style-btn"        id="style-attached"  onclick="setStyle('attached')">Side Lid<span>Hinged side</span></button>
+        <button class="style-btn"        id="style-tuck"      onclick="setStyle('tuck')">Tuck End<span>Flap tucks in</span></button>
+        <button class="style-btn"        id="style-drawer"    onclick="setStyle('drawer')">Drawer<span>Slides out</span></button>
+        <button class="style-btn"        id="style-sleeve"    onclick="setStyle('sleeve')">Sleeve<span>Outer sleeve</span></button>
+        <button class="style-btn"        id="style-hinged"    onclick="setStyle('hinged')">Hinged Lid<span>Clam shell</span></button>
+        <button class="style-btn"        id="style-twopiec"   onclick="setStyle('twopiec')">Two-Piece<span>Lid + base</span></button>
+        <button class="style-btn"        id="style-mailer"    onclick="setStyle('mailer')">Mailer Box<span>RSC flaps</span></button>
+        <button class="style-btn"        id="style-pillow"    onclick="setStyle('pillow')">Pillow Box<span>Curved sides</span></button>
+        <button class="style-btn"        id="style-gable"     onclick="setStyle('gable')">Gable Box<span>Carry handle</span></button>
+      </div>
+    </div>
+
+    <!-- Profile drawer -->
+    <div class="drawer" id="drawer-profile">
+      <div class="drawer-title">Side Profile</div>
+      <div class="style-grid">
+        <button class="style-btn active" id="profile-rect"   onclick="setProfile('rect')">Standard<span>Flat sides</span></button>
+        <button class="style-btn"        id="profile-wedge"  onclick="setProfile('wedge')">Wedge<span>5-sided angled</span></button>
+        <button class="style-btn"        id="profile-peaked" onclick="setProfile('peaked')">Peaked<span>6-sided ridge</span></button>
+        <button class="style-btn"        id="profile-trapez" onclick="setProfile('trapez')">Tapered<span>Narrower top</span></button>
+      </div>
+      <div class="dim-row" id="profileDepthRow" style="margin-top:.55rem;display:none">
+        <label style="width:auto;min-width:28px;font-size:.44rem;letter-spacing:.1em;color:var(--studio-text3)">Depth</label>
+        <input type="range" id="profileDepthSlider" min="0.1" max="1.0" step="0.05" value="0.3" oninput="setProfileDepth(this.value)">
+        <span id="profileDepthVal" style="font-size:.52rem;color:var(--studio-text3);min-width:30px;text-align:right">30%</span>
+      </div>
+    </div>
+
+    <!-- Finish drawer -->
+    <div class="drawer" id="drawer-finish">
+      <div class="drawer-title">Surface Finish</div>
+      <div class="finish-row">
+        <button class="finish-btn active" id="finish-matte"    onclick="setFinish('matte')">Matte</button>
+        <button class="finish-btn"        id="finish-satin"    onclick="setFinish('satin')">Satin</button>
+        <button class="finish-btn"        id="finish-glossy"   onclick="setFinish('glossy')">Glossy</button>
+        <button class="finish-btn"        id="finish-metallic" onclick="setFinish('metallic')">Metallic</button>
+      </div>
+    </div>
+
+    <!-- Foam drawer -->
+    <div class="drawer" id="drawer-foam">
+      <div class="drawer-title">Foam Insert</div>
+      <div class="insert-grid" id="insertGrid"></div>
+      <div class="drawer-sub-title" style="margin-top:.8rem">Foam Colour</div>
+      <div id="foamPaletteWrap"></div>
+      <div class="palette-actions" style="margin-bottom:.4rem">
+        <button class="pal-btn" onclick="addCurrentFoamToPalette()">+ Add</button>
+        <button class="pal-btn" onclick="clearFoamPalette()">Clear</button>
+        <button class="pal-btn" onclick="saveFoamPalette()">Save</button>
+      </div>
+      <div class="color-row">
+        <input type="color" id="foamColorPicker" value="#E8E0D4" onchange="setFoamColor(this.value)">
+        <span style="font-size:.46rem;color:var(--studio-text3);letter-spacing:.08em">Current colour</span>
+      </div>
+      <div class="drawer-sub-title" style="margin-top:.7rem">Hole Size</div>
+      <div class="dim-row">
+        <input type="range" id="slotSizeSlider" min="0.3" max="1.4" step="0.05" value="1.0" oninput="setSlotScale(this.value)" style="flex:1;accent-color:var(--studio-accent)">
+        <span id="slotSizeVal" style="font-size:.52rem;color:var(--studio-text3);min-width:30px;text-align:right">100%</span>
+      </div>
+    </div>
+
+    <!-- Paint drawer -->
+    <div class="drawer" id="drawer-paint">
+      <div class="drawer-title">Paint &amp; Text</div>
+
+      <div class="editing-title" style="margin-bottom:.5rem">Editing: <strong id="editingFaceName">Front</strong></div>
+      <canvas id="editorCanvas"></canvas>
+
+      <div style="margin-top:.7rem">
+        <div class="drawer-sub-title">Color Mode</div>
+        <div class="mode-tabs">
+          <button class="mode-tab active" id="tab-solid"    onclick="setColorMode('solid')">Solid</button>
+          <button class="mode-tab"        id="tab-gradient" onclick="setColorMode('gradient')">Gradient</button>
+        </div>
+        <div id="solidUI">
+          <div class="drawer-sub-title" style="margin-top:.5rem">Palette</div>
+          <div id="paletteWrap"></div>
+          <div class="palette-actions">
+            <button class="pal-btn" onclick="clearPalette()">Clear</button>
+            <button class="pal-btn" onclick="savePalette()">Save</button>
+          </div>
+          <div class="color-row" style="margin-top:.5rem">
+            <input type="color" id="brushColorPicker" value="#2A2118" onchange="setColor(this.value)">
+            <span style="font-size:.5rem;color:var(--studio-text3);letter-spacing:.1em">Current color</span>
+          </div>
+          <div class="dim-row">
+            <label>Sz</label>
+            <input type="range" id="brushSz" min="2" max="40" value="8" oninput="brushSize=+this.value;document.getElementById('szVal').textContent=this.value">
+            <span id="szVal">8</span>
+          </div>
+        </div>
+        <div id="gradientUI">
+          <div class="grad-row"><label>From</label><input type="color" id="gradColor1" value="#A8884A"></div>
+          <div class="grad-row"><label>To</label><input type="color" id="gradColor2" value="#2A2118"></div>
+          <div class="grad-row">
+            <label>Dir</label>
+            <div class="grad-dir">
+              <button class="grad-dir-btn active" id="gdir-h" onclick="setGradDir('h')">H</button>
+              <button class="grad-dir-btn"        id="gdir-v" onclick="setGradDir('v')">V</button>
+              <button class="grad-dir-btn"        id="gdir-d" onclick="setGradDir('d')">Diag</button>
+              <button class="grad-dir-btn"        id="gdir-r" onclick="setGradDir('r')">Radial</button>
+            </div>
+          </div>
+          <button class="apply-btn" onclick="applyGradient()">Apply to Face</button>
+          <button class="apply-btn" style="background:var(--brown2);margin-top:.3rem" onclick="applyGradientAll()">Apply to All</button>
+        </div>
+      </div>
+
+      <div style="margin-top:.6rem">
+        <div class="drawer-sub-title">Tools</div>
+        <div class="tool-grid">
+          <button class="tool-btn active" id="tool-brush"  onclick="setTool('brush')">Brush</button>
+          <button class="tool-btn"        id="tool-eraser" onclick="setTool('eraser')">Eraser</button>
+          <button class="tool-btn"        id="tool-fill"   onclick="setTool('fill')">Fill</button>
+          <button class="tool-btn"        id="tool-text"   onclick="setTool('text')">Text</button>
+        </div>
+      </div>
+
+      <!-- Text toolbar moved to viewport overlay — see #vpTextBar -->
+
+      <div style="margin-top:.6rem">
+        <div class="drawer-sub-title">Text Style</div>
+        <select class="font-select" id="fontSelect" onchange="setTextFont(this.value)">
+          <option value="EB Garamond">EB Garamond</option>
+          <option value="Playfair Display">Playfair Display</option>
+          <option value="Cormorant Garamond">Cormorant Garamond</option>
+          <option value="Libre Baskerville">Libre Baskerville</option>
+          <option value="Cinzel">Cinzel</option>
+          <option value="Abril Fatface">Abril Fatface</option>
+          <option value="Montserrat">Montserrat</option>
+          <option value="Raleway">Raleway</option>
+          <option value="Josefin Sans">Josefin Sans</option>
+          <option value="Dancing Script">Dancing Script</option>
+          <option value="Bebas Neue">Bebas Neue</option>
+          <option value="Arial">Arial</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Times New Roman">Times New Roman</option>
+        </select>
+        <div class="text-style-row" style="margin-top:.35rem">
+          <button class="txt-btn" id="txt-bold"      onclick="toggleTextStyle('bold')"><b>B</b></button>
+          <button class="txt-btn" id="txt-italic"    onclick="toggleTextStyle('italic')"><i>I</i></button>
+          <button class="txt-btn" id="txt-underline" onclick="toggleTextStyle('underline')"><u>U</u></button>
+          <button class="txt-btn" id="txt-outline"   onclick="toggleTextStyle('outline')">⬜</button>
+          <button class="txt-btn" id="txt-shadow"    onclick="toggleTextStyle('shadow')">◫</button>
+          <button class="txt-btn" id="txt-highlight" onclick="toggleTextStyle('highlight')">▬</button>
+          <button class="txt-btn" id="txt-glow"      onclick="toggleTextStyle('glow')">✦</button>
+          <button class="txt-btn" id="txt-emboss"    onclick="toggleTextStyle('emboss')">◈</button>
+          <button class="txt-btn" id="txt-border"    onclick="toggleTextStyle('border')">▭</button>
+        </div>
+        <div class="finish-row" style="margin-top:.35rem">
+          <button class="finish-btn active" id="txtfinish-normal"   onclick="setTextFinish('normal')">Normal</button>
+          <button class="finish-btn"        id="txtfinish-glossy"   onclick="setTextFinish('glossy')">Glossy</button>
+          <button class="finish-btn"        id="txtfinish-metallic" onclick="setTextFinish('metallic')">Metallic</button>
+          <button class="finish-btn"        id="txtfinish-matte"    onclick="setTextFinish('matte')">Matte</button>
+        </div>
+        <div class="color-row" id="outlineColorRow" style="display:none;margin-top:.3rem">
+          <input type="color" id="outlineColorPicker" value="#000000" onchange="textOutlineColor=this.value">
+          <span style="font-size:.46rem;color:var(--studio-text3)">Outline color</span>
+          <input type="range" id="outlineWidthSlider" min="1" max="20" value="4" style="flex:1;accent-color:var(--studio-accent)">
+          <span style="font-size:.46rem;color:var(--studio-text3);min-width:18px" id="outlineWidthVal">4</span>
+        </div>
+        <div class="color-row" id="highlightColorRow" style="display:none;margin-top:.3rem">
+          <input type="color" id="highlightColorPicker" value="#FFE066" onchange="textHighlightColor=this.value">
+          <span style="font-size:.46rem;color:var(--studio-text3)">Highlight color</span>
+        </div>
+        <div id="borderControlRow" style="display:none;margin-top:.3rem">
+          <div class="color-row" style="margin-bottom:.3rem">
+            <input type="color" id="borderColorPicker" value="#000000" onchange="textBorderColor=this.value">
+            <span style="font-size:.46rem;color:var(--studio-text3)">Border color</span>
+            <input type="range" id="borderWidthSlider" min="1" max="24" value="4" style="flex:1;accent-color:var(--studio-accent)" oninput="document.getElementById('borderWidthVal').textContent=this.value">
+            <span style="font-size:.46rem;color:var(--studio-text3);min-width:18px" id="borderWidthVal">4</span>
+          </div>
+          <div class="finish-row">
+            <button class="finish-btn active" id="borderstyle-solid"    onclick="setBorderStyle('solid')">Solid</button>
+            <button class="finish-btn"        id="borderstyle-dashed"   onclick="setBorderStyle('dashed')">Dashed</button>
+            <button class="finish-btn"        id="borderstyle-double"   onclick="setBorderStyle('double')">Double</button>
+            <button class="finish-btn"        id="borderstyle-metallic" onclick="setBorderStyle('metallic')">Metallic</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:.6rem">
+        <div class="drawer-sub-title">Import</div>
+        <label class="upload-btn">Upload Image onto Face<input type="file" accept="image/*" onchange="uploadImage(event)" style="display:none"></label>
+      </div>
+
+      <div style="margin-top:.5rem">
+        <div class="action-row">
+          <button class="action-btn" onclick="clearFace()">Clear Face</button>
+          <button class="action-btn" onclick="applyToAll()">Apply to All</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /drawerContainer -->
+
+  <!-- ── VIEWPORT ── -->
+  <div id="viewport">
+    <div id="faceLabel" class="face-label"></div>
+
+    <!-- Floating text-adjustment toolbar (shown when a text item is selected) -->
+    <div id="vpTextBar" style="
+      display:none; position:absolute; top:1rem; left:50%; transform:translateX(-50%);
+      background:rgba(254,253,251,.95); backdrop-filter:blur(18px);
+      border:1px solid rgba(160,130,80,.22); border-radius:10px;
+      padding:.45rem .7rem; z-index:60;
+      display:none; align-items:center; gap:.55rem;
+      box-shadow:0 8px 32px rgba(100,75,30,.12);
+      white-space:nowrap; pointer-events:auto;
+    ">
+      <span style="font-size:.38rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(28,20,8,.35)">Text</span>
+      <div style="width:1px;height:16px;background:rgba(160,130,80,.18)"></div>
+      <!-- Size -->
+      <button onclick="adjustSelectedTextSize(-4)" class="vptb-btn">−</button>
+      <span id="vpTextSizeVal" style="font-size:.52rem;color:var(--studio-accent);min-width:28px;text-align:center">24</span>
+      <button onclick="adjustSelectedTextSize(4)"  class="vptb-btn">+</button>
+      <input type="range" id="vpTextSizeSlider" min="6" max="256" value="24"
+             style="width:80px;accent-color:var(--studio-accent);cursor:pointer"
+             oninput="setSelectedTextSize(+this.value)">
+      <div style="width:1px;height:16px;background:rgba(160,130,80,.18)"></div>
+      <!-- Colour -->
+      <span style="font-size:.38rem;color:rgba(28,20,8,.38)">Clr</span>
+      <input type="color" id="vpTextColorPicker" value="#000000"
+             onchange="setSelectedTextColor(this.value)"
+             style="width:22px;height:22px;border:none;background:none;cursor:pointer;padding:0;border-radius:3px">
+      <div style="width:1px;height:16px;background:rgba(160,130,80,.18)"></div>
+      <!-- Opacity -->
+      <span style="font-size:.38rem;color:rgba(28,20,8,.38)">Opacity</span>
+      <input type="range" id="vpTextOpacity" min="10" max="100" value="100"
+             style="width:60px;accent-color:var(--studio-accent);cursor:pointer"
+             oninput="setSelectedTextOpacity(+this.value)">
+      <span id="vpTextOpacityVal" style="font-size:.42rem;color:rgba(28,20,8,.45);min-width:22px">100%</span>
+      <div style="width:1px;height:16px;background:rgba(160,130,80,.18)"></div>
+      <!-- Delete -->
+      <button onclick="deleteSelectedTextItem()"
+              style="background:rgba(210,50,50,.75);border:none;border-radius:5px;
+                     color:#fff;font-size:.46rem;padding:.22rem .55rem;cursor:pointer;
+                     letter-spacing:.06em">✕ Delete</button>
+    </div>
+    <div class="vp-hint">Click face to edit &nbsp;·&nbsp; Drag to rotate &nbsp;·&nbsp; Scroll to zoom</div>
+
+    <!-- Camera controls rail -->
+    <div class="cam-rail">
+      <button class="cam-btn" onclick="camReset()" title="Reset view">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="2.5"/><path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13"/></svg>
+      </button>
+      <button class="cam-btn" onclick="camZoom(0.85)" title="Zoom in">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="3.5"/><path d="M8.8 8.8l3.2 3.2M4 6h4M6 4v4"/></svg>
+      </button>
+      <button class="cam-btn" onclick="camZoom(1.18)" title="Zoom out">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="3.5"/><path d="M8.8 8.8l3.2 3.2M4 6h4"/></svg>
+      </button>
+      <button class="cam-btn" onclick="toggleAutoRotate()" title="Toggle auto-rotate" id="autoRotBtn">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7a5 5 0 0 1 8.5-3.5M12 7a5 5 0 0 1-8.5 3.5M10.5 1.5v2.5h-2.5M3.5 12.5v-2.5h2.5"/></svg>
+      </button>
+      <button class="cam-btn" onclick="toggleMoveMode()" title="Move box" id="moveModeBtn">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1v12M1 7h12M4.5 3.5L7 1l2.5 2.5M4.5 10.5L7 13l2.5-2.5M3.5 4.5L1 7l2.5 2.5M10.5 4.5L13 7l-2.5 2.5"/></svg>
+      </button>
+    </div>
+
+    <!-- Dimensions popup (above float bar) -->
+    <div id="dimPopup">
+      <div class="dp-title">Dimensions (cm)</div>
+      <div class="dp-row">
+        <label>W</label>
+        <input type="range" id="sliderW" min="2" max="20" step="0.5" value="12" oninput="syncDim('W',this.value)">
+        <input type="number" id="dimW" min="2" max="20" step="0.5" value="12" oninput="syncDim('W',this.value)">
+      </div>
+      <div class="dp-row">
+        <label>H</label>
+        <input type="range" id="sliderH" min="2" max="20" step="0.5" value="4" oninput="syncDim('H',this.value)">
+        <input type="number" id="dimH" min="2" max="20" step="0.5" value="4" oninput="syncDim('H',this.value)">
+      </div>
+      <div class="dp-row">
+        <label>D</label>
+        <input type="range" id="sliderD" min="2" max="20" step="0.5" value="6" oninput="syncDim('D',this.value)">
+        <input type="number" id="dimD" min="2" max="20" step="0.5" value="6" oninput="syncDim('D',this.value)">
+      </div>
+      <div class="dp-presets">
+        <button class="dp-chip" onclick="setPreset(12,4,6)">Shoe Box</button>
+        <button class="dp-chip" onclick="setPreset(10,6,8)">Gift Box</button>
+        <button class="dp-chip" onclick="setPreset(16,3,6)">Flat Mailer</button>
+        <button class="dp-chip" onclick="setPreset(8,8,8)">Cube</button>
+      </div>
+    </div>
+
+    <!-- Floating action bar -->
+    <div class="float-bar">
+      <button class="fb-btn" onclick="toggleDimPopup()" title="Dimensions" id="dimToggleBtn">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h10M2 7h10M2 10h6"/><path d="M10 8.5l2 1.5-2 1.5"/></svg>
+      </button>
+      <div class="fb-sep"></div>
+      <span class="fb-label">Lid</span>
+      <span style="color:rgba(245,240,232,.35);font-size:.42rem;letter-spacing:.2em;text-transform:uppercase;padding-right:.3rem">Closed</span>
+      <input type="range" class="fb-slider" id="lidSlider" min="0" max="100" value="100" oninput="setLidOpen(this.value)">
+      <span style="color:rgba(245,240,232,.35);font-size:.42rem;letter-spacing:.2em;text-transform:uppercase;padding-left:.3rem">Open</span>
+      <div class="fb-sep"></div>
+      <button class="fb-btn" onclick="openSaveDialog()" title="Save design">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 2.5h7l2 2v7h-9z M4.5 2.5v3h4v-3 M4.5 11.5v-4h5v4"/></svg>
+      </button>
+      <button class="fb-btn" onclick="duplicateDesign()" title="Duplicate">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="2.5" width="6" height="6"/><rect x="5.5" y="5.5" width="6" height="6"/></svg>
+      </button>
+      <button class="fb-btn" onclick="resetDesign()" title="Reset">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7a5 5 0 1 0 1.5-3.5M2 2v2.5h2.5"/></svg>
+      </button>
+      <button class="fb-btn" onclick="takeSnapshot()" title="Capture render">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="3.5" width="11" height="8"/><circle cx="7" cy="7.5" r="2"/><rect x="5" y="2" width="4" height="1.5"/></svg>
+      </button>
+      <div class="fb-sep"></div>
+      <button class="fb-btn" onclick="showDieline()" title="Generate dieline" style="color:var(--studio-accent)">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="1.5" width="11" height="11" rx="1" stroke-dasharray="2 1.5"/><path d="M5 1.5v11M9 1.5v11M1.5 5h11M1.5 9h11"/></svg>
+      </button>
+    </div>
+
+    <!-- Camera gizmo (bottom-right axis indicator) -->
+    <div class="cam-gizmo">
+      <svg viewBox="0 0 60 60">
+        <!-- axis lines -->
+        <line x1="30" y1="30" x2="50" y2="30" stroke="#d44" stroke-width="1.5"/>
+        <line x1="30" y1="30" x2="30" y2="10" stroke="#6a6" stroke-width="1.5"/>
+        <line x1="30" y1="30" x2="16" y2="44" stroke="#58a" stroke-width="1.5"/>
+        <!-- axis dots -->
+        <circle cx="50" cy="30" r="5" fill="#d44"/>
+        <circle cx="30" cy="10" r="5" fill="#6a6"/>
+        <circle cx="16" cy="44" r="5" fill="#58a"/>
+        <text x="50" y="33" font-size="6" fill="#fff" text-anchor="middle" font-family="Jost,sans-serif">X</text>
+        <text x="30" y="13" font-size="6" fill="#fff" text-anchor="middle" font-family="Jost,sans-serif">Y</text>
+        <text x="16" y="47" font-size="6" fill="#fff" text-anchor="middle" font-family="Jost,sans-serif">Z</text>
+      </svg>
+    </div>
+  </div>
+
+</div>
+
+<!-- DIELINE MODAL -->
+<div id="dielineModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(20,15,8,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:#FEFDFB;border-radius:16px;box-shadow:0 24px 80px rgba(80,55,20,.28);max-width:96vw;max-height:93vh;display:flex;flex-direction:column;overflow:hidden;">
+    <!-- header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem .8rem;border-bottom:1px solid rgba(160,130,80,.18);">
+      <div>
+        <div style="font-family:Playfair Display,serif;font-size:1.15rem;color:#1C1408;font-weight:600;letter-spacing:-.01em;">Dieline</div>
+        <div style="font-size:.65rem;color:rgba(28,20,8,.45);letter-spacing:.06em;text-transform:uppercase;margin-top:.1rem;">Unfolded flat pattern · ready to print</div>
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center;">
+        <button onclick="downloadDieline()" style="background:#B8934A;color:#fff;border:none;border-radius:8px;padding:.42rem 1rem;font-size:.72rem;font-family:Jost,sans-serif;font-weight:600;letter-spacing:.04em;cursor:pointer;display:flex;align-items:center;gap:.4rem;">
+          <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 2v7M4 7l3 3 3-3M2 11h10"/></svg>
+          Download PNG
+        </button>
+        <button onclick="closeDieline()" style="background:rgba(160,130,80,.12);border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:1.1rem;color:#8A6830;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+    </div>
+    <!-- legend -->
+    <div style="display:flex;gap:1.5rem;padding:.6rem 1.4rem;border-bottom:1px solid rgba(160,130,80,.12);background:rgba(244,237,225,.4);">
+      <span style="font-size:.64rem;color:rgba(28,20,8,.5);display:flex;align-items:center;gap:.35rem;font-family:Jost,sans-serif;">
+        <span style="display:inline-block;width:22px;height:2px;background:#1C1408;border-radius:1px;"></span>Cut line
+      </span>
+      <span style="font-size:.64rem;color:rgba(28,20,8,.5);display:flex;align-items:center;gap:.35rem;font-family:Jost,sans-serif;">
+        <span style="display:inline-block;width:22px;height:2px;border-top:2px dashed #4A7CC7;border-radius:1px;"></span>Fold line
+      </span>
+      <span style="font-size:.64rem;color:rgba(28,20,8,.5);display:flex;align-items:center;gap:.35rem;font-family:Jost,sans-serif;" id="dlDims"></span>
+    </div>
+    <!-- canvas scroll area -->
+    <div style="overflow:auto;flex:1;padding:1.2rem;background:#F0EBE2;">
+      <canvas id="dielineCanvas" style="display:block;border-radius:6px;box-shadow:0 4px 20px rgba(80,55,20,.14);"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- GALLERY -->
+<section class="gallery-section">
+  <div class="gallery-header">
+    <div>
+      <div class="gallery-eyebrow">Saved Designs</div>
+      <div class="gallery-title">Your <em>Collection</em></div>
+    </div>
+    <button class="gallery-clear" onclick="clearGallery()">Clear All</button>
+  </div>
+  <div class="gallery-grid" id="galleryGrid">
+    <div class="gallery-empty" id="galleryEmpty">No saved designs yet — hit "Save to Gallery" to add one.</div>
+  </div>
+</section>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+const FACE_NAMES = ['Right','Left','Top','Bottom','Front','Back'];
+const BTN_ORDER  = [2, 0, 4, 5, 1, 3];
+const TEX_SIZE   = 1024;
+
+let activeFace  = 4;
+let tool        = 'brush';
+let brushSize   = 8;
+let brushColor  = '#2A2118';
+let baseColor   = '#8C8C8C'; // neutral grey default
+let colorMode   = 'solid';
+let gradDir     = 'h';
+let boxStyle    = 'open';
+let profileShape = 'rect';  // 'rect' | 'wedge' | 'peaked' | 'trapez'
+let profileDepth = 0.3;     // 0.1–0.55, controls how pronounced the shape is
+let boxFinish = 'matte';    // 'matte' | 'satin' | 'glossy' | 'metallic'
+let isDrawing   = false;
+let lx = 0, ly = 0;
+const undoStack = [];
+const MAX_UNDO  = 30;
+
+let scene, camera, renderer, controls, boxGroup;
+let panels = [];
+let innerMat = null;
+let boxW = 12, boxH = 4, boxD = 6;
+
+// Text layer system
+const textItems   = Array.from({length: 6}, () => []); // per-face text objects
+let dragTextIdx   = -1;   // index of text being dragged (-1 = none)
+let dragOffX = 0, dragOffY = 0;
+const imageItems = Array.from({length: 6}, () => []); // per-face image objects {src, x, y, w, h, imgObj}
+let dragImgIdx   = -1;
+let dragImgOffX  = 0, dragImgOffY = 0;
+let resizeImgIdx = -1;
+let resizeImgStart = null; // {mx, my, ow, oh}
+let textFont = 'EB Garamond';
+let textWeight = '400';
+let textItalic = false;
+let textStyles = {
+  bold: false,
+  italic: false,
+  underline: false,
+  outline: false,
+  shadow: false,
+  highlight: false,
+  glow: false,
+  emboss: false,
+  border: false
+};
+let textOutlineColor = '#000000';
+let textHighlightColor = '#FFE066';
+let textFinish = 'normal'; // 'normal' | 'glossy' | 'metallic' | 'matte'
+let textBorderColor = '#000000';
+let textBorderStyle = 'solid'; // 'solid' | 'dashed' | 'double' | 'metallic'
+
+// ═══════════════════════════════════════════════════════
+// PALETTE (localStorage-backed)
+// ═══════════════════════════════════════════════════════
+const DEFAULT_PALETTE = [
+  '#D4C5A4','#EDE8DC','#F8F5EF','#2A2118','#1C1510',
+  '#4A3D2C','#8B7355','#A8884A','#C9A85C','#E8D4A0',
+  '#6B1E2C','#8B2A3A','#3D2A40','#1E3A4A','#1A3D2C',
+  '#5C7A9A','#8BB5D4','#9AB87A','#D4A574','#C47A85'
+];
+
+let palette = JSON.parse(localStorage.getItem('bcs_palette') || 'null') || [...DEFAULT_PALETTE];
+
+function renderPalette() {
+  const wrap = document.getElementById('paletteWrap');
+  wrap.innerHTML = '';
+  palette.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.className = 'pal-swatch' + (c === brushColor ? ' active' : '');
+    b.style.background = c;
+    b.title = c;
+    b.onclick = () => setColor(c);
+    b.oncontextmenu = (e) => { e.preventDefault(); removePaletteColor(i); };
+    wrap.appendChild(b);
+  });
+}
+
+function addCurrentToPalette() {
+  palette.push(brushColor);
+  localStorage.setItem('bcs_palette', JSON.stringify(palette));
+  renderPalette();
+}
+
+function removePaletteColor(i) {
+  palette.splice(i, 1);
+  localStorage.setItem('bcs_palette', JSON.stringify(palette));
+  renderPalette();
+}
+
+function clearPalette() {
+  if (confirm('Clear all palette colors?')) {
+    palette = [];
+    localStorage.setItem('bcs_palette', JSON.stringify(palette));
+    renderPalette();
+  }
+}
+
+function savePalette() {
+  localStorage.setItem('bcs_palette', JSON.stringify(palette));
+  const b = document.querySelector('.palette-actions .pal-btn:nth-child(3)');
+  const orig = b.textContent;
+  b.textContent = 'Saved!';
+  setTimeout(() => b.textContent = orig, 1200);
+}
+
+// ═══════════════════════════════════════════════════════
+// TEXTURE HELPERS
+// ═══════════════════════════════════════════════════════
+const faceCanvases = [], faceCtxs = [], textures = [];
+
+// Per-face tones — proper unbleached kraft cardboard.
+// Each face has its own baked shading so tonal variation is preserved regardless
+// of how Three.js lighting lands on each panel.
+const FACE_BASE = [
+  '#A8A4A0',  // front
+  '#A8A4A0',  // back
+  '#9C9894',  // left
+  '#9C9894',  // right
+  '#B0ACAA',  // top
+  '#969290',  // bottom
+];
+
+function hexToRgb(hex) {
+  const n = parseInt(hex.replace('#',''), 16);
+  return [(n>>16)&255, (n>>8)&255, n&255];
+}
+function rgbToHex(r,g,b) {
+  return '#' + [r,g,b].map(v => Math.min(255,Math.max(0,v)).toString(16).padStart(2,'0')).join('');
+}
+function adjustHex(hex, amt) {
+  const [r,g,b] = hexToRgb(hex);
+  return rgbToHex(r+amt, g+amt, b+amt);
+}
+
+function drawKraftFace(ctx, base) {
+  // ── Smooth clay-coated board surface (like premium printed packaging) ──────
+  // No visible paper fibers — the coating buries them. Result: clean, flat,
+  // uniform base colour that lets the PBR material / env map do the work.
+  const S = TEX_SIZE;
+
+  // 1. Clean base fill
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, S, S);
+
+  // 2. Micro-coating texture — thousands of tiny specular dots (hot-press surface)
+  //    These are so small and subtle they're invisible at normal zoom but give the
+  //    roughness map something realistic to work with.
+  ctx.save();
+  for (let i = 0; i < 1800; i++) {
+    const x = Math.random() * S;
+    const y = Math.random() * S;
+    const a = 0.012 + Math.random() * 0.018;
+    ctx.fillStyle = Math.random() > 0.5
+      ? `rgba(255,255,255,${a})`
+      : `rgba(0,0,0,${a * 0.6})`;
+    ctx.fillRect(x, y, 0.8 + Math.random() * 1.4, 0.8 + Math.random() * 1.4);
+  }
+  ctx.restore();
+
+  // 3. Very subtle radial vignette — fold crease lines darken near edges
+  const vig = ctx.createRadialGradient(S/2, S/2, S * 0.40, S/2, S/2, S * 0.78);
+  vig.addColorStop(0,    'rgba(0,0,0,0)');
+  vig.addColorStop(0.85, 'rgba(0,0,0,0.02)');
+  vig.addColorStop(1,    'rgba(0,0,0,0.07)');
+  ctx.fillStyle = vig;
+  ctx.fillRect(0, 0, S, S);
+
+  // 4. Die-cut guide line (barely visible — guides the printer/die-cutter)
+  const m = S * 0.028;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,0,0,0.04)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([10, 7]);
+  ctx.strokeRect(m, m, S - m * 2, S - m * 2);
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+for (let i = 0; i < 6; i++) {
+  // ── Base paint layer: brush strokes / fills / gradients live here ──────────
+  const base = document.createElement('canvas');
+  base.width = TEX_SIZE; base.height = TEX_SIZE;
+  drawKraftFace(base.getContext('2d'), FACE_BASE[i]);
+  faceCanvases.push(base);                      // faceCanvases[i] = base paint DOM canvas
+
+  // ── Output / composite layer: what Three.js reads from ─────────────────────
+  // MUST be a separate DOM element so commitTextToFace can drawImage(base→out)
+  const out = document.createElement('canvas');
+  out.width = TEX_SIZE; out.height = TEX_SIZE;
+  const outCtx = out.getContext('2d');
+  outCtx.drawImage(base, 0, 0);                 // initialise with base paint
+  faceCtxs.push(outCtx);                        // faceCtxs[i] = output canvas context
+
+  const tex = new THREE.CanvasTexture(out);
+  tex.encoding = THREE.sRGBEncoding;            // palette colours render true
+  textures.push(tex);
+}
+
+// ── Paper normal map — encodes surface fiber micro-bumps as RGB normals ─────
+// Normal maps use: R=X tangent, G=Y tangent, B=Z (up). Neutral = (128,128,255).
+// Fibers mostly run horizontally so we perturb the Y component (G channel).
+let paperNormalMap = null; // built lazily in init3D after THREE is guaranteed ready
+function buildPaperNormalMap() {
+  // Coated board micro-surface normal map — "orange peel" texture.
+  // Very subtle: coating fills in the fibers, leaving only microscopic
+  // surface variation from the clay coat itself.
+  const S = 512;
+  const c = document.createElement('canvas'); c.width = S; c.height = S;
+  const ctx = c.getContext('2d');
+
+  // Flat neutral base
+  ctx.fillStyle = '#8080FF';
+  ctx.fillRect(0, 0, S, S);
+
+  // Tiny spherical micro-bumps (coating orange peel)
+  for (let i = 0; i < 4000; i++) {
+    const x = Math.random() * S;
+    const y = Math.random() * S;
+    const r = 1.5 + Math.random() * 3.5;
+    const mag = 3 + Math.random() * 7;    // very low tilt
+    const nx = Math.round(128 + (Math.random() - 0.5) * mag);
+    const ny = Math.round(128 + (Math.random() - 0.5) * mag);
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0,   `rgba(${nx},${ny},255,0.35)`);
+    g.addColorStop(0.6, 'rgba(128,128,255,0.12)');
+    g.addColorStop(1,   'rgba(128,128,255,0)');
+    ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(4, 4);  // tile more for fine micro-texture
+  return t;
+}
+
+// ── Roughness map — slight variation so light catches paper grain ────────────
+let paperRoughnessMap = null;
+function buildRoughnessMap() {
+  // Smooth clay-coated board roughness — ~30-35% roughness base with
+  // tiny variation from the coating micro-texture. No coarse fiber marks.
+  const S = 256;
+  const c = document.createElement('canvas'); c.width = S; c.height = S;
+  const ctx = c.getContext('2d');
+  // Base: #505050 ≈ 31% roughness (smooth coated board, not raw paper)
+  ctx.fillStyle = '#505050';
+  ctx.fillRect(0, 0, S, S);
+  // Tiny brightness variation — barely perceptible roughness modulation
+  for (let i = 0; i < 3000; i++) {
+    const x = Math.random() * S;
+    const y = Math.random() * S;
+    const v = 70 + Math.round(Math.random() * 18);
+    ctx.fillStyle = `rgba(${v},${v},${v},0.06)`;
+    ctx.fillRect(x, y, 1.5, 1.5);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(4, 4);
+  return t;
+}
+
+// ═══════════════════════════════════════════════════════
+// THREE.JS INIT
+// ═══════════════════════════════════════════════════════
+function buildStudioEnvMap(renderer) {
+  // High-contrast product photography studio IBL.
+  // Dark studio walls + two large bright softboxes = crisp rectangular
+  // specular reflections on glossy/satin packaging (the Pacdora look).
+  // PMREM converts this to a cubemap; the bright-on-dark ratio is what
+  // makes specular highlights "pop" on satin/glossy surfaces.
+  const W = 2048, H = 1024;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const cx = c.getContext('2d');
+
+  // ── 1. Dark studio base — high contrast makes softboxes visible ──────────
+  const base = cx.createLinearGradient(0, 0, 0, H);
+  base.addColorStop(0.00, '#D0D2D5');   // upper ceiling — medium grey
+  base.addColorStop(0.30, '#888A8C');   // upper walls
+  base.addColorStop(0.52, '#464748');   // mid walls (dark)
+  base.addColorStop(0.70, '#252628');   // lower walls
+  base.addColorStop(1.00, '#0A0A0B');   // dark floor (nothing reflected from below)
+  cx.fillStyle = base; cx.fillRect(0, 0, W, H);
+
+  // ── 2. Ceiling strip softbox — wide overhead diffuser ─────────────────────
+  const ceil = cx.createLinearGradient(0, 0, 0, H * 0.32);
+  ceil.addColorStop(0,    '#FFFFFF');
+  ceil.addColorStop(0.45, 'rgba(245,248,255,0.70)');
+  ceil.addColorStop(1,    'rgba(255,255,255,0)');
+  cx.fillStyle = ceil; cx.fillRect(0, 0, W, H * 0.32);
+
+  // ── 3. LEFT large softbox — principal key light panel ─────────────────────
+  // Position: left quarter of panorama, mid-height (product-facing zone)
+  cx.save();
+  const lx = 80, ly = 180, lw = 420, lh = 480;
+  // Horizontal gradient: sharp left edge, gradual falloff right
+  const lg = cx.createLinearGradient(lx, 0, lx + lw, 0);
+  lg.addColorStop(0,    'rgba(255,255,255,0)');
+  lg.addColorStop(0.12, 'rgba(255,253,248,1.0)');
+  lg.addColorStop(0.75, 'rgba(255,253,248,0.9)');
+  lg.addColorStop(1,    'rgba(255,255,255,0)');
+  cx.fillStyle = lg; cx.fillRect(lx, ly, lw, lh);
+  // Vertical soft edge
+  const lgv = cx.createLinearGradient(0, ly, 0, ly + lh);
+  lgv.addColorStop(0,    'rgba(0,0,0,0.7)');
+  lgv.addColorStop(0.15, 'rgba(0,0,0,0)');
+  lgv.addColorStop(0.85, 'rgba(0,0,0,0)');
+  lgv.addColorStop(1,    'rgba(0,0,0,0.7)');
+  cx.globalCompositeOperation = 'destination-out';
+  cx.fillStyle = lgv; cx.fillRect(lx, ly, lw, lh);
+  cx.globalCompositeOperation = 'source-over';
+  cx.restore();
+
+  // ── 4. RIGHT large softbox — cool fill / north-sky panel ──────────────────
+  cx.save();
+  const rx = 1530, ry = 200, rw = 440, rh = 500;
+  const rg = cx.createLinearGradient(rx, 0, rx + rw, 0);
+  rg.addColorStop(0,    'rgba(218,232,255,0)');
+  rg.addColorStop(0.25, 'rgba(218,232,255,0.92)');
+  rg.addColorStop(0.88, 'rgba(218,232,255,0.88)');
+  rg.addColorStop(1,    'rgba(218,232,255,0)');
+  cx.fillStyle = rg; cx.fillRect(rx, ry, rw, rh);
+  const rgv = cx.createLinearGradient(0, ry, 0, ry + rh);
+  rgv.addColorStop(0,    'rgba(0,0,0,0.65)');
+  rgv.addColorStop(0.15, 'rgba(0,0,0,0)');
+  rgv.addColorStop(0.85, 'rgba(0,0,0,0)');
+  rgv.addColorStop(1,    'rgba(0,0,0,0.65)');
+  cx.globalCompositeOperation = 'destination-out';
+  cx.fillStyle = rgv; cx.fillRect(rx, ry, rw, rh);
+  cx.globalCompositeOperation = 'source-over';
+  cx.restore();
+
+  // ── 5. Back-top rim strip — separates product from background ─────────────
+  const rim = cx.createLinearGradient(W * 0.3, 0, W * 0.7, 0);
+  rim.addColorStop(0,    'rgba(255,255,255,0)');
+  rim.addColorStop(0.5,  'rgba(255,255,255,0.95)');
+  rim.addColorStop(1,    'rgba(255,255,255,0)');
+  cx.fillStyle = rim; cx.fillRect(W * 0.3, 0, W * 0.4, H * 0.14);
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.mapping = THREE.EquirectangularReflectionMapping;
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  pmrem.compileEquirectangularShader();
+  const envMap = pmrem.fromEquirectangular(tex).texture;
+  pmrem.dispose(); tex.dispose();
+  return envMap;
+}
+
+function init3D() {
+  const vp = document.getElementById('viewport');
+
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(40, vp.offsetWidth / vp.offsetHeight, 0.1, 200);
+  camera.position.set(13, 11, 20);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(vp.offsetWidth, vp.offsetHeight);
+  renderer.setClearColor(0xE8E8E8); // match studio floor so no black bleeding at top
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // ── Real-world colour pipeline ──────────────────────────────────────────────
+  renderer.outputEncoding      = THREE.sRGBEncoding;
+  renderer.toneMapping         = THREE.LinearToneMapping; // no ACES colour shift → palette colours render true
+  renderer.toneMappingExposure = 1.0;
+  vp.insertBefore(renderer.domElement, vp.firstChild);
+
+  // ── Paper surface maps (normal + roughness) ─────────────────────────────────
+  paperNormalMap    = buildPaperNormalMap();
+  paperRoughnessMap = buildRoughnessMap();
+
+  // ── Studio environment map (IBL) ────────────────────────────────────────────
+  const envMap = buildStudioEnvMap(renderer);
+  scene.environment = envMap;           // drives reflections on all std materials
+  // (scene.background + fog set after floor block)
+
+  // ── Studio 3-point lighting ────────────────────────────────────────────────
+  scene.add(new THREE.AmbientLight(0xF8F6F2, 0.20));
+
+  const key = new THREE.DirectionalLight(0xFFFBF5, 1.5);
+  key.position.set(-9, 18, 12);
+  key.castShadow = true;
+  key.shadow.mapSize.set(4096, 4096);
+  key.shadow.camera.near   =  0.5;
+  key.shadow.camera.far    =  60;
+  key.shadow.camera.left   = -20;
+  key.shadow.camera.right  =  20;
+  key.shadow.camera.top    =  20;
+  key.shadow.camera.bottom = -20;
+  key.shadow.bias        = -0.0004;
+  key.shadow.normalBias  =  0.02;
+  key.shadow.radius      =  7;
+  scene.add(key);
+
+  const fillL = new THREE.DirectionalLight(0xDCE8FF, 0.58);
+  fillL.position.set(12, 8, -6);
+  scene.add(fillL);
+
+  const rimL = new THREE.DirectionalLight(0xFFFFFF, 0.50);
+  rimL.position.set(1, 12, -18);
+  scene.add(rimL);
+
+  // ── Infinite grey studio floor — Pacdora style ─────────────────────────────
+  // Background + fog both match so the grid fades to nothing at the horizon,
+  // giving the illusion of an infinitely large surface.
+  const bgColor = new THREE.Color(0xE8E8E8);
+  scene.background = bgColor;
+  scene.fog = new THREE.Fog(bgColor, 50, 130);
+
+  // Large shadow-receiving plane (invisible — only catches cast shadows)
+  const floorShadow = new THREE.Mesh(
+    new THREE.PlaneGeometry(500, 500),
+    new THREE.ShadowMaterial({ opacity: 0.13, color: 0x000000 })
+  );
+  floorShadow.rotation.x = -Math.PI / 2;
+  floorShadow.position.y = -0.01;
+  floorShadow.receiveShadow = true;
+  scene.add(floorShadow);
+
+  // Fine grid — 1-unit cells, subtle
+  const fineGrid = new THREE.GridHelper(300, 300, 0xCCCCCC, 0xCCCCCC);
+  fineGrid.position.y = 0;
+  scene.add(fineGrid);
+
+  // Major grid — 10-unit cells, slightly more visible
+  const majorGrid = new THREE.GridHelper(300, 30, 0xAAAAAA, 0xAAAAAA);
+  majorGrid.position.y = 0.002;
+  scene.add(majorGrid);
+
+  // Shadow-only overlay plane — wider + softer than before for pro product-shot feel
+  const shadowPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(120, 120),
+    new THREE.ShadowMaterial({ opacity: 0.28 })
+  );
+  shadowPlane.rotation.x = -Math.PI / 2;
+  shadowPlane.position.y  = 0.001;
+  shadowPlane.receiveShadow = true;
+  scene.add(shadowPlane);
+
+  // Soft radial contact shadow right under box (always present, regardless of light)
+  const contactTex = (() => {
+    const S = 512;
+    const c = document.createElement('canvas'); c.width = S; c.height = S;
+    const x = c.getContext('2d');
+    const g = x.createRadialGradient(S/2, S/2, 0, S/2, S/2, S/2);
+    g.addColorStop(0,    'rgba(0,0,0,0.45)');
+    g.addColorStop(0.35, 'rgba(0,0,0,0.18)');
+    g.addColorStop(0.7,  'rgba(0,0,0,0.05)');
+    g.addColorStop(1,    'rgba(0,0,0,0)');
+    x.fillStyle = g; x.fillRect(0, 0, S, S);
+    return new THREE.CanvasTexture(c);
+  })();
+  const contactMat = new THREE.MeshBasicMaterial({
+    map: contactTex, transparent: true, depthWrite: false, opacity: 0.75
+  });
+  const contactShadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), contactMat);
+  contactShadow.rotation.x = -Math.PI / 2;
+  contactShadow.position.y  = 0.002;
+  contactShadow.name = 'contactShadow';
+  scene.add(contactShadow);
+  window._contactShadow = contactShadow;
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.autoRotate = false;   // stays where you put it
+  controls.autoRotateSpeed = 1.2;
+  controls.enablePan = false;
+  controls.minDistance = 5;
+  controls.maxDistance = 60;
+  controls.target.set(0, 0.5, 0);
+
+  createBox();
+
+  renderer.domElement.addEventListener('click',     onVpClick);
+  renderer.domElement.addEventListener('mousemove', onVpHover);
+  renderer.domElement.addEventListener('mouseleave', () => document.getElementById('faceLabel').classList.remove('show'));
+  window.addEventListener('resize', onResize);
+  animate();
+}
+
+// ═══════════════════════════════════════════════════════
+// BOX CONSTRUCTION
+// ═══════════════════════════════════════════════════════
+function getFinishParams() {
+  // Real-world PBR values with clearcoat layer for coated finishes:
+  //   matte    — uncoated paper, no clearcoat
+  //   satin    — soft-touch / matte lamination, light clearcoat
+  //   glossy   — UV gloss varnish, full clearcoat mirror layer
+  //   metallic — foil stamp, pure metal
+  // Real coated-board PBR values: all finishes are "coated paper" quality or better.
+  // matte   = soft-touch lamination / uncoated digital print (still smooth coating)
+  // satin   = standard CMYK gloss-matte, most common premium packaging
+  // glossy  = UV gloss varnish / high-gloss laminate
+  // metallic = foil stamped board
+  return {
+    matte:    { roughness: 0.72, metalness: 0.00, envInt: 0.85, clearcoat: 0.00, ccRough: 0.00, sheen: 0.00 },
+    satin:    { roughness: 0.40, metalness: 0.00, envInt: 1.05, clearcoat: 0.40, ccRough: 0.32, sheen: 0.00 },
+    glossy:   { roughness: 0.14, metalness: 0.00, envInt: 1.35, clearcoat: 1.00, ccRough: 0.05, sheen: 0.00 },
+    metallic: { roughness: 0.18, metalness: 0.92, envInt: 1.80, clearcoat: 0.25, ccRough: 0.12, sheen: 0.00 }
+  }[boxFinish] || { roughness: 0.72, metalness: 0.00, envInt: 0.85, clearcoat: 0.00, ccRough: 0.00, sheen: 0.00 };
+}
+function makeMat(fi) {
+  const fp = getFinishParams();
+  // MeshPhysicalMaterial — enables clearcoat (UV gloss layer) + sheen (kraft fibres)
+  const mat = new THREE.MeshPhysicalMaterial({
+    map:              textures[fi],
+    normalMap:        paperNormalMap,
+    normalScale:      new THREE.Vector2(0.22, 0.22),
+    roughnessMap:     paperRoughnessMap,
+    side:             THREE.DoubleSide,
+    roughness:        fp.roughness,
+    metalness:        fp.metalness,
+    envMapIntensity:  fp.envInt,
+    clearcoat:        fp.clearcoat,
+    clearcoatRoughness: fp.ccRough,
+    reflectivity:     0.55
+  });
+  return mat;
+}
+function addEdges(mesh) {
+  // Crisp fold/crease lines — barely-there dark seam, defines box structure
+  // without looking painted-on. Very low opacity so lighting does the real work.
+  const el = new THREE.LineSegments(
+    new THREE.EdgesGeometry(mesh.geometry),
+    new THREE.LineBasicMaterial({ color: 0x1A1A1A, transparent: true, opacity: 0.18 })
+  );
+  mesh.add(el);
+}
+function mkPanel(geo, mat, fi, px, py, pz, rx, ry) {
+  const m = new THREE.Mesh(geo, mat);
+  m.position.set(px, py, pz);
+  if (rx) m.rotation.x = rx;
+  if (ry) m.rotation.y = ry;
+  m.castShadow = true; m.receiveShadow = true;
+  addEdges(m);
+  boxGroup.add(m);
+  panels.push({ mesh: m, faceIndex: fi });
+  return m;
+}
+
+// ── Side profile geometry helpers ──────────────────────
+function makeShapedSide(shape, H, D, T, extra) {
+  // Builds a shaped prism for left/right panels via ExtrudeGeometry
+  // ExtrudeGeometry: shape in X-Y plane, extruded along Z (depth = T)
+  // After rotateY(PI/2): original X→new -Z, original Z→new X
+  // Convention: "front" of box (z=+D/2) maps from original x=-D/2
+  const s = new THREE.Shape();
+
+  if (shape === 'wedge') {
+    // Pentagon: front (x=-D/2) taller by `extra`, back (x=D/2) normal height
+    s.moveTo(-D/2, 0);
+    s.lineTo( D/2, 0);
+    s.lineTo( D/2, H);
+    s.lineTo(-D/2, H + extra);
+    s.closePath();
+  } else if (shape === 'peaked') {
+    // Hexagon: both front and back at normal H, peak at centre top
+    s.moveTo(-D/2, 0);
+    s.lineTo( D/2, 0);
+    s.lineTo( D/2, H);
+    s.lineTo(   0, H + extra);   // ridge peak
+    s.lineTo(-D/2, H);
+    s.closePath();
+  } else if (shape === 'trapez') {
+    // Pentagon/trapezoid: top is narrower than base (sides angle inward)
+    const inset = D * 0.12;
+    s.moveTo(-D/2,       0);
+    s.lineTo( D/2,       0);
+    s.lineTo( D/2-inset, H);
+    s.lineTo(-D/2+inset, H);
+    s.closePath();
+  }
+
+  const geo = new THREE.ExtrudeGeometry(s, { depth: T, bevelEnabled: false });
+  geo.rotateY(Math.PI / 2);
+  geo.translate(-T / 2, 0, 0);
+  return geo;
+}
+
+function createBox() {
+  if (boxGroup) scene.remove(boxGroup);
+  boxGroup = new THREE.Group();
+  panels = [];
+
+  const W = boxW, H = boxH, D = boxD, T = 0.22;
+  // Scale the soft contact shadow to the box footprint (slightly wider)
+  if (window._contactShadow) {
+    window._contactShadow.scale.set(W * 1.7, D * 1.7, 1);
+  }
+  const _fp = getFinishParams();
+  innerMat = new THREE.MeshPhysicalMaterial({
+    color: baseColor, side: THREE.DoubleSide,
+    roughness: Math.min(0.95, _fp.roughness + 0.05),  // inside is always less finished
+    metalness: _fp.metalness * 0.3,
+    envMapIntensity: _fp.envInt * 0.55,
+    clearcoat: _fp.clearcoat * 0.3,
+    clearcoatRoughness: 0.6,
+    normalMap: paperNormalMap, normalScale: new THREE.Vector2(0.12, 0.12)
+  });
+
+  // helper to add inner floor (used by open-top styles)
+  function addInnerFloor() {
+    const f = new THREE.Mesh(new THREE.PlaneGeometry(W - T*2, D - T*2), innerMat);
+    f.rotation.x = -Math.PI / 2;
+    f.position.set(0, T * 1.01, 0);
+    boxGroup.add(f);
+  }
+
+  // helper: standard open box body (bottom + 4 walls)
+  function addBody() {
+    // Bottom always flat
+    mkPanel(new THREE.BoxGeometry(W, T, D), makeMat(3), 3, 0, 0, 0);
+
+    if (profileShape === 'rect') {
+      // ── Standard rectangular body ───────────────────
+      mkPanel(new THREE.BoxGeometry(W, H, T), makeMat(4), 4,  0, H/2,  D/2-T/2);
+      mkPanel(new THREE.BoxGeometry(W, H, T), makeMat(5), 5,  0, H/2, -D/2+T/2);
+      mkPanel(new THREE.BoxGeometry(T, H, D), makeMat(0), 0,  W/2-T/2, H/2, 0);
+      mkPanel(new THREE.BoxGeometry(T, H, D), makeMat(1), 1, -W/2+T/2, H/2, 0);
+      addInnerFloor();
+
+    } else if (profileShape === 'wedge') {
+      // ── Wedge: pentagon sides, front taller ─────────
+      const extra = H * profileDepth;
+      // Front panel taller
+      mkPanel(new THREE.BoxGeometry(W, H+extra, T), makeMat(4), 4, 0, (H+extra)/2,  D/2-T/2);
+      // Back panel normal height
+      mkPanel(new THREE.BoxGeometry(W, H,       T), makeMat(5), 5, 0, H/2,          -D/2+T/2);
+      // Pentagon side panels
+      const sg = makeShapedSide('wedge', H, D, T, extra);
+      mkPanel(sg,         makeMat(0), 0,  W/2-T/2, 0, 0);
+      mkPanel(sg.clone(), makeMat(1), 1, -W/2+T/2, 0, 0);
+      // Angled floor inside (positioned low like normal inner floor)
+      addInnerFloor();
+
+    } else if (profileShape === 'peaked') {
+      // ── Peaked: hexagon sides, all walls same height ─
+      const extra = H * profileDepth;
+      mkPanel(new THREE.BoxGeometry(W, H, T), makeMat(4), 4, 0, H/2,  D/2-T/2);
+      mkPanel(new THREE.BoxGeometry(W, H, T), makeMat(5), 5, 0, H/2, -D/2+T/2);
+      const sg = makeShapedSide('peaked', H, D, T, extra);
+      mkPanel(sg,         makeMat(0), 0,  W/2-T/2, 0, 0);
+      mkPanel(sg.clone(), makeMat(1), 1, -W/2+T/2, 0, 0);
+      addInnerFloor();
+
+    } else if (profileShape === 'trapez') {
+      // ── Tapered: sides angle inward at top ───────────
+      const extra = H * profileDepth * 0.5; // smaller effect for trapez
+      mkPanel(new THREE.BoxGeometry(W, H, T), makeMat(4), 4, 0, H/2,  D/2-T/2);
+      mkPanel(new THREE.BoxGeometry(W, H, T), makeMat(5), 5, 0, H/2, -D/2+T/2);
+      const sg = makeShapedSide('trapez', H, D, T, extra);
+      mkPanel(sg,         makeMat(0), 0,  W/2-T/2, 0, 0);
+      mkPanel(sg.clone(), makeMat(1), 1, -W/2+T/2, 0, 0);
+      addInnerFloor();
+    }
+  }
+
+  if (boxStyle === 'open') {
+    addBody();
+    const topH = profileShape === 'wedge' ? H + H * profileDepth : H;
+    // For wedge and peaked profiles, give the open lid a matching shaped geometry
+    let lidGeo, lidOffsetZ;
+    if (profileShape === 'wedge') {
+      const extra = H * profileDepth;
+      const slopeLen = Math.sqrt(extra * extra + D * D);
+      lidGeo = new THREE.BoxGeometry(W, T, slopeLen);
+      lidOffsetZ = slopeLen / 2;
+    } else if (profileShape === 'peaked') {
+      // two-panel peaked lid: use flat but slightly longer
+      const extra = H * profileDepth;
+      const halfD = D / 2;
+      const ridgeLen = Math.sqrt(extra * extra + halfD * halfD);
+      lidGeo = new THREE.BoxGeometry(W, T, D); // flat for open peaked
+      lidOffsetZ = D / 2;
+    } else {
+      lidGeo = new THREE.BoxGeometry(W, T, D);
+      lidOffsetZ = D / 2;
+    }
+    const lid = new THREE.Mesh(lidGeo, makeMat(2));
+    const pivot = new THREE.Group();
+    pivot.position.set(0, topH, -D/2);
+    lid.position.set(0, 0, lidOffsetZ);
+    addEdges(lid); pivot.add(lid);
+    const openRotX = THREE.MathUtils.degToRad(-125);
+    pivot.userData = { isLidPivot: true, baseRot: { x: 0 }, openRot: { x: openRotX } };
+    pivot.rotation.x = openRotX * (_lidTarget / 100);
+    boxGroup.add(pivot);
+    panels.push({ mesh: lid, faceIndex: 2 });
+
+  } else if (boxStyle === 'closed') {
+    addBody();
+    if (profileShape === 'wedge') {
+      // Angled lid connecting front-top (H+extra) to back-top (H)
+      const extra     = H * profileDepth;
+      const slopeLen  = Math.sqrt(extra * extra + D * D);
+      const slopeAng  = -Math.atan2(extra, D);
+      mkPanel(new THREE.BoxGeometry(W, T, slopeLen), makeMat(2), 2,
+        0, H + extra / 2, 0, slopeAng);
+    } else if (profileShape === 'peaked') {
+      // Two ridge panels meeting at the peak
+      const extra     = H * profileDepth;
+      const halfD     = D / 2;
+      const ridgeLen  = Math.sqrt(extra * extra + halfD * halfD);
+      const ridgeAng  = Math.atan2(extra, halfD);
+      mkPanel(new THREE.BoxGeometry(W, T, ridgeLen), makeMat(2), 2,
+        0, H + extra * 0.5,  halfD / 2,  ridgeAng);
+      mkPanel(new THREE.BoxGeometry(W, T, ridgeLen), makeMat(2), 2,
+        0, H + extra * 0.5, -halfD / 2, -ridgeAng);
+    } else {
+      mkPanel(new THREE.BoxGeometry(W, T, D), makeMat(2), 2, 0, H + T/2, 0);
+    }
+
+  } else if (boxStyle === 'magnet') {
+    // Body tray — profile-aware
+    addBody();
+    // Magnet dots on front body face
+    const magnetMat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.3, metalness: 0.7 });
+    const mDot1 = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, T*2.5, 12), magnetMat);
+    const mDot2 = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, T*2.5, 12), magnetMat);
+    mDot1.rotation.x = Math.PI/2; mDot1.position.set(-W*0.3, H*0.85, D/2+T);
+    mDot2.rotation.x = Math.PI/2; mDot2.position.set( W*0.3, H*0.85, D/2+T);
+    boxGroup.add(mDot1); boxGroup.add(mDot2);
+
+    // Lid tray — slightly larger than body, shown hovering open above
+    const lW = W + 0.3, lD = D + 0.3, lH = H * 0.28;
+    const lidGroup = new THREE.Group();
+    // Magnet lid lifts up + tilts open as slider goes 0→100
+    const magClosedY = H + T/2 + 0.01;           // sitting on body
+    const magOpenY   = H + lH + 0.35;            // hovering above, tilted
+    const magOpenRot = THREE.MathUtils.degToRad(-22);
+    const _t = _lidTarget / 100;
+    lidGroup.position.set(0, magClosedY + (magOpenY - magClosedY) * _t, 0);
+    lidGroup.rotation.x = magOpenRot * _t;
+    lidGroup.userData = {
+      isLidPivot: true,
+      baseRot: { x: 0 },
+      openRot: { x: magOpenRot },
+      basePos: { x: 0, y: magClosedY, z: 0 },
+      openPos: { x: 0, y: magOpenY,   z: 0 }
+    };
+
+    const lidTop  = new THREE.Mesh(new THREE.BoxGeometry(lW, T, lD), makeMat(2));
+    const lidFront = new THREE.Mesh(new THREE.BoxGeometry(lW, lH, T), makeMat(4));
+    const lidBack  = new THREE.Mesh(new THREE.BoxGeometry(lW, lH, T), makeMat(5));
+    const lidRight = new THREE.Mesh(new THREE.BoxGeometry(T, lH, lD), makeMat(0));
+    const lidLeft  = new THREE.Mesh(new THREE.BoxGeometry(T, lH, lD), makeMat(1));
+    lidTop.position.set(0, 0, 0);
+    lidFront.position.set(0, -lH/2, lD/2-T/2);
+    lidBack.position.set(0, -lH/2, -lD/2+T/2);
+    lidRight.position.set( lW/2-T/2, -lH/2, 0);
+    lidLeft.position.set( -lW/2+T/2, -lH/2, 0);
+    [lidTop, lidFront, lidBack, lidRight, lidLeft].forEach(m => { addEdges(m); lidGroup.add(m); });
+    panels.push({ mesh: lidTop, faceIndex: 2 }, { mesh: lidFront, faceIndex: 4 });
+
+    // Magnet dots on inside front of lid
+    const lmDot1 = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, T*2.5, 12), magnetMat);
+    const lmDot2 = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, T*2.5, 12), magnetMat);
+    lmDot1.rotation.x = Math.PI/2; lmDot1.position.set(-W*0.3, -lH*0.65, lD/2);
+    lmDot2.rotation.x = Math.PI/2; lmDot2.position.set( W*0.3, -lH*0.65, lD/2);
+    lidGroup.add(lmDot1); lidGroup.add(lmDot2);
+    boxGroup.add(lidGroup);
+
+  } else if (boxStyle === 'attached') {
+    addBody();
+    const lid = new THREE.Mesh(new THREE.BoxGeometry(W, T, D), makeMat(2));
+    const pivot = new THREE.Group();
+    pivot.position.set(W/2, H, 0);
+    lid.position.set(-W/2, 0, 0);
+    addEdges(lid); pivot.add(lid);
+    const attOpen = THREE.MathUtils.degToRad(-95);
+    pivot.userData = { isLidPivot: true, baseRot: { z: 0 }, openRot: { z: attOpen } };
+    pivot.rotation.z = attOpen * (_lidTarget / 100);
+    boxGroup.add(pivot);
+    panels.push({ mesh: lid, faceIndex: 2 });
+
+  } else if (boxStyle === 'tuck') {
+    addBody();
+    const _t = _lidTarget / 100;
+    // lid partially open
+    const lid = new THREE.Mesh(new THREE.BoxGeometry(W, T, D), makeMat(2));
+    const pivot = new THREE.Group();
+    pivot.position.set(0, H, -D/2);
+    lid.position.set(0, 0, D/2);
+    addEdges(lid); pivot.add(lid);
+    const tuckOpen = THREE.MathUtils.degToRad(-70);
+    pivot.userData = { isLidPivot: true, baseRot: { x: 0 }, openRot: { x: tuckOpen } };
+    pivot.rotation.x = tuckOpen * _t;
+    boxGroup.add(pivot);
+    panels.push({ mesh: lid, faceIndex: 2 });
+    // tuck tab
+    const tab = new THREE.Mesh(new THREE.BoxGeometry(W*0.5, H*0.35, T), makeMat(4));
+    const tabPivot = new THREE.Group();
+    tabPivot.position.set(0, H, D/2);
+    tab.position.set(0, -(H*0.35)/2, 0);
+    addEdges(tab); tabPivot.add(tab);
+    const tabOpen = THREE.MathUtils.degToRad(55);
+    tabPivot.userData = { isLidPivot: true, baseRot: { x: 0 }, openRot: { x: tabOpen } };
+    tabPivot.rotation.x = tabOpen * _t;
+    boxGroup.add(tabPivot);
+
+  } else if (boxStyle === 'drawer') {
+    // outer sleeve (no left/right walls — open ends)
+    const sTop    = mkPanel(new THREE.BoxGeometry(W, T, D), makeMat(2), 2,  0, H+T/2, 0);
+    const sBot    = mkPanel(new THREE.BoxGeometry(W, T, D), makeMat(3), 3,  0, -T/2, 0);
+    const sFront  = mkPanel(new THREE.BoxGeometry(W, H, T), makeMat(4), 4,  0, H/2,  D/2);
+    const sBack   = mkPanel(new THREE.BoxGeometry(W, H, T), makeMat(5), 5,  0, H/2, -D/2);
+    // inner tray slid out to the right
+    const tray = new THREE.Group();
+    tray.position.set(W * 0.6, 0, 0);
+    const tBot = new THREE.Mesh(new THREE.BoxGeometry(W, T, D-T*2), makeMat(3));
+    tBot.position.set(0, T/2, 0);
+    addEdges(tBot); tray.add(tBot);
+    panels.push({ mesh: tBot, faceIndex: 3 });
+    // Side panels — profile-aware
+    let tLGeo, tRGeo, tLY, tRY;
+    const tD = D - T*2;
+    if (profileShape !== 'rect') {
+      const extra = (H - T) * profileDepth * (profileShape === 'trapez' ? 0.5 : 1);
+      tLGeo = makeShapedSide(profileShape, H-T, tD, T, extra);
+      tRGeo = tLGeo.clone();
+      tLY = 0; tRY = 0;
+    } else {
+      tLGeo = new THREE.BoxGeometry(T, H-T, tD);
+      tRGeo = new THREE.BoxGeometry(T, H-T, tD);
+      tLY = H/2; tRY = H/2;
+    }
+    const tL = new THREE.Mesh(tLGeo, makeMat(1));
+    const tR = new THREE.Mesh(tRGeo, makeMat(0));
+    const tBk = new THREE.Mesh(new THREE.BoxGeometry(W, H-T, T), makeMat(5));
+    tL.position.set(-W/2+T/2, tLY, 0);
+    tR.position.set( W/2-T/2, tRY, 0);
+    tBk.position.set(0, H/2, -D/2+T/2);
+    [tL, tR, tBk].forEach(m => { addEdges(m); tray.add(m); });
+    panels.push({ mesh: tL, faceIndex: 1 }, { mesh: tR, faceIndex: 0 }, { mesh: tBk, faceIndex: 5 });
+    boxGroup.add(tray);
+
+  } else if (boxStyle === 'sleeve') {
+    // inner closed box — profile-aware sides
+    mkPanel(new THREE.BoxGeometry(W, T, D), makeMat(3), 3, 0, 0, 0);
+    mkPanel(new THREE.BoxGeometry(W, T, D), makeMat(2), 2, 0, H+T/2, 0);
+    mkPanel(new THREE.BoxGeometry(W, H, T), makeMat(4), 4, 0, H/2,  D/2-T/2);
+    mkPanel(new THREE.BoxGeometry(W, H, T), makeMat(5), 5, 0, H/2, -D/2+T/2);
+    if (profileShape !== 'rect') {
+      const extra = H * profileDepth * (profileShape === 'trapez' ? 0.5 : 1);
+      const sg = makeShapedSide(profileShape, H, D, T, extra);
+      mkPanel(sg,         makeMat(0), 0,  W/2-T/2, 0, 0);
+      mkPanel(sg.clone(), makeMat(1), 1, -W/2+T/2, 0, 0);
+    } else {
+      mkPanel(new THREE.BoxGeometry(T, H, D), makeMat(0), 0,  W/2-T/2, H/2, 0);
+      mkPanel(new THREE.BoxGeometry(T, H, D), makeMat(1), 1, -W/2+T/2, H/2, 0);
+    }
+    // outer sleeve slid partway off to the right
+    const sW = W+0.35, sH = H+0.35, sD = D+0.35, ox = W*0.55;
+    const slv = new THREE.Group();
+    slv.position.set(ox, 0, 0);
+    const svT = new THREE.Mesh(new THREE.BoxGeometry(sW, T, sD), makeMat(2));
+    const svB = new THREE.Mesh(new THREE.BoxGeometry(sW, T, sD), makeMat(3));
+    const svF = new THREE.Mesh(new THREE.BoxGeometry(sW, sH, T), makeMat(4));
+    const svK = new THREE.Mesh(new THREE.BoxGeometry(sW, sH, T), makeMat(5));
+    svT.position.set(0, sH+T/2, 0);
+    svB.position.set(0, -T/2, 0);
+    svF.position.set(0, sH/2,  sD/2);
+    svK.position.set(0, sH/2, -sD/2);
+    [svT, svB, svF, svK].forEach(m => { addEdges(m); slv.add(m); });
+    panels.push({ mesh: svT, faceIndex: 2 }, { mesh: svB, faceIndex: 3 },
+                { mesh: svF, faceIndex: 4 }, { mesh: svK, faceIndex: 5 });
+    boxGroup.add(slv);
+
+  } else if (boxStyle === 'hinged') {
+    // clam-shell: two equal halves
+    const halfH = H / 2;
+    // bottom half — profile-aware sides
+    mkPanel(new THREE.BoxGeometry(W, T,     D), makeMat(3), 3,  0, 0, 0);
+    mkPanel(new THREE.BoxGeometry(W, halfH, T), makeMat(4), 4,  0, halfH/2,  D/2-T/2);
+    mkPanel(new THREE.BoxGeometry(W, halfH, T), makeMat(5), 5,  0, halfH/2, -D/2+T/2);
+    if (profileShape !== 'rect') {
+      const extra = halfH * profileDepth * (profileShape === 'trapez' ? 0.5 : 1);
+      const sg = makeShapedSide(profileShape, halfH, D, T, extra);
+      mkPanel(sg,         makeMat(0), 0,  W/2-T/2, 0, 0);
+      mkPanel(sg.clone(), makeMat(1), 1, -W/2+T/2, 0, 0);
+    } else {
+      mkPanel(new THREE.BoxGeometry(T, halfH, D), makeMat(0), 0,  W/2-T/2, halfH/2, 0);
+      mkPanel(new THREE.BoxGeometry(T, halfH, D), makeMat(1), 1, -W/2+T/2, halfH/2, 0);
+    }
+    addInnerFloor();
+    // top half — hinged at back-top edge
+    const top = new THREE.Group();
+    top.position.set(0, halfH, -D/2);
+    const tTop   = new THREE.Mesh(new THREE.BoxGeometry(W, T, D), makeMat(2));
+    const tFront = new THREE.Mesh(new THREE.BoxGeometry(W, halfH, T), makeMat(4));
+    tTop.position.set(0, halfH+T/2, D/2);
+    tFront.position.set(0, halfH/2, D-T/2);
+    addEdges(tTop); addEdges(tFront);
+    top.add(tTop); top.add(tFront);
+    panels.push({ mesh: tTop, faceIndex: 2 }, { mesh: tFront, faceIndex: 4 });
+    // top half side panels — profile-aware
+    if (profileShape !== 'rect') {
+      const extra = halfH * profileDepth * (profileShape === 'trapez' ? 0.5 : 1);
+      const sg = makeShapedSide(profileShape, halfH, D, T, extra);
+      const tR = new THREE.Mesh(sg, makeMat(0));
+      const tL = new THREE.Mesh(sg.clone(), makeMat(1));
+      tR.position.set( W/2-T/2, 0, D/2);
+      tL.position.set(-W/2+T/2, 0, D/2);
+      addEdges(tR); addEdges(tL);
+      top.add(tR); top.add(tL);
+      panels.push({ mesh: tR, faceIndex: 0 }, { mesh: tL, faceIndex: 1 });
+    } else {
+      const tRight = new THREE.Mesh(new THREE.BoxGeometry(T, halfH, D), makeMat(0));
+      const tLeft  = new THREE.Mesh(new THREE.BoxGeometry(T, halfH, D), makeMat(1));
+      tRight.position.set( W/2-T/2, halfH/2, D/2);
+      tLeft.position.set( -W/2+T/2, halfH/2, D/2);
+      addEdges(tRight); addEdges(tLeft);
+      top.add(tRight); top.add(tLeft);
+      panels.push({ mesh: tRight, faceIndex: 0 }, { mesh: tLeft, faceIndex: 1 });
+    }
+    const hingedOpen = THREE.MathUtils.degToRad(-80);
+    top.userData = { isLidPivot: true, baseRot: { x: 0 }, openRot: { x: hingedOpen } };
+    top.rotation.x = hingedOpen * (_lidTarget / 100);
+    boxGroup.add(top);
+
+  } else if (boxStyle === 'twopiec') {
+    // Two-piece rigid box: base tray + separate lid that sits on top
+    const lidH = H * 0.28;   // lid is shallower — ~28% of total height
+    const baseH = H - lidH;
+    const gap = 0.05;         // slight clearance between lid and base
+
+    // ── Base tray ──────────────────────────────────────────────────────
+    mkPanel(new THREE.BoxGeometry(W, T, D),       makeMat(3), 3, 0, 0, 0);          // bottom
+    mkPanel(new THREE.BoxGeometry(W, baseH, T),   makeMat(4), 4, 0, baseH/2,  D/2-T/2);  // front
+    mkPanel(new THREE.BoxGeometry(W, baseH, T),   makeMat(5), 5, 0, baseH/2, -D/2+T/2);  // back
+    mkPanel(new THREE.BoxGeometry(T, baseH, D),   makeMat(0), 0,  W/2-T/2, baseH/2, 0);  // right
+    mkPanel(new THREE.BoxGeometry(T, baseH, D),   makeMat(1), 1, -W/2+T/2, baseH/2, 0);  // left
+    addInnerFloor();
+
+    // ── Lid (separate piece lifted above base) ─────────────────────────
+    const lidOffset = baseH + gap;
+    const lidW = W + T * 2, lidD = D + T * 2;  // lid wraps over the base walls
+    const lidGrp = new THREE.Group();
+    lidGrp.position.set(0, lidOffset, 0);
+
+    const lidTop   = new THREE.Mesh(new THREE.BoxGeometry(lidW, T, lidD), makeMat(2));
+    const lidFront = new THREE.Mesh(new THREE.BoxGeometry(lidW, lidH, T), makeMat(4));
+    const lidBack  = new THREE.Mesh(new THREE.BoxGeometry(lidW, lidH, T), makeMat(5));
+    const lidRight = new THREE.Mesh(new THREE.BoxGeometry(T, lidH, lidD), makeMat(0));
+    const lidLeft  = new THREE.Mesh(new THREE.BoxGeometry(T, lidH, lidD), makeMat(1));
+
+    lidTop.position.set(0, lidH + T/2, 0);
+    lidFront.position.set(0, lidH/2,  lidD/2 - T/2);
+    lidBack.position.set(0,  lidH/2, -lidD/2 + T/2);
+    lidRight.position.set( lidW/2 - T/2, lidH/2, 0);
+    lidLeft.position.set( -lidW/2 + T/2, lidH/2, 0);
+
+    [lidTop, lidFront, lidBack, lidRight, lidLeft].forEach(m => { addEdges(m); lidGrp.add(m); });
+    panels.push(
+      { mesh: lidTop,   faceIndex: 2 },
+      { mesh: lidFront, faceIndex: 4 },
+      { mesh: lidBack,  faceIndex: 5 },
+      { mesh: lidRight, faceIndex: 0 },
+      { mesh: lidLeft,  faceIndex: 1 }
+    );
+    boxGroup.add(lidGrp);
+
+  } else if (boxStyle === 'mailer') {
+    // RSC mailer box: 4 walls + bottom, top has 4 dust flaps + 2 major flaps
+    addBody();
+    const _t = _lidTarget / 100;  // 0 = closed, 1 = open
+
+    // Outer major flap (front) — opens upward from top front edge
+    const majorFront = new THREE.Mesh(new THREE.BoxGeometry(W, T, D/2), makeMat(2));
+    const pfFront = new THREE.Group();
+    pfFront.position.set(0, H, D/2 - T/2);
+    majorFront.position.set(0, 0, -(D/2)/2);
+    addEdges(majorFront); pfFront.add(majorFront);
+    const mfOpen = THREE.MathUtils.degToRad(-110);
+    pfFront.rotation.x = mfOpen * _t;
+    boxGroup.add(pfFront);
+
+    // Outer major flap (back)
+    const majorBack = new THREE.Mesh(new THREE.BoxGeometry(W, T, D/2), makeMat(2));
+    const pfBack = new THREE.Group();
+    pfBack.position.set(0, H, -D/2 + T/2);
+    majorBack.position.set(0, 0, (D/2)/2);
+    addEdges(majorBack); pfBack.add(majorBack);
+    const mbOpen = THREE.MathUtils.degToRad(110);
+    pfBack.rotation.x = mbOpen * _t;
+    boxGroup.add(pfBack);
+
+    // Dust flap right
+    const dustR = new THREE.Mesh(new THREE.BoxGeometry(T, T, D * 0.42), makeMat(0));
+    const pdR = new THREE.Group();
+    pdR.position.set(W/2 - T/2, H, 0);
+    dustR.position.set(0, 0, 0);
+    addEdges(dustR); pdR.add(dustR);
+    const drOpen = THREE.MathUtils.degToRad(-90);
+    pdR.rotation.z = drOpen * _t;
+    boxGroup.add(pdR);
+
+    // Dust flap left
+    const dustL = new THREE.Mesh(new THREE.BoxGeometry(T, T, D * 0.42), makeMat(1));
+    const pdL = new THREE.Group();
+    pdL.position.set(-W/2 + T/2, H, 0);
+    dustL.position.set(0, 0, 0);
+    addEdges(dustL); pdL.add(dustL);
+    const dlOpen = THREE.MathUtils.degToRad(90);
+    pdL.rotation.z = dlOpen * _t;
+    boxGroup.add(pdL);
+
+  } else if (boxStyle === 'pillow') {
+    // Pillow / cracker box — cylinder lying on its side, pinched flat ends.
+    // The long axis runs left-right (X). Cross-section = circle in Y-Z plane.
+    const segs = 32;
+    const bodyR = Math.min(H, D) * 0.45;  // radius of circular cross-section
+    // Cylinder body — full 360°, axis along X
+    const bodyGeo = new THREE.CylinderGeometry(bodyR, bodyR, W, segs, 1, false);
+    bodyGeo.rotateZ(Math.PI / 2);       // lay it on its side
+    bodyGeo.translate(0, bodyR, 0);     // sit on the floor
+    const bodyMesh = new THREE.Mesh(bodyGeo, makeMat(4));
+    bodyMesh.castShadow = true;
+    boxGroup.add(bodyMesh);
+    panels.push({ mesh: bodyMesh, faceIndex: 4 });
+
+    // Crimp tabs — flat rectangles at each end representing the pinched seam
+    for (const [side, fi] of [[-1, 1], [1, 0]]) {
+      const crimpGeo = new THREE.BoxGeometry(T * 1.5, bodyR * 0.35, bodyR * 1.8);
+      const crimp = new THREE.Mesh(crimpGeo, makeMat(fi));
+      crimp.position.set(side * (W / 2 + T * 0.75), bodyR, 0);
+      addEdges(crimp);
+      boxGroup.add(crimp);
+      panels.push({ mesh: crimp, faceIndex: fi });
+    }
+
+    // Back body panel (same cylinder, but use face 5 as primary)
+    panels.push({ mesh: bodyMesh, faceIndex: 5 });   // double-register back
+
+  } else if (boxStyle === 'gable') {
+    // Gable / carry box: box body + two angled roof panels meeting at a ridge.
+    // Ridgeline runs left-right (X). Roof slopes toward front and back (Z).
+    addBody();
+    const gableH = H * 0.50;    // height of roof above box body
+    const ridgeD = D * 0.08;    // depth of flat ridge handle strip
+
+    // Slope length and angle for a panel going from (z = ±D/2, y = H)
+    // down to the ridge at (z = ±ridgeD/2, y = H + gableH)
+    const run   = D / 2 - ridgeD / 2;
+    const rise  = gableH;
+    const slant = Math.sqrt(run * run + rise * rise);
+    const angle = Math.atan2(rise, run);   // tilt from horizontal (positive = upward)
+
+    // Front roof panel — tilted backward from front edge up to ridge
+    const roofF = new THREE.Mesh(new THREE.BoxGeometry(W, T, slant), makeMat(4));
+    roofF.position.set(0, H + rise / 2, D / 2 - run / 2);
+    roofF.rotation.x = -angle;
+    addEdges(roofF);
+    boxGroup.add(roofF);
+    panels.push({ mesh: roofF, faceIndex: 4 });
+
+    // Back roof panel — tilted forward from back edge up to ridge
+    const roofB = new THREE.Mesh(new THREE.BoxGeometry(W, T, slant), makeMat(5));
+    roofB.position.set(0, H + rise / 2, -D / 2 + run / 2);
+    roofB.rotation.x = angle;
+    addEdges(roofB);
+    boxGroup.add(roofB);
+    panels.push({ mesh: roofB, faceIndex: 5 });
+
+    // Handle ridge strip — flat bar along the top
+    const handle = new THREE.Mesh(new THREE.BoxGeometry(W, T * 1.5, ridgeD), makeMat(2));
+    handle.position.set(0, H + gableH + T * 0.75, 0);
+    addEdges(handle);
+    boxGroup.add(handle);
+    panels.push({ mesh: handle, faceIndex: 2 });
+  }
+
+  boxGroup.position.y = T / 2;
+  scene.add(boxGroup);
+
+  // Ensure every mesh in the group casts + receives shadows
+  boxGroup.traverse(obj => {
+    if (obj.isMesh) { obj.castShadow = true; obj.receiveShadow = true; }
+  });
+  highlightFace(activeFace);
+}
+
+function highlightFace(idx) {
+  panels.forEach(({ mesh, faceIndex }) => {
+    mesh.material.color.set(faceIndex === idx ? adjustHex(baseColor, 30) : baseColor);
+    mesh.material.map = textures[faceIndex];
+    mesh.material.needsUpdate = true;
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// RAYCASTING
+// ═══════════════════════════════════════════════════════
+const raycaster = new THREE.Raycaster();
+function getNDC(e) {
+  const r = renderer.domElement.getBoundingClientRect();
+  return { x: ((e.clientX-r.left)/r.width)*2-1, y: -((e.clientY-r.top)/r.height)*2+1 };
+}
+function getHit(e) {
+  raycaster.setFromCamera(getNDC(e), camera);
+  const hits = raycaster.intersectObjects(panels.map(p => p.mesh), true);
+  if (!hits.length) return null;
+  for (const h of hits) {
+    const found = panels.find(p => p.mesh === h.object || p.mesh.children.includes(h.object));
+    if (found) return found;
+  }
+  return null;
+}
+function onVpClick(e) { const h = getHit(e); if (h) selectFace(h.faceIndex); }
+function onVpHover(e) {
+  const h = getHit(e);
+  const lbl = document.getElementById('faceLabel');
+  if (h) { lbl.textContent = FACE_NAMES[h.faceIndex] + ' — Click to Edit'; lbl.classList.add('show'); }
+  else lbl.classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════
+// FACE SELECTION
+// ═══════════════════════════════════════════════════════
+function selectFace(idx) {
+  activeFace = idx;
+  highlightFace(idx);
+  document.getElementById('editingFaceName').textContent = FACE_NAMES[idx];
+  document.querySelectorAll('.face-btn').forEach((b, i) => b.classList.toggle('active', BTN_ORDER[i] === idx));
+  redrawEditor();
+  // Auto-open the paint drawer when a face is clicked
+  if (activeDrawer !== 'paint') openDrawer('paint');
+}
+
+// ═══════════════════════════════════════════════════════
+// 2D EDITOR
+// ═══════════════════════════════════════════════════════
+function drawTextItem(ctx, t, isDragging) {
+  ctx.save();
+  if (t.opacity !== undefined && t.opacity < 1) ctx.globalAlpha = t.opacity;
+  const boldStr   = t.bold   ? 'bold '   : '';
+  const italicStr = t.italic ? 'italic ' : '';
+  const fontStack = `'${t.font}', serif`;
+  ctx.font = `${italicStr}${boldStr}${t.size}px ${fontStack}`;
+  ctx.textBaseline = 'middle';
+
+  // Drag selection highlight
+  if (isDragging) {
+    ctx.shadowColor = 'rgba(168,136,74,0.9)';
+    ctx.shadowBlur  = 22;
+  }
+
+  // Emboss (paint twice: light top, dark bottom)
+  if (t.emboss) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fillText(t.text, t.x - 2, t.y - 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillText(t.text, t.x + 2, t.y + 2);
+    ctx.restore();
+  }
+
+  // Drop shadow
+  if (t.shadow) {
+    ctx.save();
+    ctx.shadowColor   = 'rgba(0,0,0,0.55)';
+    ctx.shadowBlur    = t.size * 0.18;
+    ctx.shadowOffsetX = t.size * 0.06;
+    ctx.shadowOffsetY = t.size * 0.06;
+    ctx.fillStyle = t.color;
+    ctx.fillText(t.text, t.x, t.y);
+    ctx.restore();
+  }
+
+  // Glow
+  if (t.glow) {
+    ctx.save();
+    ctx.shadowColor = t.color;
+    ctx.shadowBlur  = t.size * 0.35;
+    ctx.fillStyle   = t.color;
+    ctx.fillText(t.text, t.x, t.y);
+    ctx.restore();
+  }
+
+  // Highlight (filled rect behind text)
+  if (t.highlight) {
+    ctx.save();
+    const m = ctx.measureText(t.text);
+    const pad = t.size * 0.12;
+    ctx.fillStyle = t.highlightColor || '#FFE066';
+    ctx.fillRect(t.x - pad, t.y - t.size/2 - pad, m.width + pad*2, t.size + pad*2);
+    ctx.restore();
+  }
+
+  // Border (rectangle frame around the whole text block)
+  if (t.border) {
+    ctx.save();
+    const m   = ctx.measureText(t.text);
+    const bw  = t.borderWidth || 4;
+    const pad = t.size * 0.18;
+    const rx  = t.x - pad;
+    const ry  = t.y - t.size / 2 - pad;
+    const rw  = m.width + pad * 2;
+    const rh  = t.size + pad * 2;
+    const bStyle = t.borderStyle || 'solid';
+    if (bStyle === 'dashed') {
+      ctx.setLineDash([bw * 2.5, bw * 1.2]);
+    } else if (bStyle === 'double') {
+      // Draw outer rect
+      ctx.strokeStyle = t.borderColor || '#000000';
+      ctx.lineWidth   = bw;
+      ctx.strokeRect(rx - bw*1.5, ry - bw*1.5, rw + bw*3, rh + bw*3);
+    }
+    if (bStyle === 'metallic') {
+      const grad = ctx.createLinearGradient(rx, ry, rx, ry + rh);
+      grad.addColorStop(0,   '#fff');
+      grad.addColorStop(0.3, t.borderColor || '#888');
+      grad.addColorStop(0.7, '#fff');
+      grad.addColorStop(1,   t.borderColor || '#888');
+      ctx.strokeStyle = grad;
+    } else {
+      ctx.strokeStyle = t.borderColor || '#000000';
+    }
+    ctx.lineWidth = bw;
+    ctx.lineJoin  = 'round';
+    ctx.strokeRect(rx, ry, rw, rh);
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // Outline (letter stroke before fill)
+  if (t.outline) {
+    ctx.save();
+    ctx.strokeStyle = t.outlineColor || '#000000';
+    ctx.lineWidth   = t.outlineWidth || 4;
+    ctx.lineJoin    = 'round';
+    ctx.strokeText(t.text, t.x, t.y);
+    ctx.restore();
+  }
+
+  // Main fill
+  ctx.fillStyle = t.color;
+  if (!t.shadow && !t.glow) { // shadow/glow already drew it
+    ctx.fillText(t.text, t.x, t.y);
+  } else if (!t.shadow && !t.glow) {
+    ctx.fillText(t.text, t.x, t.y);
+  }
+  // Always draw fill on top of effects
+  ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+
+  const finish = t.textFinish || 'normal';
+  if (finish === 'glossy') {
+    // Gradient from lighter to darker version of color
+    const boldStr2   = t.bold   ? 'bold '   : '';
+    const italicStr2 = t.italic ? 'italic ' : '';
+    ctx.font = `${italicStr2}${boldStr2}${t.size}px '${t.font || 'EB Garamond'}', serif`;
+    const m2 = ctx.measureText(t.text);
+    const grd = ctx.createLinearGradient(t.x, t.y - t.size/2, t.x, t.y + t.size/2);
+    grd.addColorStop(0, 'rgba(255,255,255,0.6)');
+    grd.addColorStop(0.4, t.color);
+    grd.addColorStop(1, 'rgba(0,0,0,0.25)');
+    ctx.fillStyle = grd;
+    ctx.fillText(t.text, t.x, t.y);
+    // Specular highlight streak
+    ctx.save();
+    ctx.globalAlpha = 0.22;
+    ctx.fillStyle = 'white';
+    ctx.fillText(t.text, t.x, t.y - t.size * 0.06);
+    ctx.restore();
+  } else if (finish === 'metallic') {
+    const m3 = ctx.measureText(t.text);
+    const grd2 = ctx.createLinearGradient(t.x, t.y - t.size/2, t.x, t.y + t.size/2);
+    grd2.addColorStop(0,   '#fff');
+    grd2.addColorStop(0.2, t.color);
+    grd2.addColorStop(0.5, '#fff');
+    grd2.addColorStop(0.8, t.color);
+    grd2.addColorStop(1,   'rgba(0,0,0,0.4)');
+    ctx.fillStyle = grd2;
+    ctx.fillText(t.text, t.x, t.y);
+  } else if (finish === 'matte') {
+    // Matte: slight blur/soften via shadow trick
+    ctx.save();
+    ctx.shadowBlur = 1.5;
+    ctx.shadowColor = t.color;
+    ctx.fillStyle = t.color;
+    ctx.fillText(t.text, t.x, t.y);
+    ctx.restore();
+  } else {
+    ctx.fillStyle = t.color;
+    ctx.fillText(t.text, t.x, t.y);
+  }
+
+  // Underline
+  if (t.underline) {
+    ctx.save();
+    const m = ctx.measureText(t.text);
+    ctx.strokeStyle = t.color;
+    ctx.lineWidth   = Math.max(2, t.size * 0.05);
+    ctx.beginPath();
+    ctx.moveTo(t.x, t.y + t.size * 0.55);
+    ctx.lineTo(t.x + m.width, t.y + t.size * 0.55);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+function redrawEditor() {
+  const ec  = document.getElementById('editorCanvas');
+  const ctx = ec.getContext('2d');
+  ctx.clearRect(0, 0, TEX_SIZE, TEX_SIZE);
+  ctx.drawImage(faceCanvases[activeFace], 0, 0);
+
+  // Draw image items (below text)
+  imageItems[activeFace].forEach((im, i) => {
+    if (!im.imgObj) return;
+    ctx.save();
+    if (i === dragImgIdx || i === resizeImgIdx) {
+      ctx.shadowColor = 'rgba(0,217,245,0.80)'; ctx.shadowBlur = 18;
+    }
+    ctx.drawImage(im.imgObj, im.x, im.y, im.w, im.h);
+    ctx.restore();
+    // Resize handle (bottom-right corner)
+    const hx = im.x + im.w, hy = im.y + im.h;
+    ctx.save();
+    ctx.fillStyle = i === resizeImgIdx ? '#C9A85C' : 'rgba(255,255,255,0.85)';
+    ctx.strokeStyle = '#1C1510'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(hx, hy, 9, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    // Arrow icon inside handle
+    ctx.fillStyle = '#1C1510'; ctx.font = 'bold 9px sans-serif'; ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+    ctx.fillText('⤡', hx, hy);
+    ctx.restore();
+    // Delete handle (top-right corner)
+    const dx = im.x + im.w, dy = im.y;
+    ctx.save();
+    ctx.fillStyle = 'rgba(220,50,50,0.85)'; ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(dx, dy, 9, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 10px sans-serif'; ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+    ctx.fillText('×', dx, dy);
+    ctx.restore();
+  });
+
+  // Draw text items (above images)
+  textItems[activeFace].forEach((t, i) => drawTextItem(ctx, t, i === dragTextIdx));
+
+  // Show text selection bar if text is selected
+  showItemBar();
+}
+
+function commitTextToFace() {
+  // Render cleanly (no handles) — base + images + text → face canvas → 3D texture.
+  const ctx = faceCtxs[activeFace];
+  ctx.clearRect(0, 0, TEX_SIZE, TEX_SIZE);
+  ctx.drawImage(faceCanvases[activeFace], 0, 0);
+  imageItems[activeFace].forEach(im => {
+    if (!im.imgObj) return;
+    ctx.drawImage(im.imgObj, im.x, im.y, im.w, im.h);
+  });
+  textItems[activeFace].forEach(t => drawTextItem(ctx, t, false));
+  textures[activeFace].needsUpdate = true;
+}
+
+function hitImgHandle(px, py) {
+  // returns {type:'resize'|'delete'|'body', idx} or null
+  const items = imageItems[activeFace];
+  for (let i = items.length - 1; i >= 0; i--) {
+    const im = items[i];
+    const R = 12;
+    // Delete handle: top-right
+    if (Math.hypot(px - (im.x + im.w), py - im.y) < R) return {type:'delete', idx:i};
+    // Resize handle: bottom-right
+    if (Math.hypot(px - (im.x + im.w), py - (im.y + im.h)) < R) return {type:'resize', idx:i};
+    // Body
+    if (px >= im.x && px <= im.x + im.w && py >= im.y && py <= im.y + im.h) return {type:'body', idx:i};
+  }
+  return null;
+}
+
+function initEditor() {
+  const ec = document.getElementById('editorCanvas');
+  ec.width = TEX_SIZE; ec.height = TEX_SIZE;
+
+  function pos(e) {
+    const r = ec.getBoundingClientRect();
+    const s = e.touches ? e.touches[0] : e;
+    return { x: (s.clientX-r.left)/r.width*TEX_SIZE, y: (s.clientY-r.top)/r.height*TEX_SIZE };
+  }
+
+  function hitTextItem(px, py) {
+    const items = textItems[activeFace];
+    const ctx = ec.getContext('2d');
+    for (let i = items.length - 1; i >= 0; i--) {
+      const t = items[i];
+      const boldStr = t.bold ? 'bold ' : '';
+      const italicStr = t.italic ? 'italic ' : '';
+      ctx.font = `${italicStr}${boldStr}${t.size}px '${t.font || 'EB Garamond'}', serif`;
+      const w = ctx.measureText(t.text).width;
+      const h = t.size;
+      if (px >= t.x - 4 && px <= t.x + w + 4 && py >= t.y - h/2 - 4 && py <= t.y + h/2 + 4) return i;
+    }
+    return -1;
+  }
+
+  ec.addEventListener('mousedown', e => {
+    const p = pos(e); lx = p.x; ly = p.y;
+
+    if (tool === 'fill') {
+      pushUndo();
+      const bCtx = faceCanvases[activeFace].getContext('2d');
+      bCtx.fillStyle = brushColor;
+      bCtx.fillRect(0, 0, TEX_SIZE, TEX_SIZE);
+      commitTextToFace();   // composite base → output → texture
+      redrawEditor();
+      return;
+    }
+
+    // Image item interaction
+    const imgHit = hitImgHandle(p.x, p.y);
+    if (imgHit) {
+      if (imgHit.type === 'delete') {
+        pushUndo();
+        imageItems[activeFace].splice(imgHit.idx, 1);
+        redrawEditor();
+        commitImageToFace();
+      } else if (imgHit.type === 'resize') {
+        resizeImgIdx = imgHit.idx;
+        const im = imageItems[activeFace][imgHit.idx];
+        resizeImgStart = { mx: p.x, my: p.y, ow: im.w, oh: im.h, ox: im.x, oy: im.y };
+        ec.style.cursor = 'nwse-resize';
+      } else {
+        dragImgIdx = imgHit.idx;
+        const im = imageItems[activeFace][imgHit.idx];
+        dragImgOffX = p.x - im.x; dragImgOffY = p.y - im.y;
+        ec.style.cursor = 'grabbing';
+      }
+      return;
+    }
+
+    // text drag — check if clicking an existing text item
+    if (tool === 'text' || tool === 'brush') {
+      const hit = hitTextItem(p.x, p.y);
+      if (hit !== -1) {
+        dragTextIdx = hit;
+        dragOffX = p.x - textItems[activeFace][hit].x;
+        dragOffY = p.y - textItems[activeFace][hit].y;
+        ec.style.cursor = 'grabbing';
+        selectedTextIdx = hit;
+        const t = textItems[activeFace][hit];
+        if (t) {
+          _syncVpTextBar(t);
+          document.getElementById('vpTextBar').style.display = 'flex';
+        }
+        return;
+      }
+    }
+
+    if (tool === 'text') return; // click to place handled below
+    pushUndo();
+    isDrawing = true; draw(e);
+  });
+
+  ec.addEventListener('mousemove', e => {
+    const p = pos(e);
+    if (dragTextIdx !== -1) {
+      textItems[activeFace][dragTextIdx].x = p.x - dragOffX;
+      textItems[activeFace][dragTextIdx].y = p.y - dragOffY;
+      redrawEditor();
+      commitTextToFace();
+      return;
+    }
+    if (resizeImgIdx !== -1) {
+      const im = imageItems[activeFace][resizeImgIdx];
+      const s = resizeImgStart;
+      const aspect = s.ow / s.oh;
+      const dx = p.x - s.mx;
+      const newW = Math.max(20, s.ow + dx);
+      const newH = newW / aspect;
+      im.w = newW; im.h = newH;
+      redrawEditor(); commitImageToFace();
+      return;
+    }
+    if (dragImgIdx !== -1) {
+      const im = imageItems[activeFace][dragImgIdx];
+      im.x = p.x - dragImgOffX;
+      im.y = p.y - dragImgOffY;
+      redrawEditor(); commitImageToFace();
+      return;
+    }
+    if (isDrawing) draw(e);
+    // cursor hint
+    if (tool === 'text' || tool === 'brush') {
+      ec.style.cursor = hitTextItem(p.x, p.y) !== -1 ? 'grab' : (hitImgHandle(p.x, p.y) ? 'grab' : '');
+    }
+  });
+
+  ec.addEventListener('mouseup', () => {
+    if (resizeImgIdx !== -1 || dragImgIdx !== -1) {
+      resizeImgIdx = -1; dragImgIdx = -1; resizeImgStart = null;
+      ec.style.cursor = '';
+      return;
+    }
+    if (dragTextIdx !== -1) { dragTextIdx = -1; ec.style.cursor = ''; return; }
+    isDrawing = false;
+  });
+  ec.addEventListener('mouseleave', () => { dragTextIdx = -1; isDrawing = false; dragImgIdx = -1; resizeImgIdx = -1; });
+
+  ec.addEventListener('click', e => {
+    if (tool !== 'text') return;
+    const p = pos(e);
+    // Clicking empty space hides the selection bar
+    if (hitTextItem(p.x, p.y) === -1 && hitImgHandle(p.x, p.y) === null) {
+      hideItemBar();
+    }
+    // don't place if we just finished a drag
+    if (hitTextItem(p.x, p.y) !== -1) return;
+    const txt = prompt('Enter text:'); if (!txt) return;
+    pushUndo();
+    textItems[activeFace].push({
+      text:          txt,
+      x:             p.x,
+      y:             p.y,
+      color:         brushColor,
+      size:          Math.max(brushSize * 4, 18),
+      font:          textFont,
+      bold:          textStyles.bold,
+      italic:        textStyles.italic,
+      underline:     textStyles.underline,
+      outline:       textStyles.outline,
+      outlineColor:  textOutlineColor,
+      outlineWidth:  parseInt(document.getElementById('outlineWidthSlider').value) || 4,
+      shadow:        textStyles.shadow,
+      highlight:     textStyles.highlight,
+      highlightColor: textHighlightColor,
+      glow:          textStyles.glow,
+      emboss:        textStyles.emboss,
+      textFinish:    textFinish,
+      border:        textStyles.border,
+      borderColor:   textBorderColor,
+      borderWidth:   parseInt(document.getElementById('borderWidthSlider').value) || 4,
+      borderStyle:   textBorderStyle
+    });
+    redrawEditor();
+    commitTextToFace();
+  });
+
+  function draw(e) {
+    const r   = ec.getBoundingClientRect();
+    const cx  = (e.clientX-r.left)/r.width*TEX_SIZE;
+    const cy  = (e.clientY-r.top)/r.height*TEX_SIZE;
+    const strokeStyle = tool === 'eraser' ? baseColor : brushColor;
+    const lineWidth   = tool === 'eraser' ? brushSize*2.5 : brushSize;
+    // Paint stroke on BOTH canvases — ec is display (base+text overlay),
+    // faceCtxs holds only the paint layer (no text baked in).
+    function applyStroke(ctx) {
+      ctx.beginPath(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.strokeStyle = strokeStyle; ctx.lineWidth = lineWidth;
+      ctx.moveTo(lx, ly); ctx.lineTo(cx, cy); ctx.stroke();
+    }
+    applyStroke(ec.getContext('2d'));                          // display canvas
+    applyStroke(faceCanvases[activeFace].getContext('2d'));    // base paint layer
+    // Fast composite: redraw base onto output so 3D stays in sync
+    const _oc = faceCtxs[activeFace];
+    _oc.clearRect(0, 0, TEX_SIZE, TEX_SIZE);
+    _oc.drawImage(faceCanvases[activeFace], 0, 0);
+    if (imageItems[activeFace].length || textItems[activeFace].length) {
+      imageItems[activeFace].forEach(im => { if (im.imgObj) _oc.drawImage(im.imgObj, im.x, im.y, im.w, im.h); });
+      textItems[activeFace].forEach(t => drawTextItem(_oc, t, false));
+    }
+    lx = cx; ly = cy;
+    textures[activeFace].needsUpdate = true;
+  }
+}
+
+function syncToFace() {
+  // Route through the clean-bake path so handles never appear on 3D texture.
+  commitImageToFace();
+}
+
+function pushUndo() {
+  // Snapshot the BASE paint canvas (not the display canvas)
+  const imageData    = faceCanvases[activeFace].getContext('2d').getImageData(0, 0, TEX_SIZE, TEX_SIZE);
+  const textSnapshot = textItems[activeFace].map(t => ({...t}));
+  const imgSnapshot  = imageItems[activeFace].map(im => ({...im}));
+  undoStack.push({ faceIndex: activeFace, imageData, textSnapshot, imgSnapshot });
+  if (undoStack.length > MAX_UNDO) undoStack.shift();
+}
+
+function undo() {
+  if (!undoStack.length) return;
+  const last = undoStack.pop();
+  if (last.faceIndex !== activeFace) selectFace(last.faceIndex);
+  // Restore base paint canvas
+  faceCanvases[last.faceIndex].getContext('2d').putImageData(last.imageData, 0, 0);
+  textItems[last.faceIndex]  = last.textSnapshot;
+  imageItems[last.faceIndex] = last.imgSnapshot || [];
+  commitTextToFace();
+  redrawEditor();
+}
+
+// ═══════════════════════════════════════════════════════
+// GRADIENT
+// ═══════════════════════════════════════════════════════
+function setGradDir(d) {
+  gradDir = d;
+  document.querySelectorAll('.grad-dir-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('gdir-' + d).classList.add('active');
+}
+
+function buildGradient(ctx, c1, c2) {
+  const S = TEX_SIZE;
+  let g;
+  if (gradDir === 'h') g = ctx.createLinearGradient(0, 0, S, 0);
+  else if (gradDir === 'v') g = ctx.createLinearGradient(0, 0, 0, S);
+  else if (gradDir === 'd') g = ctx.createLinearGradient(0, 0, S, S);
+  else g = ctx.createRadialGradient(S/2, S/2, 0, S/2, S/2, S*0.7);
+  g.addColorStop(0, c1);
+  g.addColorStop(1, c2);
+  return g;
+}
+
+function applyGradient() {
+  pushUndo();
+  const c1  = document.getElementById('gradColor1').value;
+  const c2  = document.getElementById('gradColor2').value;
+  const bCtx = faceCanvases[activeFace].getContext('2d');
+  bCtx.fillStyle = buildGradient(bCtx, c1, c2);
+  bCtx.fillRect(0, 0, TEX_SIZE, TEX_SIZE);
+  commitTextToFace();
+  redrawEditor();
+}
+
+function applyGradientAll() {
+  const c1 = document.getElementById('gradColor1').value;
+  const c2 = document.getElementById('gradColor2').value;
+  for (let i = 0; i < 6; i++) {
+    const bCtx = faceCanvases[i].getContext('2d');
+    bCtx.fillStyle = buildGradient(bCtx, c1, c2);
+    bCtx.fillRect(0, 0, TEX_SIZE, TEX_SIZE);
+    // composite → output
+    const oCtx = faceCtxs[i];
+    oCtx.clearRect(0, 0, TEX_SIZE, TEX_SIZE);
+    oCtx.drawImage(faceCanvases[i], 0, 0);
+    imageItems[i].forEach(im => { if (im.imgObj) oCtx.drawImage(im.imgObj, im.x, im.y, im.w, im.h); });
+    textItems[i].forEach(t => drawTextItem(oCtx, t, false));
+    textures[i].needsUpdate = true;
+  }
+  redrawEditor();
+}
+
+// ═══════════════════════════════════════════════════════
+// CONTROLS
+// ═══════════════════════════════════════════════════════
+function setColorMode(m) {
+  colorMode = m;
+  document.getElementById('tab-solid').classList.toggle('active', m === 'solid');
+  document.getElementById('tab-gradient').classList.toggle('active', m === 'gradient');
+  document.getElementById('solidUI').style.display    = m === 'solid'    ? '' : 'none';
+  document.getElementById('gradientUI').classList.toggle('show', m === 'gradient');
+}
+
+function setStyle(s) {
+  boxStyle = s;
+  document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('style-' + s).classList.add('active');
+  createBox();
+}
+
+function setProfile(p) {
+  profileShape = p;
+  document.querySelectorAll('[id^="profile-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('profile-' + p).classList.add('active');
+  document.getElementById('profileDepthRow').style.display = p !== 'rect' ? '' : 'none';
+  createBox();
+}
+
+function setProfileDepth(v) {
+  profileDepth = parseFloat(v);
+  document.getElementById('profileDepthVal').textContent = Math.round(profileDepth * 100) + '%';
+  if (profileShape !== 'rect') createBox();
+}
+
+function setFinish(f) {
+  boxFinish = f;
+  document.querySelectorAll('[id^="finish-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('finish-' + f).classList.add('active');
+  // Update all panel materials live — no need to rebuild box
+  const params = getFinishParams();
+  const applyTo = (mat) => {
+    if (!mat) return;
+    mat.roughness          = params.roughness;
+    mat.metalness          = params.metalness;
+    mat.envMapIntensity    = params.envInt;
+    if ('clearcoat' in mat) {
+      mat.clearcoat          = params.clearcoat;
+      mat.clearcoatRoughness = params.ccRough;
+    }
+    mat.needsUpdate = true;
+  };
+  panels.forEach(({ mesh }) => {
+    applyTo(mesh.material);
+    mesh.children.forEach(child => {
+      if (child.isMesh) applyTo(child.material);
+    });
+  });
+  if (innerMat) {
+    applyTo(innerMat);
+    innerMat.envMapIntensity = params.envInt * 0.55;
+  }
+}
+
+function setSlotScale(v) {
+  slotScale = parseFloat(v);
+  document.getElementById('slotSizeVal').textContent = Math.round(slotScale * 100) + '%';
+  if (activeInsert && activeInsert !== 'none') setInsert(activeInsert);
+}
+
+function setColor(c) {
+  brushColor = c;
+  document.getElementById('brushColorPicker').value = c;
+  renderPalette();
+}
+
+function fillAllFaces(color) {
+  for (let i = 0; i < 6; i++) {
+    faceCtxs[i].fillStyle = color;
+    faceCtxs[i].fillRect(0, 0, TEX_SIZE, TEX_SIZE);
+    textures[i].needsUpdate = true;
+  }
+  if (innerMat) innerMat.color.set(color);
+  const ec = document.getElementById('editorCanvas');
+  const ctx = ec.getContext('2d');
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, TEX_SIZE, TEX_SIZE);
+  baseColor = color;
+}
+
+function setTool(t) {
+  tool = t;
+  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tool-' + t).classList.add('active');
+}
+
+function setTextFont(f) {
+  textFont = f;
+}
+
+function toggleTextStyle(style) {
+  textStyles[style] = !textStyles[style];
+  document.getElementById('txt-' + style).classList.toggle('active', textStyles[style]);
+  // Show/hide sub-controls
+  if (style === 'outline') {
+    document.getElementById('outlineColorRow').style.display = textStyles.outline ? '' : 'none';
+    document.getElementById('outlineWidthSlider').oninput = function() {
+      document.getElementById('outlineWidthVal').textContent = this.value;
+    };
+  }
+  if (style === 'highlight') {
+    document.getElementById('highlightColorRow').style.display = textStyles.highlight ? '' : 'none';
+  }
+  if (style === 'border') {
+    document.getElementById('borderControlRow').style.display = textStyles.border ? '' : 'none';
+  }
+}
+
+// ── Selected text item controls ───────────────────────────────────────
+let selectedTextIdx = -1;
+
+function _syncVpTextBar(t) {
+  if (!t) return;
+  const sz  = Math.round(t.size || 24);
+  const op  = Math.round((t.opacity !== undefined ? t.opacity : 1) * 100);
+  document.getElementById('vpTextSizeVal').textContent   = sz;
+  document.getElementById('vpTextSizeSlider').value      = sz;
+  document.getElementById('vpTextColorPicker').value     = t.color || '#000000';
+  document.getElementById('vpTextOpacity').value         = op;
+  document.getElementById('vpTextOpacityVal').textContent = op + '%';
+}
+
+function showItemBar() {
+  if (dragTextIdx !== -1) {
+    selectedTextIdx = dragTextIdx;
+    const t = textItems[activeFace][selectedTextIdx];
+    if (t) {
+      _syncVpTextBar(t);
+      document.getElementById('vpTextBar').style.display = 'flex';
+    }
+  }
+}
+
+function hideItemBar() {
+  document.getElementById('vpTextBar').style.display = 'none';
+  selectedTextIdx = -1;
+}
+
+function adjustSelectedTextSize(delta) {
+  if (selectedTextIdx === -1) return;
+  const t = textItems[activeFace][selectedTextIdx];
+  if (!t) return;
+  t.size = Math.max(6, Math.min(256, (t.size || 24) + delta));
+  _syncVpTextBar(t);
+  redrawEditor(); commitTextToFace();
+}
+
+function setSelectedTextSize(val) {
+  if (selectedTextIdx === -1) return;
+  const t = textItems[activeFace][selectedTextIdx];
+  if (!t) return;
+  t.size = +val;
+  _syncVpTextBar(t);
+  redrawEditor(); commitTextToFace();
+}
+
+function setSelectedTextColor(val) {
+  if (selectedTextIdx === -1) return;
+  const t = textItems[activeFace][selectedTextIdx];
+  if (!t) return;
+  t.color = val;
+  redrawEditor(); commitTextToFace();
+}
+
+function setSelectedTextOpacity(val) {
+  if (selectedTextIdx === -1) return;
+  const t = textItems[activeFace][selectedTextIdx];
+  if (!t) return;
+  t.opacity = +val / 100;
+  document.getElementById('vpTextOpacityVal').textContent = val + '%';
+  redrawEditor(); commitTextToFace();
+}
+
+function deleteSelectedTextItem() {
+  if (selectedTextIdx === -1) return;
+  pushUndo();
+  textItems[activeFace].splice(selectedTextIdx, 1);
+  selectedTextIdx = -1;
+  dragTextIdx     = -1;
+  hideItemBar();
+  redrawEditor(); commitTextToFace();
+}
+
+function setBorderStyle(s) {
+  textBorderStyle = s;
+  document.querySelectorAll('[id^="borderstyle-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('borderstyle-' + s).classList.add('active');
+}
+
+function setTextFinish(f) {
+  textFinish = f;
+  document.querySelectorAll('[id^="txtfinish-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('txtfinish-' + f).classList.add('active');
+}
+
+function syncDim(axis, val) {
+  val = Math.min(20, Math.max(2, parseFloat(val) || 2));
+  document.getElementById('slider' + axis).value = val;
+  document.getElementById('dim'    + axis).value = val;
+  if (axis === 'W') boxW = val;
+  else if (axis === 'H') boxH = val;
+  else boxD = val;
+  createBox();
+}
+
+function setPreset(w, h, d) {
+  boxW = w; boxH = h; boxD = d;
+  ['W','H','D'].forEach((a, i) => {
+    const v = [w,h,d][i];
+    document.getElementById('slider' + a).value = v;
+    document.getElementById('dim'    + a).value = v;
+  });
+  createBox();
+}
+
+function clearFace() {
+  textItems[activeFace]  = [];
+  imageItems[activeFace] = [];
+  drawKraftFace(faceCanvases[activeFace].getContext('2d'), FACE_BASE[activeFace]);
+  commitTextToFace();
+  redrawEditor();
+}
+
+function applyToAll() {
+  for (let i = 0; i < 6; i++) {
+    // Copy active base paint to every other face base canvas
+    const bCtx = faceCanvases[i].getContext('2d');
+    bCtx.clearRect(0, 0, TEX_SIZE, TEX_SIZE);
+    bCtx.drawImage(faceCanvases[activeFace], 0, 0);
+    // Composite to output (no images/text carry over)
+    const oCtx = faceCtxs[i];
+    oCtx.clearRect(0, 0, TEX_SIZE, TEX_SIZE);
+    oCtx.drawImage(faceCanvases[i], 0, 0);
+    textures[i].needsUpdate = true;
+  }
+}
+
+function uploadImage(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      const sc = Math.min((TEX_SIZE * 0.75) / img.width, (TEX_SIZE * 0.75) / img.height);
+      const w = img.width * sc, h = img.height * sc;
+      pushUndo();
+      imageItems[activeFace].push({
+        src: ev.target.result,
+        imgObj: img,
+        x: (TEX_SIZE - w) / 2,
+        y: (TEX_SIZE - h) / 2,
+        w, h
+      });
+      redrawEditor();
+      commitImageToFace();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+function commitImageToFace() {
+  // Render cleanly (no handles) into the face canvas so 3D texture stays clean.
+  // 1. Start from the raw base paint layer
+  // 2. Draw image items (no circles/handles)
+  // 3. Draw text items
+  const ctx = faceCtxs[activeFace];
+  ctx.clearRect(0, 0, TEX_SIZE, TEX_SIZE);
+  ctx.drawImage(faceCanvases[activeFace], 0, 0);
+
+  imageItems[activeFace].forEach(im => {
+    if (!im.imgObj) return;
+    ctx.drawImage(im.imgObj, im.x, im.y, im.w, im.h);
+  });
+  textItems[activeFace].forEach(t => drawTextItem(ctx, t, false));
+
+  textures[activeFace].needsUpdate = true;
+}
+
+function downloadScreenshot() {
+  renderer.render(scene, camera);
+  const a = document.createElement('a');
+  a.href = renderer.domElement.toDataURL('image/png');
+  a.download = 'box-design.png';
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════
+// GALLERY
+// ═══════════════════════════════════════════════════════
+let gallery = JSON.parse(localStorage.getItem('bcs_gallery') || '[]');
+
+function saveToGallery() {
+  renderer.render(scene, camera);
+  const dataUrl = renderer.domElement.toDataURL('image/png');
+  const name = `Design ${gallery.length + 1} — ${['Open','Closed','Magnet','Side'][['open','closed','magnet','attached'].indexOf(boxStyle)]} Box`;
+  gallery.unshift({ dataUrl, name, ts: Date.now() });
+  localStorage.setItem('bcs_gallery', JSON.stringify(gallery));
+  renderGallery();
+  // scroll to gallery
+  document.querySelector('.gallery-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function deleteGalleryItem(ts) {
+  gallery = gallery.filter(g => g.ts !== ts);
+  localStorage.setItem('bcs_gallery', JSON.stringify(gallery));
+  renderGallery();
+}
+
+function clearGallery() {
+  if (!gallery.length) return;
+  if (confirm('Remove all saved designs?')) {
+    gallery = [];
+    localStorage.setItem('bcs_gallery', JSON.stringify(gallery));
+    renderGallery();
+  }
+}
+
+function renderGallery() {
+  const grid  = document.getElementById('galleryGrid');
+  const empty = document.getElementById('galleryEmpty');
+  if (!gallery.length) {
+    grid.innerHTML = '';
+    grid.appendChild(empty);
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = gallery.map(g => `
+    <div class="gallery-card">
+      <img src="${g.dataUrl}" alt="${g.name}" loading="lazy">
+      <div class="gallery-card-info">
+        <span class="gallery-card-name">${g.name}</span>
+        <button class="gallery-card-del" onclick="deleteGalleryItem(${g.ts})" title="Remove">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// LOOP + RESIZE
+// ═══════════════════════════════════════════════════════
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+function onResize() {
+  const vp = document.getElementById('viewport');
+  camera.aspect = vp.offsetWidth / vp.offsetHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(vp.offsetWidth, vp.offsetHeight);
+}
+
+// ═══════════════════════════════════════════════════════
+// ICON RAIL — DRAWER OPEN / CLOSE
+// ═══════════════════════════════════════════════════════
+let activeDrawer = null;
+
+function openDrawer(name) {
+  const isAlreadyOpen = activeDrawer === name;
+
+  // Close every drawer + deactivate every rail button
+  document.querySelectorAll('.drawer').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+
+  if (isAlreadyOpen) {
+    // Second click on same icon → collapse
+    activeDrawer = null;
+    return;
+  }
+
+  const drawer  = document.getElementById('drawer-' + name);
+  const railBtn = document.getElementById('rail-'   + name);
+  if (drawer)  drawer.classList.add('open');
+  if (railBtn) railBtn.classList.add('active');
+  activeDrawer = name;
+
+  // Close dim popup so it doesn't overlap
+  document.getElementById('dimPopup').classList.remove('show');
+  const dimBtn = document.getElementById('dimToggleBtn');
+  if (dimBtn) dimBtn.style.color = '';
+}
+
+// ── Dimensions popup ───────────────────────────────────────
+function toggleDimPopup() {
+  const popup = document.getElementById('dimPopup');
+  const btn   = document.getElementById('dimToggleBtn');
+  const isOpen = popup.classList.toggle('show');
+  btn.style.color = isOpen ? 'var(--studio-accent)' : '';
+  // Close if clicking outside
+  if (isOpen) {
+    const close = (e) => {
+      if (!popup.contains(e.target) && e.target !== btn) {
+        popup.classList.remove('show');
+        btn.style.color = '';
+        document.removeEventListener('click', close, true);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', close, true), 50);
+  }
+}
+
+// ── Camera controls ───────────────────────────────────────
+function camReset() {
+  if (!camera || !controls) return;
+  camera.position.set(13, 11, 20);
+  controls.target.set(0, 0.5, 0);
+  controls.update();
+}
+function camZoom(factor) {
+  if (!camera || !controls) return;
+  const dir = camera.position.clone().sub(controls.target);
+  dir.multiplyScalar(factor);
+  // Clamp to control limits
+  const len = dir.length();
+  if (len >= controls.minDistance && len <= controls.maxDistance) {
+    camera.position.copy(controls.target).add(dir);
+    controls.update();
+  }
+}
+function toggleAutoRotate() {
+  if (!controls) return;
+  controls.autoRotate = !controls.autoRotate;
+  const b = document.getElementById('autoRotBtn');
+  b.style.color = controls.autoRotate ? 'var(--studio-accent)' : '';
+}
+
+// ── Box move / translate mode ─────────────────────────────
+let _moveMode    = false;
+let _movePlane   = null;  // THREE.Plane (XZ at box Y)
+let _moveStart   = null;  // THREE.Vector3 world hit on mousedown
+let _moveBoxOrig = null;  // boxGroup.position at drag start
+
+function toggleMoveMode() {
+  _moveMode = !_moveMode;
+  const btn = document.getElementById('moveModeBtn');
+  if (_moveMode) {
+    controls.enabled = false;
+    btn.style.color      = 'var(--studio-accent)';
+    btn.style.background = 'rgba(184,147,74,.15)';
+    document.getElementById('viewport').style.cursor = 'move';
+  } else {
+    controls.enabled = true;
+    btn.style.color      = '';
+    btn.style.background = '';
+    document.getElementById('viewport').style.cursor = '';
+  }
+}
+
+function _vpRayPlane(e) {
+  // Cast a ray from mouse and intersect with the horizontal plane at box Y
+  const vp = document.getElementById('viewport');
+  const r  = vp.getBoundingClientRect();
+  const mx = ((e.clientX - r.left) / r.width)  *  2 - 1;
+  const my = ((e.clientY - r.top)  / r.height) * -2 + 1;
+  const raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(new THREE.Vector2(mx, my), camera);
+  const pt = new THREE.Vector3();
+  raycaster.ray.intersectPlane(_movePlane, pt);
+  return pt;
+}
+
+// Move-drag handlers are registered in the window load block below
+
+// ── Lid slider (0 = closed flat, 100 = fully open) ────────
+let _lidTarget = 100;
+function setLidOpen(v) {
+  _lidTarget = +v;
+  if (!boxGroup) return;
+  const t = _lidTarget / 100;
+  boxGroup.traverse(obj => {
+    if (!obj.userData || !obj.userData.isLidPivot) return;
+    const base = obj.userData.baseRot || {};
+    const open = obj.userData.openRot || {};
+    // Rotation lerp — per-axis so 'attached' (Z), 'open'/'tuck'/'hinged' (X) all work
+    ['x','y','z'].forEach(axis => {
+      if (axis in base || axis in open) {
+        const b = base[axis] || 0;
+        const o = open[axis] || 0;
+        obj.rotation[axis] = b + (o - b) * t;
+      }
+    });
+    // Position lerp — used by magnet style (lid lifts off body)
+    if (obj.userData.basePos && obj.userData.openPos) {
+      const bp = obj.userData.basePos, op = obj.userData.openPos;
+      obj.position.set(
+        bp.x + (op.x - bp.x) * t,
+        bp.y + (op.y - bp.y) * t,
+        bp.z + (op.z - bp.z) * t
+      );
+    }
+  });
+}
+
+// ── Floating bar actions ─────────────────────────────────
+function duplicateDesign() {
+  // Quick: copy current palette + dims to a named slot in localStorage
+  const snap = { boxW, boxH, boxD, boxStyle, boxFinish, baseColor, palette: [...palette] };
+  const list = JSON.parse(localStorage.getItem('bcs_slots') || '[]');
+  list.push({ ts: Date.now(), ...snap });
+  localStorage.setItem('bcs_slots', JSON.stringify(list));
+  flashHint('Design duplicated to slots');
+}
+function resetDesign() {
+  if (!confirm('Reset all design changes on every face?')) return;
+  for (let i = 0; i < 6; i++) {
+    textItems[i] = [];
+    drawKraftFace(faceCtxs[i], FACE_BASE[i]);
+    textures[i].needsUpdate = true;
+  }
+  redrawEditor && redrawEditor();
+  flashHint('Design reset');
+}
+function openSaveDialog() {
+  // Hook into existing save-to-gallery flow via top nav
+  const btn = document.querySelector('.btn-nav-primary');
+  if (btn) btn.click();
+  else flashHint('Save flow unavailable');
+}
+function takeSnapshot() {
+  try {
+    renderer.render(scene, camera);
+    const url = renderer.domElement.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `boxcraft-${Date.now()}.png`;
+    a.click();
+    flashHint('Render captured');
+  } catch (e) { flashHint('Capture failed'); }
+}
+// ═══════════════════════════════════════════════════════
+// DIELINE
+// ═══════════════════════════════════════════════════════
+function showDieline() {
+  const modal = document.getElementById('dielineModal');
+  modal.style.display = 'flex';
+  _renderDieline();
+}
+function closeDieline() {
+  document.getElementById('dielineModal').style.display = 'none';
+}
+// Close on backdrop click
+document.addEventListener('DOMContentLoaded', () => {
+  const m = document.getElementById('dielineModal');
+  if (m) m.addEventListener('click', e => { if (e.target === m) closeDieline(); });
+});
+// Close on Escape
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const m = document.getElementById('dielineModal');
+    if (m && m.style.display === 'flex') { closeDieline(); e.preventDefault(); }
+  }
+});
+function _renderDieline() {
+  const W = boxW, H = boxH, D = boxD;
+
+  // ── Scale to fit a comfortable canvas ──────────────
+  const PAD   = 48;   // px padding around the cross
+  const LABEL = 22;   // px reserved for panel labels
+  const MAX_W = Math.min(window.innerWidth  * 0.88, 1400);
+  const MAX_H = Math.min(window.innerHeight * 0.70, 900);
+
+  // Cross footprint: (D+W+D) × (D+H+D+H)
+  const scaleX = (MAX_W - PAD*2) / (D + W + D);
+  const scaleY = (MAX_H - PAD*2) / (D + H + D + H);
+  const SC     = Math.floor(Math.min(scaleX, scaleY));
+
+  const Wp = W * SC, Hp = H * SC, Dp = D * SC;
+
+  const CW = Dp + Wp + Dp + PAD * 2;
+  const CH = Dp + Hp + Dp + Hp + PAD * 2;
+
+  const canvas = document.getElementById('dielineCanvas');
+  canvas.width  = CW;
+  canvas.height = CH;
+  canvas.style.width  = CW + 'px';
+  canvas.style.height = CH + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, CW, CH);
+
+  // Background
+  ctx.fillStyle = '#FEFDFB';
+  ctx.fillRect(0, 0, CW, CH);
+
+  // Origin of the cross (top-left of top panel)
+  const ox = PAD + Dp;
+  const oy = PAD;
+
+  // ── Panel definitions ──────────────────────────────
+  // Each entry: { faceIdx, x, y, pw, ph, label, rotate }
+  // rotate: 0=normal, 1=90°CW, -1=90°CCW, 2=180°
+  const panels = [
+    { faceIdx: 2, x: ox,        y: oy,             pw: Wp, ph: Dp, label: 'TOP',    rotate: 0 },
+    { faceIdx: 4, x: ox,        y: oy + Dp,        pw: Wp, ph: Hp, label: 'FRONT',  rotate: 0 },
+    { faceIdx: 3, x: ox,        y: oy + Dp + Hp,   pw: Wp, ph: Dp, label: 'BOTTOM', rotate: 0 },
+    { faceIdx: 5, x: ox,        y: oy + Dp+Hp+Dp,  pw: Wp, ph: Hp, label: 'BACK',   rotate: 2 },
+    { faceIdx: 1, x: ox - Dp,   y: oy + Dp,        pw: Dp, ph: Hp, label: 'LEFT',   rotate: -1 },
+    { faceIdx: 0, x: ox + Wp,   y: oy + Dp,        pw: Dp, ph: Hp, label: 'RIGHT',  rotate: 1  },
+  ];
+
+  // ── Draw face artwork into each panel ──────────────
+  panels.forEach(p => {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(p.x, p.y, p.pw, p.ph);
+    ctx.clip();
+
+    const src = faceCanvases[p.faceIdx];
+    if (p.rotate === 0) {
+      ctx.drawImage(src, p.x, p.y, p.pw, p.ph);
+    } else if (p.rotate === 1) {
+      // 90° CW: translate to panel centre, rotate, draw
+      ctx.translate(p.x + p.pw/2, p.y + p.ph/2);
+      ctx.rotate(Math.PI/2);
+      ctx.drawImage(src, -p.ph/2, -p.pw/2, p.ph, p.pw);
+    } else if (p.rotate === -1) {
+      ctx.translate(p.x + p.pw/2, p.y + p.ph/2);
+      ctx.rotate(-Math.PI/2);
+      ctx.drawImage(src, -p.ph/2, -p.pw/2, p.ph, p.pw);
+    } else if (p.rotate === 2) {
+      ctx.translate(p.x + p.pw/2, p.y + p.ph/2);
+      ctx.rotate(Math.PI);
+      ctx.drawImage(src, -p.pw/2, -p.ph/2, p.pw, p.ph);
+    }
+    ctx.restore();
+  });
+
+  // ── Fold lines (blue dashed) ───────────────────────
+  ctx.save();
+  ctx.setLineDash([6, 5]);
+  ctx.strokeStyle = '#4A7CC7';
+  ctx.lineWidth   = 1.5;
+
+  const foldLines = [
+    // horizontal folds
+    [ox, oy + Dp,         ox + Wp, oy + Dp],         // top/front
+    [ox, oy + Dp + Hp,    ox + Wp, oy + Dp + Hp],    // front/bottom
+    [ox, oy + Dp+Hp+Dp,   ox + Wp, oy + Dp+Hp+Dp],  // bottom/back
+    // vertical folds (left & right side panels)
+    [ox,      oy + Dp,    ox,      oy + Dp + Hp],    // left of front
+    [ox + Wp, oy + Dp,    ox + Wp, oy + Dp + Hp],    // right of front
+  ];
+  foldLines.forEach(([x1,y1,x2,y2]) => {
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  });
+  ctx.restore();
+
+  // ── Cut outline (solid black) ──────────────────────
+  ctx.save();
+  ctx.setLineDash([]);
+  ctx.strokeStyle = '#1C1408';
+  ctx.lineWidth   = 2;
+
+  // Build the cross path clockwise
+  ctx.beginPath();
+  // Outer cross shape
+  const x0=ox, x1=ox+Wp, lx=ox-Dp, rx=ox+Wp+Dp;
+  const y0=oy, yT=oy+Dp, yF=oy+Dp+Hp, yB=oy+Dp+Hp+Dp, yK=oy+Dp+Hp+Dp+Hp;
+  ctx.moveTo(x0, y0);      // TL of top panel
+  ctx.lineTo(x1, y0);      // TR of top panel
+  ctx.lineTo(x1, yT);      // top-right inner corner
+  ctx.lineTo(rx, yT);      // right panel TL
+  ctx.lineTo(rx, yF);      // right panel BL
+  ctx.lineTo(x1, yF);      // right inner corner bottom
+  ctx.lineTo(x1, yB);      // bottom panel TR
+  ctx.lineTo(x1, yK);      // back panel TR
+  ctx.lineTo(x0, yK);      // back panel TL
+  ctx.lineTo(x0, yB);      // bottom panel TL
+  ctx.lineTo(x0, yF);      // left inner corner bottom
+  ctx.lineTo(lx, yF);      // left panel BR
+  ctx.lineTo(lx, yT);      // left panel TR
+  ctx.lineTo(x0, yT);      // left inner corner top
+  ctx.lineTo(x0, y0);      // close
+  ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Panel labels ───────────────────────────────────
+  ctx.save();
+  ctx.font = `600 ${Math.max(9, SC * 0.22)}px Jost, sans-serif`;
+  ctx.fillStyle = 'rgba(28,20,8,.55)';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  panels.forEach(p => {
+    ctx.fillText(p.label, p.x + p.pw/2, p.y + p.ph/2);
+  });
+  ctx.restore();
+
+  // ── Dimension arrows ──────────────────────────────
+  // W arrow: above the top panel
+  _drawDimArrow(ctx, ox, oy - 16, ox + Wp, oy - 16, `W = ${W} cm`);
+  // H arrow: left of the left panel (further out)
+  _drawDimArrow(ctx, lx - 24, oy + Dp, lx - 24, oy + Dp + Hp, `H = ${H} cm`, true);
+  // D arrow: left of left panel, spanning top panel height
+  _drawDimArrow(ctx, lx - 8,  oy,        lx - 8,  oy + Dp,        `D = ${D} cm`, true);
+
+  // Update legend dims label
+  document.getElementById('dlDims').textContent = `W ${W} × H ${H} × D ${D} cm`;
+}
+
+function _drawDimArrow(ctx, x1, y1, x2, y2, label, vertical=false) {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(28,20,8,.35)';
+  ctx.fillStyle   = 'rgba(28,20,8,.50)';
+  ctx.lineWidth   = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Arrow heads
+  const AH = 5;
+  if (!vertical) {
+    // left arrowhead
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x1+AH,y1-AH/2); ctx.lineTo(x1+AH,y1+AH/2); ctx.closePath(); ctx.fill();
+    // right arrowhead
+    ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-AH,y2-AH/2); ctx.lineTo(x2-AH,y2+AH/2); ctx.closePath(); ctx.fill();
+    // label above midpoint
+    ctx.font = `500 9px Jost, sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.fillStyle='rgba(28,20,8,.55)';
+    ctx.fillText(label, (x1+x2)/2, y1 - 2);
+  } else {
+    // top arrowhead
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x1-AH/2,y1+AH); ctx.lineTo(x1+AH/2,y1+AH); ctx.closePath(); ctx.fill();
+    // bottom arrowhead
+    ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-AH/2,y2-AH); ctx.lineTo(x2+AH/2,y2-AH); ctx.closePath(); ctx.fill();
+    // label rotated
+    ctx.save();
+    ctx.translate(x1 - 8, (y1+y2)/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.font = '500 9px Jost, sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle='rgba(28,20,8,.55)';
+    ctx.fillText(label, 0, 0);
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+function downloadDieline() {
+  _renderDieline(); // ensure freshly rendered
+  const canvas = document.getElementById('dielineCanvas');
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = `boxcraft-dieline-${boxW}x${boxH}x${boxD}-${Date.now()}.png`;
+  a.click();
+  flashHint('Dieline downloaded');
+}
+
+function flashHint(msg) {
+  const el = document.getElementById('faceLabel');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(window._hintT);
+  window._hintT = setTimeout(() => el.classList.remove('show'), 1400);
+}
+
+// ═══════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════
+window.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+});
+
+// ── Custom cursor — viewport only ─────────────────────
+(function() {
+  const dot  = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  const vp   = document.getElementById('viewport');
+  let ringX = 0, ringY = 0, dotX = 0, dotY = 0, inVp = false;
+
+  document.addEventListener('mousemove', e => {
+    dotX = e.clientX; dotY = e.clientY;
+    if (inVp) {
+      dot.style.left  = dotX + 'px';
+      dot.style.top   = dotY + 'px';
+    }
+  });
+
+  (function animRing() {
+    ringX += (dotX - ringX) * 0.1;
+    ringY += (dotY - ringY) * 0.1;
+    if (inVp) {
+      ring.style.left = ringX + 'px';
+      ring.style.top  = ringY + 'px';
+    }
+    requestAnimationFrame(animRing);
+  })();
+
+  vp.addEventListener('mouseenter', () => {
+    inVp = true;
+    dot.style.opacity  = '1';
+    ring.style.opacity = '1';
+  });
+  vp.addEventListener('mouseleave', () => {
+    inVp = false;
+    dot.style.opacity  = '0';
+    ring.style.opacity = '0';
+  });
+})();
+
+// ═══════════════════════════════════════════════════════
+// FOAM INSERT SYSTEM
+// ═══════════════════════════════════════════════════════
+let foamGroup    = null;
+let activeInsert = null;
+let foamColor    = '#E8E0D4';
+let slotScale    = 1.0;
+
+const FOAM_SWATCHES = ['#E8E0D4','#D4C9B0','#F5F0E8','#2A2118','#6B1E2C','#1E3A4A','#1A3D2C','#3D2A40','#C9A85C'];
+
+// ── Helpers ────────────────────────────────────────────
+// Returns a dark material representing the slot cavity floor
+function slotMat() {
+  return new THREE.MeshStandardMaterial({
+    color: adjustHex(foamColor, -68), roughness: 1.0, metalness: 0.0
+  });
+}
+// Shorthand to add a mesh to a group
+function addTo(g, geo, mat, x, y, z) {
+  const m = new THREE.Mesh(geo, mat);
+  m.position.set(x, y, z);
+  g.add(m);
+  return m;
+}
+// Build 4 foam rim walls around an open rectangular slot
+//   g       = group to add to
+//   mat     = foam material
+//   fH      = foam height
+//   T       = wall thickness
+//   iW, iD  = total inner foam area (W-T*2, D-T*2)
+//   sW, sD  = slot width & depth
+//   cx, cz  = slot centre offset
+function addRims(g, mat, fH, T, iW, iD, sW, sD, cx, cz) {
+  const rimLR = Math.max(0.001, (iW - sW) / 2);
+  const rimFB = Math.max(0.001, (iD - sD) / 2);
+  const Y = fH / 2 + T;
+  // left
+  addTo(g, new THREE.BoxGeometry(rimLR, fH, iD), mat, cx - (sW/2 + rimLR/2), Y, cz);
+  // right
+  addTo(g, new THREE.BoxGeometry(rimLR, fH, iD), mat, cx + (sW/2 + rimLR/2), Y, cz);
+  // front
+  addTo(g, new THREE.BoxGeometry(sW, fH, rimFB), mat, cx, Y, cz + sD/2 + rimFB/2);
+  // back
+  addTo(g, new THREE.BoxGeometry(sW, fH, rimFB), mat, cx, Y, cz - sD/2 - rimFB/2);
+}
+// Dark slot floor at the base of the cavity
+function addSlotFloor(g, sW, sD, T, cx, cz) {
+  addTo(g, new THREE.BoxGeometry(sW, T * 0.8, sD), slotMat(), cx, T * 1.4, cz);
+}
+
+const INSERTS = [
+  // ── Full Slab ─────────────────────────────────────────
+  {
+    id: 'full',
+    label: 'Full Slab',
+    sub: 'Solid foam base',
+    icon: `<svg viewBox="0 0 36 28"><rect x="2" y="6" width="32" height="16" rx="2" fill="#D4C9B0"/></svg>`,
+    build: (W,H,D,T,mat) => {
+      const g = new THREE.Group();
+      const fH = H * 0.55;
+      addTo(g, new THREE.BoxGeometry(W-T*2, fH, D-T*2), mat, 0, fH/2+T, 0);
+      return g;
+    }
+  },
+
+  // ── Single Slot ───────────────────────────────────────
+  {
+    id: 'single',
+    label: 'Single Slot',
+    sub: 'One centred cutout',
+    icon: `<svg viewBox="0 0 36 28"><rect x="2" y="6" width="32" height="16" rx="2" fill="#D4C9B0"/><rect x="11" y="10" width="14" height="8" rx="1.5" fill="#3A3028"/></svg>`,
+    build: (W,H,D,T,mat) => {
+      const g = new THREE.Group();
+      const fH = H * 0.55;
+      const iW = W-T*2, iD = D-T*2;
+      const sW = Math.min(iW*0.9, iW * 0.48 * slotScale);
+      const sD = Math.min(iD*0.9, iD * 0.62 * slotScale);
+      addSlotFloor(g, sW, sD, T, 0, 0);
+      addRims(g, mat, fH, T, iW, iD, sW, sD, 0, 0);
+      return g;
+    }
+  },
+
+  // ── 2×2 Grid ──────────────────────────────────────────
+  {
+    id: 'grid2x2',
+    label: '2×2 Grid',
+    sub: '4 equal slots',
+    icon: `<svg viewBox="0 0 36 28"><rect x="2" y="4" width="32" height="20" rx="2" fill="#D4C9B0"/><rect x="5" y="7" width="11" height="7" rx="1" fill="#3A3028"/><rect x="20" y="7" width="11" height="7" rx="1" fill="#3A3028"/><rect x="5" y="17" width="11" height="4" rx="1" fill="#3A3028"/><rect x="20" y="17" width="11" height="4" rx="1" fill="#3A3028"/></svg>`,
+    build: (W,H,D,T,mat) => {
+      const g = new THREE.Group();
+      const fH = H * 0.6;
+      const iW = W-T*2, iD = D-T*2;
+      const divT2 = T * 1.5;
+      // cell slot size (each of the 4 slots)
+      const sW = Math.min((iW - divT2) * 0.9, (iW - divT2) * 0.46 * slotScale);
+      const sD = Math.min((iD - divT2) * 0.9, (iD - divT2) * 0.46 * slotScale);
+      const offX = sW / 2 + divT2 / 2;
+      const offZ = sD / 2 + divT2 / 2;
+
+      // 4 slot floors + 4 rim sets (one per slot)
+      [[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([sx,sz]) => {
+        const cx = sx * offX, cz = sz * offZ;
+        addSlotFloor(g, sW, sD, T, cx, cz);
+      });
+
+      // Outer rim — surrounds the full 2×2 footprint
+      const totalW = sW * 2 + divT2, totalD = sD * 2 + divT2;
+      const rimLR = (iW - totalW) / 2, rimFB = (iD - totalD) / 2;
+      const Y = fH/2+T;
+      if (rimLR > 0) {
+        addTo(g, new THREE.BoxGeometry(rimLR, fH, iD), mat, -(totalW/2 + rimLR/2), Y, 0);
+        addTo(g, new THREE.BoxGeometry(rimLR, fH, iD), mat,  (totalW/2 + rimLR/2), Y, 0);
+      }
+      if (rimFB > 0) {
+        addTo(g, new THREE.BoxGeometry(iW, fH, rimFB), mat, 0, Y, -(totalD/2 + rimFB/2));
+        addTo(g, new THREE.BoxGeometry(iW, fH, rimFB), mat, 0, Y,  (totalD/2 + rimFB/2));
+      }
+      // Cross dividers
+      addTo(g, new THREE.BoxGeometry(totalW, fH, divT2), mat, 0, Y, 0); // horizontal
+      addTo(g, new THREE.BoxGeometry(divT2, fH, totalD), mat, 0, Y, 0); // vertical
+      return g;
+    }
+  },
+
+  // ── 3 Slots ───────────────────────────────────────────
+  {
+    id: 'grid3x1',
+    label: '3 Slots',
+    sub: 'Three side-by-side',
+    icon: `<svg viewBox="0 0 36 28"><rect x="2" y="5" width="32" height="18" rx="2" fill="#D4C9B0"/><rect x="4" y="8" width="7" height="9" rx="1" fill="#3A3028"/><rect x="14.5" y="8" width="7" height="9" rx="1" fill="#3A3028"/><rect x="25" y="8" width="7" height="9" rx="1" fill="#3A3028"/></svg>`,
+    build: (W,H,D,T,mat) => {
+      const g = new THREE.Group();
+      const fH = H * 0.6;
+      const iW = W-T*2, iD = D-T*2;
+      const divT2 = T * 1.5;
+      const sW = Math.min((iW - 2*divT2) * 0.9, (iW - 2*divT2) / 3 * slotScale);
+      const sD = Math.min(iD * 0.9, iD * 0.7 * slotScale);
+      const pitch = sW + divT2; // centre-to-centre distance
+      const rimFB = (iD - sD) / 2;
+      const rimLR = (iW - 3*sW - 2*divT2) / 2;
+      const Y = fH/2+T;
+
+      // 3 slot floors
+      [-1,0,1].forEach(i => addSlotFloor(g, sW, sD, T, i * pitch, 0));
+
+      // Outer left/right rims
+      if (rimLR > 0) {
+        addTo(g, new THREE.BoxGeometry(rimLR, fH, iD), mat, -(1.5*sW + divT2 + rimLR/2), Y, 0);
+        addTo(g, new THREE.BoxGeometry(rimLR, fH, iD), mat,  (1.5*sW + divT2 + rimLR/2), Y, 0);
+      }
+      // Front / back rims (full width)
+      if (rimFB > 0) {
+        addTo(g, new THREE.BoxGeometry(iW, fH, rimFB), mat, 0, Y,  sD/2 + rimFB/2);
+        addTo(g, new THREE.BoxGeometry(iW, fH, rimFB), mat, 0, Y, -(sD/2 + rimFB/2));
+      }
+      // 2 dividers
+      addTo(g, new THREE.BoxGeometry(divT2, fH, iD), mat, -pitch/2 - sW/2 + divT2/2, Y, 0);
+      addTo(g, new THREE.BoxGeometry(divT2, fH, iD), mat,  pitch/2 + sW/2 - divT2/2, Y, 0);
+      return g;
+    }
+  },
+
+  // ── Ring / Round ──────────────────────────────────────
+  {
+    id: 'ring',
+    label: 'Ring / Round',
+    sub: 'Cylindrical pocket',
+    icon: `<svg viewBox="0 0 36 28"><rect x="2" y="5" width="32" height="18" rx="2" fill="#D4C9B0"/><ellipse cx="18" cy="14" rx="8" ry="6" fill="#3A3028"/></svg>`,
+    build: (W,H,D,T,mat) => {
+      const g = new THREE.Group();
+      const fH = H * 0.6;
+      const r   = Math.min(W-T*2, D-T*2) * 0.24 * slotScale;
+      const iW  = W-T*2, iD = D-T*2;
+
+      // Dark cylinder floor (represents the hole bottom)
+      const floorCyl = new THREE.Mesh(
+        new THREE.CylinderGeometry(r, r, T * 0.8, 32), slotMat()
+      );
+      floorCyl.position.set(0, T * 1.4, 0);
+      g.add(floorCyl);
+
+      // Foam rims around the cylinder (4 rectangular pieces, approximate the ring)
+      const rimLR = (iW/2 - r);
+      const rimFB = (iD/2 - r);
+      const Y = fH/2+T;
+      addTo(g, new THREE.BoxGeometry(rimLR, fH, iD), mat, -(r + rimLR/2), Y, 0);
+      addTo(g, new THREE.BoxGeometry(rimLR, fH, iD), mat,  (r + rimLR/2), Y, 0);
+      addTo(g, new THREE.BoxGeometry(r*2,  fH, rimFB), mat, 0, Y,  r + rimFB/2);
+      addTo(g, new THREE.BoxGeometry(r*2,  fH, rimFB), mat, 0, Y, -(r + rimFB/2));
+      return g;
+    }
+  },
+
+  // ── Wave Cradle ───────────────────────────────────────
+  {
+    id: 'wave',
+    label: 'Wave Cradle',
+    sub: 'Contoured ridges',
+    icon: `<svg viewBox="0 0 36 28"><rect x="2" y="5" width="32" height="18" rx="2" fill="#D4C9B0"/><path d="M4 16 Q9 8 14 16 Q19 24 24 16 Q29 8 34 16" stroke="#6B5840" stroke-width="2.5" fill="none"/></svg>`,
+    build: (W,H,D,T,mat) => {
+      const g = new THREE.Group();
+      const fH = H * 0.55;
+      // Low base
+      addTo(g, new THREE.BoxGeometry(W-T*2, fH*0.38, D-T*2), mat, 0, fH*0.19+T, 0);
+      // Alternating ridges — high/low creates the wave
+      const cols = 5;
+      const rW   = (W-T*2) / cols;
+      const gap  = slotScale < 1 ? rW * (1 - slotScale) * 0.4 : 0; // wider troughs when scale < 1
+      for (let i = 0; i < cols; i++) {
+        const ridgeH = i % 2 === 0 ? fH * 0.88 : fH * 0.42;
+        const geo    = new THREE.BoxGeometry(rW * 0.72 - gap, ridgeH, D-T*2);
+        addTo(g, geo, mat, -(W-T*2)/2 + rW*(i+0.5), ridgeH/2+T, 0);
+      }
+      return g;
+    }
+  },
+
+  // ── Bottle Holder ─────────────────────────────────────
+  {
+    id: 'bottle',
+    label: 'Bottle Holder',
+    sub: 'Tall cylindrical slot',
+    icon: `<svg viewBox="0 0 36 28"><rect x="2" y="5" width="32" height="18" rx="2" fill="#D4C9B0"/><rect x="13" y="7" width="10" height="14" rx="3" fill="#3A3028"/></svg>`,
+    build: (W,H,D,T,mat) => {
+      const g = new THREE.Group();
+      const iW = W-T*2, iD = D-T*2;
+      const fH = H * 0.72;
+      // Horizontal cylinder along X (width) axis
+      // Radius based on height so it fits inside the foam block
+      const r  = Math.min(fH * 0.38, iD * 0.38) * slotScale;
+      const len = iW; // runs full width
+
+      // Dark cylinder tunnel (horizontal, rotated along Z→X: rotateZ 90°)
+      const floorCyl = new THREE.Mesh(
+        new THREE.CylinderGeometry(r, r, len, 28), slotMat()
+      );
+      floorCyl.rotation.z = Math.PI / 2; // lay it sideways along X
+      floorCyl.position.set(0, r + T, 0);
+      g.add(floorCyl);
+
+      // Foam rims — top slab above cylinder, bottom slab, front/back slabs
+      const rimTop = fH - (r + T);            // foam above the hole
+      const rimBot = T;                        // thin floor
+      const rimFB  = Math.max(0.01, iD/2 - r); // foam front/back of hole
+
+      const Y_top = (r + T) + r + rimTop/2;
+      const Y_mid = r + T;
+
+      // Top foam slab
+      addTo(g, new THREE.BoxGeometry(iW, rimTop, iD), mat, 0, Y_top, 0);
+      // Front foam slab
+      addTo(g, new THREE.BoxGeometry(iW, r*2, rimFB), mat, 0, Y_mid,  r + rimFB/2);
+      // Back foam slab
+      addTo(g, new THREE.BoxGeometry(iW, r*2, rimFB), mat, 0, Y_mid, -(r + rimFB/2));
+      return g;
+    }
+  },
+
+  // ── No Insert ─────────────────────────────────────────
+  {
+    id: 'none',
+    label: 'No Insert',
+    sub: 'Remove foam',
+    icon: `<svg viewBox="0 0 36 28"><line x1="6" y1="6" x2="30" y2="22" stroke="#8A7E6E" stroke-width="2.5"/><line x1="30" y1="6" x2="6" y2="22" stroke="#8A7E6E" stroke-width="2.5"/></svg>`,
+    build: () => null
+  }
+];
+
+function renderInsertButtons() {
+  const grid = document.getElementById('insertGrid');
+  grid.innerHTML = '';
+  INSERTS.forEach(ins => {
+    const b = document.createElement('button');
+    b.className = 'insert-btn' + (activeInsert === ins.id ? ' active' : '');
+    b.innerHTML = `${ins.icon}${ins.label}<span>${ins.sub}</span>`;
+    b.onclick = () => setInsert(ins.id);
+    grid.appendChild(b);
+  });
+}
+
+// ── Foam palette (full, like the paint palette) ──────────────────────────
+let foamPalette = JSON.parse(localStorage.getItem('bcs_foam_palette') || 'null') || [...FOAM_SWATCHES];
+
+function renderFoamPalette() {
+  const wrap = document.getElementById('foamPaletteWrap');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  foamPalette.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.className = 'pal-swatch' + (c === foamColor ? ' active' : '');
+    b.style.background = c;
+    b.title = c;
+    b.onclick = () => setFoamColor(c);
+    b.oncontextmenu = (e) => { e.preventDefault(); foamPalette.splice(i, 1); renderFoamPalette(); };
+    wrap.appendChild(b);
+  });
+}
+
+function addCurrentFoamToPalette() {
+  foamPalette.push(foamColor);
+  localStorage.setItem('bcs_foam_palette', JSON.stringify(foamPalette));
+  renderFoamPalette();
+}
+
+function clearFoamPalette() {
+  if (confirm('Clear foam palette?')) {
+    foamPalette = [];
+    localStorage.setItem('bcs_foam_palette', JSON.stringify(foamPalette));
+    renderFoamPalette();
+  }
+}
+
+function saveFoamPalette() {
+  localStorage.setItem('bcs_foam_palette', JSON.stringify(foamPalette));
+  const b = document.querySelector('.palette-actions .pal-btn:last-child');
+  if (b) { const orig = b.textContent; b.textContent = 'Saved!'; setTimeout(() => b.textContent = orig, 1200); }
+}
+
+function setFoamColor(c) {
+  foamColor = c;
+  const picker = document.getElementById('foamColorPicker');
+  if (picker) picker.value = c;
+  renderFoamPalette();
+  if (activeInsert && activeInsert !== 'none') setInsert(activeInsert);
+}
+
+function setInsert(id) {
+  activeInsert = id;
+  document.querySelectorAll('.insert-btn').forEach(b => b.classList.remove('active'));
+  const btns = document.querySelectorAll('.insert-btn');
+  INSERTS.forEach((ins, i) => { if (ins.id === id) btns[i].classList.add('active'); });
+
+  // remove old foam
+  if (foamGroup) { boxGroup.remove(foamGroup); foamGroup = null; }
+  if (id === 'none') return;
+
+  const ins = INSERTS.find(i => i.id === id);
+  if (!ins) return;
+
+  const W = boxW, H = boxH, D = boxD, T = 0.22;
+  const mat = new THREE.MeshStandardMaterial({ color: foamColor, side: THREE.DoubleSide, roughness: 1.0, metalness: 0.0 });
+  foamGroup = ins.build(W, H, D, T, mat);
+  if (foamGroup) {
+    // Foam casts and receives shadows so it's visually distinct from the box interior
+    foamGroup.traverse(obj => {
+      if (obj.isMesh) { obj.castShadow = true; obj.receiveShadow = true; }
+    });
+    boxGroup.add(foamGroup);
+  }
+}
+
+window.addEventListener('load', () => {
+  init3D();
+  initEditor();
+  renderPalette();
+  renderFoamPalette();
+  renderGallery();
+  renderInsertButtons();
+  selectFace(4);
+
+  // ── Box move-mode drag handlers ────────────────────────────────────────────
+  const vp = document.getElementById('viewport');
+  vp.addEventListener('mousedown', e => {
+    if (!_moveMode || !boxGroup) return;
+    e.stopPropagation();
+    _movePlane   = new THREE.Plane(new THREE.Vector3(0, 1, 0), -boxGroup.position.y);
+    _moveStart   = _vpRayPlane(e);
+    _moveBoxOrig = boxGroup.position.clone();
+  }, true);
+  vp.addEventListener('mousemove', e => {
+    if (!_moveMode || !_moveStart || !boxGroup) return;
+    const now = _vpRayPlane(e);
+    if (!now) return;
+    boxGroup.position.x = _moveBoxOrig.x + (now.x - _moveStart.x);
+    boxGroup.position.z = _moveBoxOrig.z + (now.z - _moveStart.z);
+  }, true);
+  vp.addEventListener('mouseup',    () => { _moveStart = null; }, true);
+  vp.addEventListener('mouseleave', () => { _moveStart = null; }, true);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,2523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Box Craft Studios — Premium Curated Boxes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Leaflet CSS for map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:   #F5F0E8;
+  --cream2:  #EDE8DC;
+  --cream3:  #E4DDD0;
+  --warm:    #D4C9B0;
+  --brown:   #8B7355;
+  --brown2:  #6B5840;
+  --brown3:  #4A3D2C;
+  --dark:    #1C1510;
+  --text:    #2A2118;
+  --text2:   #5A4E3C;
+  --text3:   #8A7E6E;
+  --gold:    #A8884A;
+  --gold2:   #C9A85C;
+  --gold3:   #E8D4A0;
+  --maroon:  #6B1E2C;
+  --maroon2: #8B2A3A;
+  --border:  rgba(139,115,85,0.2);
+  --border2: rgba(139,115,85,0.4);
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--cream); color: var(--text); font-family: 'Jost', sans-serif; font-weight: 300; overflow-x: hidden; }
+
+/* CURSOR */
+body { cursor: none; }
+#cursor { position: fixed; width: 8px; height: 8px; background: var(--brown3); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .3s, height .3s, opacity .3s; }
+#cursor-ring { position: fixed; width: 32px; height: 32px; border: 1px solid rgba(74,61,44,0.4); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform .12s ease-out, width .3s, height .3s; }
+.cursor-expand #cursor { width: 44px; height: 44px; opacity: .1; }
+.cursor-expand #cursor-ring { width: 60px; height: 60px; opacity: 0; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--cream2); }
+::-webkit-scrollbar-thumb { background: var(--maroon); }
+
+/* ANNOUNCEMENT */
+.announcement { background: var(--dark); color: rgba(245,240,232,.65); text-align: center; padding: .55rem 1rem; font-size: .58rem; letter-spacing: .28em; text-transform: uppercase; }
+
+/* NAV */
+nav { position: sticky; top: 0; z-index: 900; background: var(--cream); border-bottom: 1px solid var(--border); }
+.nav-top { display: flex; align-items: center; justify-content: space-between; padding: .9rem 3rem; }
+.nav-logo { font-family: 'EB Garamond', serif; font-size: 1.45rem; letter-spacing: .08em; text-transform: uppercase; color: var(--dark); text-decoration: none; font-weight: 400; }
+.nav-utils { display: flex; align-items: center; gap: 1.8rem; }
+.nav-util-link { color: var(--text2); text-decoration: none; font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; transition: color .25s; }
+.nav-util-link:hover { color: var(--dark); }
+.cart-trigger { display: flex; align-items: center; gap: .4rem; background: none; border: none; font-family: 'Jost', sans-serif; font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; color: var(--text2); cursor: none; transition: color .25s; }
+.cart-trigger:hover { color: var(--dark); }
+.nav-bottom { border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 3rem; padding: .7rem 3rem; }
+.nav-bottom a { color: var(--text2); text-decoration: none; font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; transition: color .25s; position: relative; padding-bottom: 2px; }
+.nav-bottom a::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: var(--dark); transform: scaleX(0); transform-origin: left; transition: transform .3s; }
+.nav-bottom a:hover { color: var(--dark); }
+.nav-bottom a:hover::after { transform: scaleX(1); }
+
+/* HERO */
+.hero { display: grid; grid-template-columns: 1fr 1fr; min-height: 88vh; border-bottom: 1px solid var(--border); }
+.hero-left { background: var(--cream2); display: flex; flex-direction: column; justify-content: flex-end; padding: 5rem 4rem 5rem 5rem; position: relative; overflow: hidden; }
+.hero-left::before { content: 'Box Craft Studios'; position: absolute; top: 2rem; left: 3rem; font-family: 'EB Garamond', serif; font-size: 7rem; color: rgba(139,115,85,.05); letter-spacing: .3em; line-height: 1; pointer-events: none; white-space: nowrap; }
+.hero-eyebrow { font-size: .57rem; letter-spacing: .35em; text-transform: uppercase; color: var(--maroon); margin-bottom: 2rem; display: flex; align-items: center; gap: .8rem; }
+.hero-eyebrow::before { content: ''; width: 28px; height: 1px; background: var(--maroon); }
+.hero-title { font-family: 'EB Garamond', serif; font-size: clamp(3rem, 5.5vw, 5.5rem); font-weight: 400; line-height: 1.07; color: var(--dark); margin-bottom: 2.5rem; }
+.hero-title em { font-style: italic; color: var(--maroon); }
+.hero-sub { font-size: .78rem; line-height: 1.95; color: var(--text2); max-width: 380px; margin-bottom: 3rem; }
+.hero-ctas { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+.btn-primary { background: var(--dark); color: var(--cream); padding: .85rem 2.2rem; border: none; font-family: 'Jost', sans-serif; font-size: .58rem; letter-spacing: .22em; text-transform: uppercase; cursor: none; text-decoration: none; display: inline-block; transition: background .3s; }
+.btn-primary:hover { background: var(--maroon); }
+.btn-outline { background: none; color: var(--dark); padding: .82rem 2rem; border: 1px solid var(--border2); font-family: 'Jost', sans-serif; font-size: .58rem; letter-spacing: .22em; text-transform: uppercase; cursor: none; text-decoration: none; display: inline-block; transition: all .3s; }
+.btn-outline:hover { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+.hero-right { background: var(--cream3); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.hero-right-inner { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
+.lv-box { width: 240px; height: 240px; background: var(--cream2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1.2rem; position: relative; box-shadow: 10px 10px 0 var(--warm), 20px 20px 0 rgba(139,115,85,.1); animation: boxFloat 7s ease-in-out infinite; }
+.lv-box::before { content: ''; position: absolute; top: -14px; left: 14px; right: -14px; bottom: 14px; background: var(--cream3); border: 1px solid var(--border); z-index: -1; }
+@keyframes boxFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+.lv-box-logo { font-family: 'EB Garamond', serif; font-size: 1.7rem; letter-spacing: .55em; color: var(--brown3); padding-left: .55em; }
+.lv-box-line { width: 55px; height: 1px; background: var(--gold); }
+.lv-box-sub { font-size: .46rem; letter-spacing: .4em; text-transform: uppercase; color: var(--text3); }
+.hero-stats { display: flex; flex-direction: column; gap: 1.4rem; margin-top: 3rem; }
+.stat-row { display: flex; align-items: baseline; gap: .7rem; }
+.stat-num { font-family: 'EB Garamond', serif; font-size: 1.9rem; color: var(--dark); font-weight: 400; line-height: 1; }
+.stat-label { font-size: .52rem; letter-spacing: .18em; text-transform: uppercase; color: var(--text3); }
+.hero-caption { position: absolute; bottom: 3.5rem; right: 3rem; font-size: .52rem; letter-spacing: .2em; text-transform: uppercase; color: var(--text3); writing-mode: vertical-rl; }
+
+/* MARQUEE */
+.marquee-wrap { overflow: hidden; background: var(--dark); padding: .82rem 0; }
+.marquee-track { display: flex; gap: 5rem; width: max-content; animation: marquee 35s linear infinite; }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.marquee-item { font-size: .56rem; letter-spacing: .3em; text-transform: uppercase; color: rgba(245,240,232,.45); display: flex; align-items: center; gap: 2rem; white-space: nowrap; }
+.marquee-sep { color: var(--gold); }
+
+/* EDITORIAL */
+.editorial { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--border); }
+.editorial-visual { background: var(--cream3); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; min-height: 520px; }
+.editorial-pattern { position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(139,115,85,.04) 30px, rgba(139,115,85,.04) 31px), repeating-linear-gradient(-45deg, transparent, transparent 30px, rgba(139,115,85,.04) 30px, rgba(139,115,85,.04) 31px); }
+.editorial-obj { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 2rem; }
+.editorial-ring { width: 190px; height: 190px; border: 1px solid var(--border2); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+.editorial-ring::before { content: ''; position: absolute; inset: 12px; border: 1px solid var(--warm); border-radius: 50%; }
+.editorial-ring-text { font-family: 'EB Garamond', serif; font-size: 1rem; letter-spacing: .5em; color: var(--brown3); text-align: center; padding-left: .5em; }
+.editorial-nums { display: flex; gap: 3rem; }
+.editorial-num { text-align: center; }
+.editorial-num-val { font-family: 'EB Garamond', serif; font-size: 2.2rem; color: var(--dark); display: block; }
+.editorial-num-label { font-size: .5rem; letter-spacing: .2em; text-transform: uppercase; color: var(--text3); display: block; margin-top: .3rem; }
+.editorial-text { padding: 6rem 5rem; display: flex; flex-direction: column; justify-content: center; background: var(--cream); }
+.section-label { font-size: .53rem; letter-spacing: .4em; text-transform: uppercase; color: var(--maroon); margin-bottom: 1.5rem; display: flex; align-items: center; gap: .8rem; }
+.section-label::before { content: ''; width: 20px; height: 1px; background: var(--maroon); }
+.section-heading { font-family: 'EB Garamond', serif; font-size: clamp(2.2rem, 3.5vw, 3.8rem); font-weight: 400; line-height: 1.1; color: var(--dark); margin-bottom: 1.8rem; }
+.section-heading em { font-style: italic; color: var(--maroon); }
+.section-body { font-size: .8rem; line-height: 2; color: var(--text2); margin-bottom: 2.5rem; max-width: 480px; }
+.link-arrow { display: inline-flex; align-items: center; gap: .7rem; font-size: .58rem; letter-spacing: .2em; text-transform: uppercase; text-decoration: none; cursor: none; transition: gap .3s; }
+.link-arrow:hover { gap: 1.2rem; }
+.pillars-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem; }
+.pillar { border-top: 1px solid var(--border); padding-top: 1.2rem; }
+.pillar-num { font-family: 'EB Garamond', serif; font-size: 1.3rem; color: var(--warm); margin-bottom: .4rem; }
+.pillar-title { font-size: .65rem; letter-spacing: .12em; text-transform: uppercase; color: var(--dark); margin-bottom: .5rem; font-weight: 400; }
+.pillar-body { font-size: .7rem; color: var(--text3); line-height: 1.75; }
+
+/* COLLECTIONS */
+.collections { background: var(--cream); padding: 6rem 4rem; }
+.collections-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 3.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
+.collections-title { font-family: 'EB Garamond', serif; font-size: clamp(2rem, 3vw, 3.2rem); font-weight: 400; color: var(--dark); }
+.collections-title em { font-style: italic; color: var(--maroon); }
+.filter-row { display: flex; }
+.filter-btn { background: none; border: 1px solid var(--border); border-right: none; color: var(--text3); padding: .5rem 1.2rem; font-family: 'Jost', sans-serif; font-size: .55rem; letter-spacing: .2em; text-transform: uppercase; cursor: none; transition: all .25s; }
+.filter-btn:last-child { border-right: 1px solid var(--border); }
+.filter-btn.active, .filter-btn:hover { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+.products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); }
+.product-card { background: var(--cream2); position: relative; overflow: hidden; cursor: none; transition: background .3s; }
+.product-card:hover { background: var(--cream); }
+.product-card:hover .product-img-inner { transform: scale(1.04); }
+.product-card:hover .product-hover-bar { transform: translateY(0); }
+.product-img { aspect-ratio: 3/4; overflow: hidden; position: relative; background: var(--cream3); display: flex; align-items: center; justify-content: center; }
+.product-img-inner { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: transform .7s cubic-bezier(.25,.46,.45,.94); }
+.box-visual { width: 130px; height: 130px; border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: .6rem; position: relative; box-shadow: 7px 7px 0 var(--warm); }
+.box-visual::before { content: ''; position: absolute; top: -9px; left: 9px; right: -9px; bottom: 9px; border: 1px solid var(--border); z-index: -1; background: var(--cream2); }
+.box-visual-label { font-family: 'EB Garamond', serif; font-size: .8rem; letter-spacing: .3em; color: var(--brown3); padding-left: .3em; }
+.box-visual-line { width: 36px; height: 1px; background: var(--gold); }
+.product-badge { position: absolute; top: 1.2rem; left: 1.2rem; background: var(--maroon); color: rgba(245,240,232,.85); font-size: .46rem; letter-spacing: .2em; text-transform: uppercase; padding: .22rem .65rem; z-index: 2; }
+.product-hover-bar { position: absolute; bottom: 0; left: 0; right: 0; background: var(--dark); color: var(--cream); text-align: center; padding: .75rem; font-size: .53rem; letter-spacing: .22em; text-transform: uppercase; transform: translateY(100%); transition: transform .35s cubic-bezier(.25,.46,.45,.94); cursor: none; }
+.product-body { padding: 1.3rem 1.3rem 1.5rem; }
+.product-category { font-size: .48rem; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); margin-bottom: .45rem; }
+.product-name { font-family: 'EB Garamond', serif; font-size: 1.3rem; color: var(--dark); margin-bottom: .4rem; font-weight: 400; line-height: 1.2; }
+.product-desc { font-size: .67rem; color: var(--text3); line-height: 1.65; margin-bottom: .9rem; }
+.product-footer { display: flex; align-items: center; justify-content: space-between; }
+.product-price { font-family: 'EB Garamond', serif; font-size: 1.35rem; color: var(--dark); }
+.product-price-orig { font-size: .7rem; color: var(--text3); text-decoration: line-through; margin-right: .4rem; }
+.add-btn { width: 32px; height: 32px; border: 1px solid var(--border2); background: none; color: var(--brown); display: flex; align-items: center; justify-content: center; font-size: .95rem; cursor: none; transition: all .25s; }
+.add-btn:hover { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+
+/* PROCESS */
+.process { background: var(--dark); padding: 6rem 4rem; position: relative; overflow: hidden; }
+.process::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(245,240,232,.015) 80px, rgba(245,240,232,.015) 81px); }
+.process-header { text-align: center; margin-bottom: 5rem; position: relative; }
+.process-label { font-size: .53rem; letter-spacing: .4em; text-transform: uppercase; color: var(--gold2); margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: center; gap: .8rem; }
+.process-label::before, .process-label::after { content: ''; width: 28px; height: 1px; background: var(--gold); }
+.process-heading { font-family: 'EB Garamond', serif; font-size: clamp(2rem, 3.5vw, 3.5rem); font-weight: 400; color: var(--cream); line-height: 1.1; }
+.process-heading em { font-style: italic; color: var(--gold2); }
+.process-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
+.process-steps::before { content: ''; position: absolute; top: 27px; left: 12.5%; right: 12.5%; height: 1px; background: linear-gradient(90deg, transparent, var(--brown2), var(--gold), var(--maroon), var(--brown2), transparent); }
+.process-step { text-align: center; padding: 0 2rem; }
+.step-icon { width: 54px; height: 54px; border: 1px solid rgba(245,240,232,.14); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; background: var(--dark); position: relative; z-index: 1; }
+.step-roman { font-family: 'EB Garamond', serif; font-size: 1.05rem; color: var(--gold2); }
+.step-title { font-size: .62rem; letter-spacing: .18em; text-transform: uppercase; color: var(--cream); margin-bottom: .75rem; font-weight: 400; }
+.step-body { font-size: .68rem; color: rgba(245,240,232,.4); line-height: 1.8; }
+
+/* STORY SPLIT */
+.story-split { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.story-panel { padding: 6rem 5rem; display: flex; flex-direction: column; justify-content: center; }
+.story-panel.dark { background: var(--dark); }
+.story-panel.light { background: var(--cream2); }
+.story-heading { font-family: 'EB Garamond', serif; font-size: clamp(1.8rem, 2.8vw, 3rem); font-weight: 400; line-height: 1.15; margin-bottom: 1.5rem; }
+.story-panel.dark .story-heading { color: var(--cream); }
+.story-panel.light .story-heading { color: var(--dark); }
+.story-heading em { font-style: italic; }
+.story-panel.dark .story-heading em { color: var(--gold2); }
+.story-panel.light .story-heading em { color: var(--maroon2); }
+.story-body { font-size: .76rem; line-height: 2; margin-bottom: 2rem; }
+.story-panel.dark .story-body { color: rgba(245,240,232,.5); }
+.story-panel.light .story-body { color: var(--text2); }
+.story-panel.dark .link-arrow { color: var(--gold2); }
+.story-panel.light .link-arrow { color: var(--dark); }
+.story-visual { background: var(--cream3); display: flex; align-items: center; justify-content: center; min-height: 400px; position: relative; overflow: hidden; }
+.story-visual-pattern { position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(139,115,85,.08) 1px, transparent 1px); background-size: 26px 26px; }
+.diamond-frame { width: 150px; height: 150px; border: 1px solid var(--border2); transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+.diamond-frame-inner { transform: rotate(-45deg); text-align: center; }
+.diamond-label { font-family: 'EB Garamond', serif; font-size: .9rem; letter-spacing: .3em; color: var(--brown3); display: block; padding-left: .3em; }
+.diamond-sub { font-size: .42rem; letter-spacing: .28em; text-transform: uppercase; color: var(--text3); display: block; margin-top: .4rem; }
+
+/* TESTIMONIALS */
+.testimonials { background: var(--cream); padding: 7rem 4rem; }
+.testimonials-header { text-align: center; margin-bottom: 4rem; }
+.testi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); }
+.testi-card { background: var(--cream2); padding: 2.5rem 2rem; transition: background .3s; }
+.testi-card:hover { background: var(--cream); }
+.testi-card.featured { background: var(--dark); }
+.testi-stars { color: var(--gold); font-size: .62rem; letter-spacing: .05em; margin-bottom: .75rem; }
+.testi-card.featured .testi-stars { color: var(--gold2); }
+.testi-quote-mark { font-family: 'EB Garamond', serif; font-size: 2.2rem; color: var(--warm); line-height: 1; margin-bottom: .7rem; opacity: .55; }
+.testi-card.featured .testi-quote-mark { color: var(--gold2); opacity: .45; }
+.testi-text { font-family: 'EB Garamond', serif; font-size: .98rem; font-style: italic; color: var(--text); line-height: 1.7; margin-bottom: 1.8rem; }
+.testi-card.featured .testi-text { color: rgba(245,240,232,.75); }
+.testi-footer { display: flex; align-items: center; gap: .8rem; }
+.testi-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--warm); display: flex; align-items: center; justify-content: center; font-family: 'EB Garamond', serif; font-size: .82rem; color: var(--dark); flex-shrink: 0; }
+.testi-card.featured .testi-avatar { background: var(--gold2); }
+.testi-name { font-size: .62rem; letter-spacing: .1em; color: var(--dark); }
+.testi-card.featured .testi-name { color: var(--cream); }
+.testi-role { font-size: .53rem; color: var(--text3); margin-top: .15rem; }
+.testi-card.featured .testi-role { color: rgba(245,240,232,.35); }
+
+/* TRUST */
+.trust { background: var(--cream2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.trust-inner { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--border); gap: 1px; }
+.trust-item { background: var(--cream2); padding: 2.5rem 2rem; text-align: center; transition: background .3s; }
+.trust-item:hover { background: var(--cream); }
+.trust-icon { font-size: 1.1rem; margin-bottom: .75rem; color: var(--gold); }
+.trust-title { font-size: .58rem; letter-spacing: .2em; text-transform: uppercase; color: var(--dark); margin-bottom: .3rem; }
+.trust-sub { font-size: .6rem; color: var(--text3); }
+
+/* NEWSLETTER */
+.newsletter { background: var(--maroon); padding: 7rem 4rem; text-align: center; position: relative; overflow: hidden; }
+.newsletter::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(135deg, transparent, transparent 40px, rgba(245,240,232,.025) 40px, rgba(245,240,232,.025) 41px); }
+.newsletter-content { position: relative; z-index: 1; max-width: 560px; margin: 0 auto; }
+.newsletter-label { font-size: .53rem; letter-spacing: .4em; text-transform: uppercase; color: rgba(245,240,232,.45); margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; gap: .8rem; }
+.newsletter-label::before, .newsletter-label::after { content: ''; width: 22px; height: 1px; background: rgba(245,240,232,.25); }
+.newsletter-title { font-family: 'EB Garamond', serif; font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 400; color: var(--cream); line-height: 1.1; margin-bottom: 1rem; }
+.newsletter-title em { font-style: italic; color: var(--gold3); }
+.newsletter-sub { font-size: .73rem; color: rgba(245,240,232,.55); line-height: 1.9; margin-bottom: 2.5rem; }
+.nl-form { display: flex; max-width: 440px; margin: 0 auto; border: 1px solid rgba(245,240,232,.2); }
+.nl-input { flex: 1; padding: .88rem 1.2rem; background: rgba(245,240,232,.07); border: none; color: var(--cream); font-family: 'Jost', sans-serif; font-size: .7rem; outline: none; }
+.nl-input::placeholder { color: rgba(245,240,232,.3); }
+.nl-btn { padding: .88rem 1.8rem; background: var(--cream); border: none; color: var(--maroon); font-family: 'Jost', sans-serif; font-size: .56rem; letter-spacing: .22em; text-transform: uppercase; cursor: none; transition: background .3s; white-space: nowrap; }
+.nl-btn:hover { background: var(--gold3); }
+
+/* FOOTER */
+footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
+.footer-main { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 4rem; padding: 5rem 4rem 4rem; border-bottom: 1px solid rgba(245,240,232,.05); }
+.footer-brand-name { font-family: 'EB Garamond', serif; font-size: 1.7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--cream); margin-bottom: .8rem; }
+.footer-brand-body { font-size: .67rem; color: rgba(245,240,232,.35); line-height: 1.9; max-width: 255px; margin-bottom: 1.8rem; }
+.footer-brand-sep { width: 28px; height: 1px; background: var(--gold); }
+.footer-col-title { font-size: .53rem; letter-spacing: .3em; text-transform: uppercase; color: rgba(245,240,232,.4); margin-bottom: 1.5rem; }
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: .65rem; }
+.footer-links a { color: rgba(245,240,232,.3); text-decoration: none; font-size: .68rem; transition: color .25s; }
+.footer-links a:hover { color: var(--cream); }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; padding: 1.8rem 4rem; }
+.footer-copy { font-size: .53rem; color: rgba(245,240,232,.2); letter-spacing: .1em; }
+.footer-legal { display: flex; gap: 1.8rem; }
+.footer-legal a { color: rgba(245,240,232,.2); text-decoration: none; font-size: .53rem; letter-spacing: .1em; transition: color .25s; }
+.footer-legal a:hover { color: rgba(245,240,232,.5); }
+.footer-socials { display: flex; gap: 2rem; }
+.social-link { color: rgba(245,240,232,.25); text-decoration: none; font-size: .53rem; letter-spacing: .2em; text-transform: uppercase; transition: color .25s; }
+.social-link:hover { color: var(--cream); }
+
+/* MODAL */
+.product-modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(28,21,16,.97); backdrop-filter: blur(14px); overflow-y: auto; }
+.product-modal.open { display: block; }
+.modal-inner { max-width: 1100px; margin: 0 auto; padding: 5rem 4rem; min-height: 100vh; }
+.modal-close { position: fixed; top: 1.8rem; right: 2.2rem; background: none; border: 1px solid rgba(245,240,232,.12); color: rgba(245,240,232,.4); width: 44px; height: 44px; font-size: 1rem; cursor: none; display: flex; align-items: center; justify-content: center; transition: all .3s; z-index: 10; }
+.modal-close:hover { border-color: var(--cream); color: var(--cream); }
+.modal-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 5rem; align-items: start; }
+.modal-gallery { position: sticky; top: 2rem; }
+.gallery-main { background: var(--cream3); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; margin-bottom: .75rem; }
+.gallery-thumbs { display: flex; gap: .4rem; }
+.thumb { width: 70px; aspect-ratio: 1; background: var(--cream2); border: 1px solid var(--border); cursor: none; transition: border-color .25s; display: flex; align-items: center; justify-content: center; }
+.thumb.active { border-color: var(--dark); }
+.thumb:hover { border-color: var(--brown); }
+.thumb-mini { width: 26px; height: 26px; border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; }
+.thumb-mini-label { font-family: 'EB Garamond', serif; font-size: .52rem; color: var(--brown3); }
+.modal-info { padding-top: 1rem; }
+.modal-category { font-size: .52rem; letter-spacing: .35em; text-transform: uppercase; color: var(--gold2); margin-bottom: .75rem; }
+.modal-name { font-family: 'EB Garamond', serif; font-size: clamp(1.9rem, 3vw, 2.7rem); font-weight: 400; line-height: 1.1; color: var(--cream); margin-bottom: .75rem; }
+.modal-rating { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.5rem; }
+.stars { color: var(--gold2); font-size: .68rem; letter-spacing: .05em; }
+.rating-count { font-size: .58rem; color: rgba(245,240,232,.3); }
+.modal-divider { height: 1px; background: rgba(245,240,232,.07); margin-bottom: 1.5rem; }
+.modal-price { font-family: 'EB Garamond', serif; font-size: 2.1rem; color: var(--cream); }
+.modal-price-note { font-size: .58rem; color: rgba(245,240,232,.28); margin-top: .3rem; }
+.modal-desc { font-size: .76rem; color: rgba(245,240,232,.5); line-height: 1.9; margin: 1.4rem 0; }
+.modal-contents-title { font-size: .55rem; letter-spacing: .25em; text-transform: uppercase; color: rgba(245,240,232,.35); margin-bottom: .9rem; }
+.contents-list { display: flex; flex-direction: column; gap: .45rem; margin-bottom: 1.4rem; }
+.content-item { display: flex; align-items: center; gap: .7rem; font-size: .7rem; color: rgba(245,240,232,.5); }
+.content-dot { width: 3px; height: 3px; background: var(--gold2); border-radius: 50%; flex-shrink: 0; }
+.qty-wrap { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; }
+.qty-label { font-size: .55rem; letter-spacing: .2em; text-transform: uppercase; color: rgba(245,240,232,.3); }
+.qty-ctrl { display: flex; }
+.qty-btn { width: 32px; height: 32px; border: 1px solid rgba(245,240,232,.1); background: none; color: rgba(245,240,232,.45); font-size: .9rem; cursor: none; transition: all .2s; }
+.qty-btn:hover { border-color: var(--cream); color: var(--cream); }
+.qty-num { width: 42px; height: 32px; border-top: 1px solid rgba(245,240,232,.1); border-bottom: 1px solid rgba(245,240,232,.1); background: rgba(245,240,232,.04); color: var(--cream); text-align: center; line-height: 32px; font-size: .8rem; }
+.modal-add-btn { width: 100%; padding: 1rem; background: var(--cream); border: none; color: var(--dark); font-family: 'Jost', sans-serif; font-size: .58rem; letter-spacing: .22em; text-transform: uppercase; cursor: none; transition: background .3s; margin-bottom: .55rem; }
+.modal-add-btn:hover { background: var(--gold3); }
+.modal-wish-btn { width: 100%; padding: .82rem; background: none; border: 1px solid rgba(245,240,232,.1); color: rgba(245,240,232,.45); font-family: 'Jost', sans-serif; font-size: .56rem; letter-spacing: .2em; text-transform: uppercase; cursor: none; transition: all .3s; }
+.modal-wish-btn:hover { border-color: rgba(245,240,232,.25); color: var(--cream); }
+.modal-meta { margin-top: 1.8rem; padding-top: 1.4rem; border-top: 1px solid rgba(245,240,232,.07); display: flex; flex-direction: column; gap: .55rem; }
+.meta-row { display: flex; justify-content: space-between; align-items: center; }
+.meta-key { font-size: .52rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(245,240,232,.22); }
+.meta-val { font-size: .68rem; color: rgba(245,240,232,.45); }
+
+/* TOAST */
+.toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 2000; background: var(--dark); border: 1px solid rgba(245,240,232,.08); border-left: 3px solid var(--maroon); padding: 1.1rem 1.5rem; min-width: 255px; transform: translateY(100px); opacity: 0; transition: all .4s; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast-title { font-size: .6rem; letter-spacing: .15em; color: var(--gold2); text-transform: uppercase; margin-bottom: .25rem; }
+.toast-body { font-size: .67rem; color: rgba(245,240,232,.4); }
+.toast-action { margin-top: .7rem; background: none; border: 1px solid rgba(245,240,232,.18); color: var(--cream); font-family: 'Jost', sans-serif; font-size: .54rem; letter-spacing: .18em; text-transform: uppercase; padding: .4rem .9rem; cursor: none; transition: background .2s; display: block; }
+.toast-action:hover { background: rgba(245,240,232,.08); }
+/* ── CART DRAWER ─────────────────────────────────────────────────────────────── */
+.cart-drawer { position: fixed; top: 0; right: -420px; width: 400px; max-width: 95vw; height: 100vh; background: var(--cream); z-index: 1500; display: flex; flex-direction: column; transition: right .35s cubic-bezier(.25,.46,.45,.94); box-shadow: -8px 0 40px rgba(28,21,16,.18); }
+.cart-drawer.open { right: 0; }
+.cart-drawer-overlay { display: none; position: fixed; inset: 0; z-index: 1499; background: rgba(28,21,16,.45); }
+.cart-drawer-overlay.open { display: block; }
+.cart-drawer-header { display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 1.8rem; border-bottom: 1px solid var(--border); }
+.cart-drawer-title { font-family: 'EB Garamond', serif; font-size: 1.3rem; color: var(--dark); }
+.cart-drawer-close { background: none; border: 1px solid var(--border2); color: var(--text3); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: none; font-size: .8rem; transition: all .2s; }
+.cart-drawer-close:hover { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+.cart-drawer-items { flex: 1; overflow-y: auto; padding: 1.2rem 1.8rem; }
+.cart-drawer-empty { text-align: center; padding: 3rem 0; font-size: .65rem; letter-spacing: .18em; text-transform: uppercase; color: var(--text3); }
+.cart-drawer-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+.cart-item-info { flex: 1; }
+.cart-item-name { font-size: .78rem; color: var(--dark); margin-bottom: .25rem; }
+.cart-item-qty { font-size: .56rem; letter-spacing: .14em; text-transform: uppercase; color: var(--text3); }
+.cart-item-price { font-size: .78rem; color: var(--dark); white-space: nowrap; }
+.cart-item-remove { background: none; border: none; color: var(--text3); cursor: none; font-size: .9rem; padding: 0 .2rem; transition: color .2s; line-height: 1; }
+.cart-item-remove:hover { color: var(--maroon); }
+.cart-drawer-footer { padding: 1.4rem 1.8rem; border-top: 1px solid var(--border); }
+.cart-drawer-total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+.cart-total-label { font-size: .55rem; letter-spacing: .2em; text-transform: uppercase; color: var(--text2); }
+.cart-total-value { font-family: 'EB Garamond', serif; font-size: 1.2rem; color: var(--dark); }
+.cart-checkout-btn { width: 100%; padding: .9rem; background: var(--dark); color: var(--cream); border: none; font-family: 'Jost', sans-serif; font-size: .58rem; letter-spacing: .22em; text-transform: uppercase; cursor: none; transition: background .3s; margin-bottom: .6rem; }
+.cart-checkout-btn:hover { background: var(--maroon); }
+.cart-clear-btn { width: 100%; padding: .7rem; background: none; border: 1px solid var(--border2); color: var(--text3); font-family: 'Jost', sans-serif; font-size: .54rem; letter-spacing: .18em; text-transform: uppercase; cursor: none; transition: all .25s; }
+.cart-clear-btn:hover { border-color: var(--maroon); color: var(--maroon); }
+
+/* ── INFO MODAL ─────────────────────────────────────────────────────────────── */
+.info-overlay { display:none; position:fixed; inset:0; z-index:1600; }
+.info-overlay.open { display:grid; grid-template-columns:38% 62%; }
+/* LEFT PANEL */
+.info-left {
+  background:var(--dark);
+  padding:4rem 3.5rem;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  position:relative;
+  overflow:hidden;
+}
+.info-left::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background: repeating-linear-gradient(135deg,transparent,transparent 50px,rgba(245,240,232,.025) 50px,rgba(245,240,232,.025) 51px);
+  pointer-events:none;
+}
+.info-left::after {
+  content:'';
+  position:absolute;
+  bottom:-80px;
+  right:-80px;
+  width:320px;
+  height:320px;
+  border-radius:50%;
+  border:1px solid rgba(168,136,74,.12);
+  pointer-events:none;
+}
+.info-deco-num {
+  font-family:'EB Garamond',serif;
+  font-size:9rem;
+  color:rgba(245,240,232,.04);
+  line-height:1;
+  position:absolute;
+  top:2rem;
+  right:2rem;
+  pointer-events:none;
+  letter-spacing:-.02em;
+}
+.info-tag {
+  font-size:.5rem;
+  letter-spacing:.38em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:1.4rem;
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+  position:relative;
+  z-index:1;
+}
+.info-tag::before { content:''; width:20px; height:1px; background:var(--gold); }
+.info-heading {
+  font-family:'EB Garamond',serif;
+  font-size:clamp(1.8rem,3vw,2.8rem);
+  color:var(--cream);
+  font-weight:400;
+  line-height:1.15;
+  position:relative;
+  z-index:1;
+}
+.info-heading em { font-style:italic; color:var(--gold3); }
+.info-left-bottom {
+  position:relative;
+  z-index:1;
+}
+.info-brand-mark {
+  font-family:'EB Garamond',serif;
+  font-size:.72rem;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:rgba(245,240,232,.2);
+  margin-bottom:.5rem;
+}
+.info-close-hint {
+  font-size:.5rem;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:rgba(245,240,232,.18);
+}
+/* RIGHT PANEL */
+.info-right {
+  background:var(--cream2);
+  overflow-y:auto;
+  padding:3.5rem 4rem 4rem;
+  position:relative;
+  max-height:100vh;
+}
+.info-close {
+  position:sticky;
+  top:0;
+  float:right;
+  background:var(--cream);
+  border:1px solid var(--border2);
+  color:var(--text3);
+  width:36px;
+  height:36px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:none;
+  font-size:.85rem;
+  transition:all .25s;
+  margin-bottom:2rem;
+  margin-left:1rem;
+  z-index:2;
+}
+.info-close:hover { background:var(--dark); color:var(--cream); border-color:var(--dark); }
+.info-body { font-size:.76rem; color:var(--text2); line-height:1.95; clear:both; }
+.info-body h3 {
+  font-family:'EB Garamond',serif;
+  font-size:1.25rem;
+  color:var(--dark);
+  margin:2rem 0 .6rem;
+  padding-top:1.2rem;
+  border-top:1px solid var(--border);
+}
+.info-body h3:first-child { margin-top:0; padding-top:0; border-top:none; }
+.info-body p { margin-bottom:1rem; }
+.info-body ul { padding-left:1.4rem; margin-bottom:1rem; }
+.info-body ul li { margin-bottom:.5rem; }
+.info-body a { color:var(--maroon); text-decoration:none; font-weight:400; }
+.info-body a:hover { text-decoration:underline; }
+.info-body strong { color:var(--dark); font-weight:500; }
+.info-body .badge { display:inline-block; background:var(--dark); color:var(--cream); font-size:.5rem; letter-spacing:.2em; text-transform:uppercase; padding:.3rem .8rem; margin-bottom:1.2rem; }
+.info-body .closed-badge { display:inline-block; background:rgba(107,30,44,.08); color:var(--maroon); border:1px solid rgba(107,30,44,.3); font-size:.5rem; letter-spacing:.2em; text-transform:uppercase; padding:.35rem .9rem; margin-bottom:1.4rem; }
+@media(max-width:768px) {
+  .info-overlay.open { grid-template-columns:1fr; grid-template-rows:auto 1fr; }
+  .info-left { padding:2.5rem 2rem; min-height:auto; }
+  .info-right { padding:2rem 1.5rem; max-height:60vh; }
+}
+
+/* ── CURRENCY SELECTOR ───────────────────────────────────────────────────────── */
+.currency-selector { position:relative; }
+.currency-trigger { background:none; border:none; font-family:'Jost',sans-serif; font-size:.58rem; letter-spacing:.15em; text-transform:uppercase; color:var(--text2); cursor:none; display:flex; align-items:center; gap:.35rem; transition:color .25s; padding:0; }
+.currency-trigger:hover { color:var(--dark); }
+.currency-caret { font-size:.45rem; opacity:.6; transition:transform .2s; }
+.currency-selector.open .currency-caret { transform:rotate(180deg); }
+.currency-menu { display:none; position:absolute; top:calc(100% + .8rem); left:0; background:var(--cream); border:1px solid var(--border2); min-width:220px; box-shadow:0 8px 24px rgba(28,21,16,.12); z-index:999; }
+.currency-selector.open .currency-menu { display:block; }
+.currency-option { display:block; width:100%; padding:.65rem 1rem; font-family:'Jost',sans-serif; font-size:.56rem; letter-spacing:.12em; text-transform:uppercase; color:var(--text2); background:none; border:none; border-bottom:1px solid var(--border); text-align:left; cursor:none; transition:background .15s; }
+.currency-option:last-child { border-bottom:none; }
+.currency-option:hover, .currency-option.active { background:var(--dark); color:var(--cream); }
+
+/* ── SEARCH ─────────────────────────────────────────────────────────────────── */
+#searchOverlay.open { display:flex !important; }
+.search-result-item { display:flex; justify-content:space-between; align-items:center; padding:.9rem 0; border-bottom:1px solid rgba(245,240,232,.1); cursor:none; transition:opacity .2s; }
+.search-result-item:hover { opacity:.7; }
+.search-result-name { font-family:'EB Garamond',serif; font-size:1.1rem; color:var(--cream); margin-bottom:.2rem; }
+.search-result-cat { font-size:.55rem; letter-spacing:.18em; text-transform:uppercase; color:rgba(245,240,232,.4); }
+.search-result-price { font-size:.9rem; color:var(--gold); white-space:nowrap; }
+.search-empty { font-size:.65rem; letter-spacing:.15em; text-transform:uppercase; color:rgba(245,240,232,.35); margin-top:1rem; }
+
+/* ── AUTH MODAL ─────────────────────────────────────────────────────────────── */
+.overlay { display:none; position:fixed; inset:0; z-index:1100; background:rgba(28,21,16,.96); backdrop-filter:blur(12px); overflow-y:auto; }
+.overlay.open { display:flex; align-items:center; justify-content:center; padding:2rem; }
+.auth-box { background:var(--cream); width:100%; max-width:440px; padding:3rem 2.8rem; position:relative; }
+.auth-close { position:absolute; top:1.2rem; right:1.2rem; background:none; border:1px solid var(--border2); color:var(--text3); width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:none; font-size:.9rem; transition:all .25s; }
+.auth-close:hover { border-color:var(--dark); color:var(--dark); }
+.auth-logo { font-family:'EB Garamond',serif; font-size:1.3rem; letter-spacing:.08em; text-transform:uppercase; color:var(--dark); margin-bottom:.4rem; }
+.auth-label { font-size:.52rem; letter-spacing:.3em; text-transform:uppercase; color:var(--maroon); margin-bottom:2rem; }
+.auth-tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:2rem; }
+.auth-tab { background:none; border:none; font-family:'Jost',sans-serif; font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--text3); padding:.6rem 1.2rem .6rem 0; cursor:none; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all .25s; }
+.auth-tab.active { color:var(--dark); border-bottom-color:var(--dark); }
+.auth-form { display:flex; flex-direction:column; gap:1.1rem; }
+.form-field { display:flex; flex-direction:column; gap:.4rem; }
+.form-label { font-size:.52rem; letter-spacing:.18em; text-transform:uppercase; color:var(--text2); }
+.form-input { padding:.78rem 1rem; border:1px solid var(--border2); background:var(--cream2); color:var(--text); font-family:'Jost',sans-serif; font-size:.78rem; outline:none; transition:border-color .25s; }
+.form-input:focus { border-color:var(--brown); }
+.form-error { font-size:.62rem; color:var(--maroon); min-height:.9rem; }
+.auth-submit { margin-top:.5rem; padding:.9rem; background:var(--dark); color:var(--cream); border:none; font-family:'Jost',sans-serif; font-size:.58rem; letter-spacing:.22em; text-transform:uppercase; cursor:none; transition:background .3s; }
+.auth-submit:hover { background:var(--maroon); }
+.auth-divider { text-align:center; font-size:.55rem; letter-spacing:.15em; text-transform:uppercase; color:var(--text3); margin:.4rem 0; }
+
+/* ── NAV AUTH BUTTONS ────────────────────────────────────────────────────────── */
+.nav-auth-btn { background:none; border:1px solid var(--border2); color:var(--text2); padding:.38rem .9rem; font-family:'Jost',sans-serif; font-size:.55rem; letter-spacing:.18em; text-transform:uppercase; cursor:none; transition:all .25s; }
+.nav-auth-btn:hover { background:var(--dark); color:var(--cream); border-color:var(--dark); }
+.nav-user { display:none; align-items:center; gap:.7rem; }
+.nav-user.visible { display:flex; }
+.nav-user-name { font-size:.58rem; letter-spacing:.12em; color:var(--text2); text-transform:uppercase; }
+.nav-logout-btn { background:none; border:none; font-family:'Jost',sans-serif; font-size:.55rem; letter-spacing:.18em; text-transform:uppercase; color:var(--text3); cursor:none; transition:color .25s; }
+.nav-logout-btn:hover { color:var(--maroon); }
+
+/* ── ADDRESS MODAL ───────────────────────────────────────────────────────────── */
+.addr-modal { display:none; position:fixed; inset:0; z-index:1200; background:rgba(28,21,16,.97); backdrop-filter:blur(12px); overflow-y:auto; }
+.addr-modal.open { display:flex; align-items:flex-start; justify-content:center; padding:2rem; }
+.addr-box { background:var(--cream); width:100%; max-width:680px; padding:3rem; position:relative; margin:auto; }
+.addr-close { position:absolute; top:1.2rem; right:1.2rem; background:none; border:1px solid var(--border2); color:var(--text3); width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:none; font-size:.9rem; transition:all .25s; }
+.addr-close:hover { border-color:var(--dark); color:var(--dark); }
+.addr-heading { font-family:'EB Garamond',serif; font-size:1.6rem; color:var(--dark); margin-bottom:.4rem; }
+.addr-sub { font-size:.65rem; color:var(--text3); margin-bottom:2rem; }
+.form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+#addrMap { width:100%; height:220px; border:1px solid var(--border2); margin:1rem 0; z-index:1; }
+.addr-list { display:flex; flex-direction:column; gap:.8rem; margin-bottom:1.5rem; }
+.addr-card { border:1px solid var(--border); padding:1.2rem 1.4rem; background:var(--cream2); display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; cursor:none; transition:border-color .25s; }
+.addr-card.selected { border-color:var(--dark); background:var(--cream); }
+.addr-card-info { flex:1; }
+.addr-card-label { font-size:.52rem; letter-spacing:.25em; text-transform:uppercase; color:var(--maroon); margin-bottom:.3rem; }
+.addr-card-name { font-size:.78rem; color:var(--dark); font-weight:400; margin-bottom:.2rem; }
+.addr-card-line { font-size:.68rem; color:var(--text2); line-height:1.6; }
+.addr-card-actions { display:flex; gap:.5rem; flex-shrink:0; }
+.addr-action-btn { background:none; border:1px solid var(--border); color:var(--text3); padding:.28rem .65rem; font-family:'Jost',sans-serif; font-size:.5rem; letter-spacing:.15em; text-transform:uppercase; cursor:none; transition:all .2s; }
+.addr-action-btn:hover { border-color:var(--dark); color:var(--dark); }
+.addr-action-btn.danger:hover { border-color:var(--maroon); color:var(--maroon); }
+.addr-select-btn { width:100%; padding:.85rem; background:var(--dark); color:var(--cream); border:none; font-family:'Jost',sans-serif; font-size:.58rem; letter-spacing:.22em; text-transform:uppercase; cursor:none; transition:background .3s; }
+.addr-select-btn:hover { background:var(--maroon); }
+
+/* ── CHECKOUT MODAL ──────────────────────────────────────────────────────────── */
+.checkout-modal { display:none; position:fixed; inset:0; z-index:1300; background:rgba(28,21,16,.97); backdrop-filter:blur(12px); overflow-y:auto; }
+.checkout-modal.open { display:flex; align-items:flex-start; justify-content:center; padding:2rem; }
+.checkout-box { background:var(--cream); width:100%; max-width:760px; padding:3rem; position:relative; margin:auto; }
+.checkout-close { position:absolute; top:1.2rem; right:1.2rem; background:none; border:1px solid var(--border2); color:var(--text3); width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:none; font-size:.9rem; transition:all .25s; }
+.checkout-close:hover { border-color:var(--dark); color:var(--dark); }
+.checkout-heading { font-family:'EB Garamond',serif; font-size:1.8rem; color:var(--dark); margin-bottom:2rem; }
+.checkout-grid { display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:start; }
+.checkout-section-title { font-size:.55rem; letter-spacing:.3em; text-transform:uppercase; color:var(--maroon); margin-bottom:1rem; display:flex; align-items:center; gap:.6rem; }
+.checkout-section-title::before { content:''; width:16px; height:1px; background:var(--maroon); }
+.order-summary-list { display:flex; flex-direction:column; gap:.7rem; margin-bottom:1.2rem; }
+.order-summary-item { display:flex; justify-content:space-between; align-items:center; }
+.order-item-name { font-size:.7rem; color:var(--text2); }
+.order-item-qty { font-size:.58rem; color:var(--text3); }
+.order-item-price { font-size:.75rem; color:var(--dark); font-family:'EB Garamond',serif; }
+.order-summary-divider { height:1px; background:var(--border); margin:.5rem 0; }
+.order-total-row { display:flex; justify-content:space-between; align-items:center; }
+.order-total-label { font-size:.6rem; letter-spacing:.15em; text-transform:uppercase; color:var(--text2); }
+.order-total-value { font-family:'EB Garamond',serif; font-size:1.4rem; color:var(--dark); }
+.checkout-addr-info { background:var(--cream2); border:1px solid var(--border); padding:1rem 1.2rem; margin-bottom:1rem; font-size:.68rem; color:var(--text2); line-height:1.7; }
+.checkout-addr-change { font-size:.55rem; letter-spacing:.18em; text-transform:uppercase; color:var(--brown); text-decoration:none; cursor:none; transition:color .25s; background:none; border:none; font-family:'Jost',sans-serif; }
+.checkout-addr-change:hover { color:var(--dark); }
+.pay-btn { width:100%; padding:1rem; background:var(--dark); color:var(--cream); border:none; font-family:'Jost',sans-serif; font-size:.6rem; letter-spacing:.22em; text-transform:uppercase; cursor:none; transition:background .3s; margin-top:1.5rem; }
+.pay-btn:hover { background:var(--maroon); }
+.pay-btn:disabled { opacity:.4; pointer-events:none; }
+.pay-note { font-size:.58rem; color:var(--text3); text-align:center; margin-top:.8rem; line-height:1.6; }
+
+/* ── PROFILE DROPDOWN ────────────────────────────────────────────────────────── */
+.profile-dropdown { position:relative; }
+.profile-dropdown-menu { display:none; position:absolute; top:calc(100% + .6rem); right:0; background:var(--cream); border:1px solid var(--border2); min-width:180px; box-shadow:0 8px 24px rgba(28,21,16,.12); z-index:999; }
+.profile-dropdown.open .profile-dropdown-menu { display:block; }
+.profile-menu-item { display:block; padding:.7rem 1.1rem; font-size:.6rem; letter-spacing:.14em; text-transform:uppercase; color:var(--text2); text-decoration:none; border-bottom:1px solid var(--border); transition:background .2s; cursor:none; background:none; border-left:none; border-right:none; font-family:'Jost',sans-serif; width:100%; text-align:left; }
+.profile-menu-item:last-child { border-bottom:none; }
+.profile-menu-item:hover { background:var(--cream2); color:var(--dark); }
+.profile-menu-item.danger:hover { color:var(--maroon); }
+
+/* REVEAL */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity .9s cubic-bezier(.25,.46,.45,.94), transform .9s cubic-bezier(.25,.46,.45,.94); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: .1s; }
+.reveal-delay-2 { transition-delay: .2s; }
+.reveal-delay-3 { transition-delay: .3s; }
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-right { display: none; }
+  .hero-left { padding: 5rem 3rem 4rem; min-height: 80vh; }
+  .editorial { grid-template-columns: 1fr; }
+  .editorial-visual { min-height: 280px; }
+  .editorial-text { padding: 4rem 3rem; }
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .process-steps { grid-template-columns: repeat(2, 1fr); }
+  .process-steps::before { display: none; }
+  .story-split { grid-template-columns: 1fr; }
+  .testi-grid { grid-template-columns: repeat(2, 1fr); }
+  .trust-inner { grid-template-columns: repeat(2, 1fr); }
+  .footer-main { grid-template-columns: 1fr 1fr; gap: 3rem; }
+  .modal-grid { grid-template-columns: 1fr; }
+  .nav-top { padding: .8rem 2rem; }
+  .nav-bottom { gap: 1.5rem; padding: .7rem 2rem; }
+  .collections { padding: 5rem 2.5rem; }
+}
+@media (max-width: 640px) {
+  .nav-bottom { display: none; }
+  .hero-left { padding: 4rem 1.5rem 3.5rem; }
+  .hero-stats { position: static; margin-top: 2.5rem; flex-direction: row; gap: 2rem; flex-wrap: wrap; }
+  .products-grid { grid-template-columns: 1fr; }
+  .process-steps { grid-template-columns: 1fr; }
+  .testi-grid { grid-template-columns: 1fr; }
+  .trust-inner { grid-template-columns: 1fr; }
+  .footer-main { grid-template-columns: 1fr; padding: 4rem 1.5rem; }
+  .footer-bottom { flex-direction: column; gap: 1rem; padding: 1.5rem; text-align: center; }
+  .modal-inner { padding: 4rem 1.2rem; }
+  .collections { padding: 4rem 1.5rem; }
+  .editorial-text { padding: 3.5rem 1.5rem; }
+  .process { padding: 5rem 1.5rem; }
+  .newsletter { padding: 5rem 1.5rem; }
+  .nl-form { flex-direction: column; }
+  .story-panel { padding: 4rem 2rem; }
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<div class="announcement">Complimentary gift wrapping on all orders &nbsp;·&nbsp; Free shipping on bulk orders &nbsp;·&nbsp; New: The Diwali Edit</div>
+
+<nav id="navbar">
+  <div class="nav-top">
+    <div class="currency-selector" id="currencySelector">
+      <button class="currency-trigger" onclick="toggleCurrencyMenu(event)">
+        <span id="activeCurrencyCode">INR</span>
+        <span id="activeCurrencySymbol">₹</span>
+        <span class="currency-caret">▾</span>
+      </button>
+      <div class="currency-menu" id="currencyMenu">
+        <button class="currency-option active" onclick="setCurrency('INR','₹',event)">INR — ₹ Indian Rupee</button>
+        <button class="currency-option" onclick="setCurrency('USD','$',event)">USD — $ US Dollar</button>
+        <button class="currency-option" onclick="setCurrency('EUR','€',event)">EUR — € Euro</button>
+        <button class="currency-option" onclick="setCurrency('GBP','£',event)">GBP — £ British Pound</button>
+        <button class="currency-option" onclick="setCurrency('AED','د.إ',event)">AED — د.إ Dirham</button>
+        <button class="currency-option" onclick="setCurrency('SGD','S$',event)">SGD — S$ Singapore Dollar</button>
+        <button class="currency-option" onclick="setCurrency('AUD','A$',event)">AUD — A$ Australian Dollar</button>
+        <button class="currency-option" onclick="setCurrency('CAD','C$',event)">CAD — C$ Canadian Dollar</button>
+      </div>
+    </div>
+    <div style="text-align:center">
+      <a href="#" class="nav-logo">Box Craft Studios</a>
+      <div style="font-size:.45rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-top:.2rem">If you can imagine it, we can build it.</div>
+    </div>
+    <div class="nav-utils">
+      <a href="#" class="nav-util-link" onclick="openSearch();return false;">Search</a>
+      <!-- Auth: logged out -->
+      <div id="navAuthButtons" style="display:flex;gap:.7rem;align-items:center">
+        <button class="nav-auth-btn" onclick="openAuth('login')">Sign In</button>
+        <button class="nav-auth-btn" style="background:var(--dark);color:var(--cream);border-color:var(--dark)" onclick="openAuth('register')">Register</button>
+      </div>
+      <!-- Auth: logged in -->
+      <div class="nav-user profile-dropdown" id="navUser">
+        <span class="nav-user-name" id="navUserName"></span>
+        <div class="profile-dropdown-menu">
+          <button class="profile-menu-item" onclick="openAddressModal()">My Addresses</button>
+          <button class="profile-menu-item" onclick="openOrdersPanel()">My Orders</button>
+          <button class="profile-menu-item danger" onclick="handleLogout()">Sign Out</button>
+        </div>
+      </div>
+      <button class="cart-trigger" onclick="openCartDrawer()">
+        Bag <span id="cartCount"></span>
+      </button>
+    </div>
+  </div>
+  <div class="nav-bottom">
+    <a href="#collections">Collections</a>
+    <a href="#philosophy">Our Story</a>
+    <a href="#experience">How It Works</a>
+    <a href="#testimonials">Reviews</a>
+    <a href="#customize">Customize Your Box</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<section class="hero" id="home">
+  <div class="hero-left">
+    <p class="hero-eyebrow reveal">Est. 2025 — Premium Curation</p>
+    <p style="font-family:'EB Garamond',serif;font-style:italic;font-size:1.1rem;color:var(--brown);margin-bottom:1.2rem;margin-top:-1rem;">If you can imagine it, we can build it.</p>
+    <h1 class="hero-title reveal reveal-delay-1">Objects of<br><em>Desire,</em><br>Perfectly<br>Packaged</h1>
+    <p class="hero-sub reveal reveal-delay-2">Each Box Craft Studios box is a meticulously curated collection of premium goods — sourced from the world's finest artisans and delivered in packaging worthy of what's inside.</p>
+    <div class="hero-ctas reveal reveal-delay-3">
+      <a href="#collections" class="btn-primary">Explore Collections</a>
+      <a href="#philosophy" class="btn-outline">Our Story</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-row reveal reveal-delay-1"><span class="stat-num">12k+</span><span class="stat-label">Boxes Delivered</span></div>
+      <div class="stat-row reveal reveal-delay-2"><span class="stat-num">98%</span><span class="stat-label">Satisfaction Rate</span></div>
+      <div class="stat-row reveal reveal-delay-3"><span class="stat-num">40+</span><span class="stat-label">Artisan Partners</span></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-right-inner">
+      <div class="lv-box">
+        <div class="lv-box-line"></div>
+        <span class="lv-box-logo">Box Craft Studios</span>
+        <div class="lv-box-sub">Premium Curated Boxes</div>
+        <div class="lv-box-line"></div>
+      </div>
+      <span class="hero-caption">New Season — 2026</span>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">Free Shipping On Bulk Orders <span class="marquee-sep">—</span></span>
+    <span class="marquee-item">Handcrafted Packaging <span class="marquee-sep">—</span></span>
+    <span class="marquee-item">Gift Wrapping Available <span class="marquee-sep">—</span></span>
+    <span class="marquee-item">Curated By Experts <span class="marquee-sep">—</span></span>
+    <span class="marquee-item">Artisan Sourced Products <span class="marquee-sep">—</span></span>
+    <span class="marquee-item">30-Day Satisfaction Guarantee <span class="marquee-sep">—</span></span>
+    <span class="marquee-item">Free Shipping On Bulk Orders <span class="marquee-sep">—</span></span>
+    <span class="marquee-item">Handcrafted Packaging <span class="marquee-sep">—</span></span>
+    <span class="marquee-item">Gift Wrapping Available <span class="marquee-sep">—</span></span>
+    <span class="marquee-item">Curated By Experts <span class="marquee-sep">—</span></span>
+    <span class="marquee-item">Artisan Sourced Products <span class="marquee-sep">—</span></span>
+    <span class="marquee-item">30-Day Satisfaction Guarantee <span class="marquee-sep">—</span></span>
+  </div>
+</div>
+
+<section class="editorial" id="philosophy">
+  <div class="editorial-visual">
+    <div class="editorial-pattern"></div>
+    <div class="editorial-obj">
+      <div class="editorial-ring">
+        <div style="text-align:center">
+          <span class="editorial-ring-text">Box Craft Studios</span>
+          <span style="font-size:.42rem;letter-spacing:.25em;text-transform:uppercase;color:var(--text3);display:block;margin-top:.3rem">Est. 2025</span>
+        </div>
+      </div>
+      <div class="editorial-nums">
+        <div class="editorial-num"><span class="editorial-num-val">12k</span><span class="editorial-num-label">Boxes Sold</span></div>
+        <div class="editorial-num"><span class="editorial-num-val">40+</span><span class="editorial-num-label">Artisans</span></div>
+        <div class="editorial-num"><span class="editorial-num-val">98%</span><span class="editorial-num-label">Satisfaction</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="editorial-text">
+    <p class="section-label reveal">Our Story</p>
+    <h2 class="section-heading reveal reveal-delay-1">The <em>Art</em> of<br>the Perfect Box</h2>
+    <p class="section-body reveal reveal-delay-2">Box Craft Studios was born from a singular obsession: the belief that what surrounds a gift is as important as the gift itself. We've spent years forging relationships with the world's finest artisans — from Rajasthan's silk weavers to Ooty's small-batch tea estates — bringing their work together in boxes that feel like opening a secret.</p>
+    <a href="#collections" class="link-arrow reveal reveal-delay-3" style="color:var(--dark)">Discover Our Collections <span>→</span></a>
+    <div class="pillars-grid">
+      <div class="pillar reveal"><div class="pillar-num">01</div><div class="pillar-title">Uncompromising Curation</div><p class="pillar-body">We reject 90% of what we consider. Every item earns its place.</p></div>
+      <div class="pillar reveal reveal-delay-1"><div class="pillar-num">02</div><div class="pillar-title">Tactile Luxury</div><p class="pillar-body">Sustainably sourced materials with artisan finishing on every box.</p></div>
+      <div class="pillar reveal reveal-delay-2"><div class="pillar-num">03</div><div class="pillar-title">Artisan-First</div><p class="pillar-body">We pay fairly and tell every maker's story inside each box.</p></div>
+      <div class="pillar reveal reveal-delay-3"><div class="pillar-num">04</div><div class="pillar-title">The Unboxing Ritual</div><p class="pillar-body">Designed like theatre — sequence, scent, and surprise.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="collections" id="collections">
+  <div class="collections-header reveal">
+    <div>
+      <p class="section-label" style="margin-bottom:.8rem">Our Collections</p>
+      <h2 class="collections-title">Curated <em>Boxes</em></h2>
+    </div>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
+      <button class="filter-btn" onclick="filterProducts('wellness', this)">Wellness</button>
+      <button class="filter-btn" onclick="filterProducts('gourmet', this)">Gourmet</button>
+      <button class="filter-btn" onclick="filterProducts('gifting', this)">Gifting</button>
+    </div>
+  </div>
+  <div class="products-grid" id="productsGrid"></div>
+</section>
+
+<section class="process" id="experience">
+  <div class="process-header">
+    <p class="process-label reveal">The Process</p>
+    <h2 class="process-heading reveal reveal-delay-1">From <em>Curation</em> to Your Door</h2>
+  </div>
+  <div class="process-steps">
+    <div class="process-step reveal">
+      <div class="step-icon"><span class="step-roman">I</span></div>
+      <div class="step-title">We Curate</div>
+      <p class="step-body">Our team sources items across India and globally, visiting artisans to select only the finest.</p>
+    </div>
+    <div class="process-step reveal reveal-delay-1">
+      <div class="step-icon"><span class="step-roman">II</span></div>
+      <div class="step-title">We Package</div>
+      <p class="step-body">Each box is hand-assembled in our studio with silk ribbon, custom tissue, and a wax seal.</p>
+    </div>
+    <div class="process-step reveal reveal-delay-2">
+      <div class="step-icon"><span class="step-roman">III</span></div>
+      <div class="step-title">We Personalise</div>
+      <p class="step-body">Add a handwritten note, choose a fragrance insert, customise the ribbon colour.</p>
+    </div>
+    <div class="process-step reveal reveal-delay-3">
+      <div class="step-icon"><span class="step-roman">IV</span></div>
+      <div class="step-title">We Deliver</div>
+      <p class="step-body">Shipped in protective outer packaging. Pan-India delivery in 3–5 business days.</p>
+    </div>
+  </div>
+</section>
+
+<div class="story-split">
+  <div class="story-panel light">
+    <p class="section-label reveal">Gifting Excellence</p>
+    <h3 class="story-heading reveal reveal-delay-1">Corporate <em>Prestige</em><br>at Scale</h3>
+    <p class="story-body reveal reveal-delay-2">When your brand's reputation depends on the gift. Fully brandable boxes, minimum 10 units. Maximum impression, every time. Trusted by India's leading companies for Diwali, client appreciation, and team milestones.</p>
+    <a href="#collections" class="link-arrow reveal reveal-delay-3">Enquire Now <span>→</span></a>
+  </div>
+  <div class="story-visual">
+    <div class="story-visual-pattern"></div>
+    <div style="position:relative;z-index:1">
+      <div class="diamond-frame"><div class="diamond-frame-inner"><span class="diamond-label">PRESTIGE</span><span class="diamond-sub">Corporate</span></div></div>
+    </div>
+  </div>
+  <div class="story-visual" style="background:var(--dark)">
+    <div style="text-align:center;position:relative;z-index:1">
+      <div style="font-family:'EB Garamond',serif;font-size:3rem;color:var(--gold2);opacity:.5;line-height:1">◈</div>
+      <div style="font-size:.5rem;letter-spacing:.35em;text-transform:uppercase;color:rgba(245,240,232,.28);margin-top:1rem">Artisan Sourced</div>
+    </div>
+  </div>
+  <div class="story-panel dark">
+    <p class="section-label reveal" style="color:var(--gold2)">Wellness Collection</p>
+    <h3 class="story-heading reveal reveal-delay-1">The <em>Morning</em><br>Alchemy Box</h3>
+    <p class="story-body reveal reveal-delay-2">Transform your mornings. A precision-curated set of seven items built around the science and ritual of a powerful start — from ceremonial matcha to adaptogen blends and jade rollers.</p>
+    <a href="#collections" class="link-arrow reveal reveal-delay-3">Shop Now <span>→</span></a>
+  </div>
+</div>
+
+<section class="testimonials" id="testimonials">
+  <div class="testimonials-header">
+    <p class="section-label reveal" style="justify-content:center">Client Voices</p>
+    <h2 class="section-heading reveal reveal-delay-1" style="margin-bottom:0">The <em>Box Craft Studios</em> Effect</h2>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card featured reveal">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote-mark">"</div>
+      <p class="testi-text">Sent the Gourmet box to a client in London. She said it was the most beautiful thing she'd received from India. That's the Box Craft Studios effect — it represents us perfectly.</p>
+      <div class="testi-footer"><div class="testi-avatar">SM</div><div><div class="testi-name">Sanya Mehra</div><div class="testi-role">CEO, Delhi</div></div></div>
+    </div>
+    <div class="testi-card reveal reveal-delay-1">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote-mark">"</div>
+      <p class="testi-text">Worth every rupee. The unboxing experience made me feel like I was receiving something rare. Will be ordering for Diwali gifts this year without question.</p>
+      <div class="testi-footer"><div class="testi-avatar">RN</div><div><div class="testi-name">Rahul Nair</div><div class="testi-role">Architect, Kochi</div></div></div>
+    </div>
+    <div class="testi-card reveal reveal-delay-2">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote-mark">"</div>
+      <p class="testi-text">The personalisation options are what sets Box Craft Studios apart. I customised everything for my wedding guests. The handwritten cards were a magical touch.</p>
+      <div class="testi-footer"><div class="testi-avatar">DV</div><div><div class="testi-name">Divya Verma</div><div class="testi-role">Event Planner, Jaipur</div></div></div>
+    </div>
+    <div class="testi-card reveal reveal-delay-3">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote-mark">"</div>
+      <p class="testi-text">Exceptional product discovery. I found a candle maker from Mysore through Box Craft Studios I'd never have encountered otherwise. That discovery alone justified the purchase.</p>
+      <div class="testi-footer"><div class="testi-avatar">KS</div><div><div class="testi-name">Kiran Shah</div><div class="testi-role">Brand Consultant, Pune</div></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="trust">
+  <div class="trust-inner">
+    <div class="trust-item reveal"><div class="trust-icon">◈</div><div class="trust-title">Free Shipping</div><div class="trust-sub">On all bulk orders</div></div>
+    <div class="trust-item reveal reveal-delay-1"><div class="trust-icon">◎</div><div class="trust-title">30-Day Guarantee</div><div class="trust-sub">Full refund, no questions</div></div>
+    <div class="trust-item reveal reveal-delay-2"><div class="trust-icon">◇</div><div class="trust-title">Hand-Assembled</div><div class="trust-sub">Every box packed in studio</div></div>
+    <div class="trust-item reveal reveal-delay-3"><div class="trust-icon">◉</div><div class="trust-title">Secure Payments</div><div class="trust-sub">256-bit SSL encryption</div></div>
+  </div>
+</div>
+
+<!-- ── CUSTOMIZE YOUR BOX ─────────────────────────────── -->
+<section id="customize" style="background:var(--dark);min-height:80vh;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;padding:6rem 2rem;">
+  <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent,transparent 60px,rgba(245,240,232,.018) 60px,rgba(245,240,232,.018) 61px);pointer-events:none;"></div>
+  <div style="position:relative;z-index:1;max-width:640px;margin:0 auto;">
+    <p style="font-size:.53rem;letter-spacing:.45em;text-transform:uppercase;color:var(--gold);margin-bottom:1.8rem;display:flex;align-items:center;justify-content:center;gap:.8rem;">
+      <span style="display:inline-block;width:22px;height:1px;background:var(--gold);"></span>
+      Coming Soon
+      <span style="display:inline-block;width:22px;height:1px;background:var(--gold);"></span>
+    </p>
+    <h2 style="font-family:'EB Garamond',serif;font-size:clamp(2.5rem,5vw,4.2rem);font-weight:400;color:var(--cream);line-height:1.1;margin-bottom:1.4rem;">Customize<br><em style="font-style:italic;color:var(--gold3);">Your Box</em></h2>
+    <p style="font-size:.78rem;color:rgba(245,240,232,.5);line-height:1.9;margin-bottom:2.8rem;max-width:480px;margin-left:auto;margin-right:auto;">We are crafting something truly personal — a fully bespoke box-building experience. Choose your products, your packaging, your message. Every detail, yours.</p>
+    <div style="display:inline-block;border:1px solid rgba(245,240,232,.15);padding:1rem 2.5rem;font-size:.55rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(245,240,232,.35);">Launching Soon</div>
+  </div>
+</section>
+
+<div class="newsletter" id="newsletter">
+  <div class="newsletter-content">
+    <p class="newsletter-label reveal">Stay in the Know</p>
+    <h2 class="newsletter-title reveal reveal-delay-1">First Access to<br><em>New Collections</em></h2>
+    <p class="newsletter-sub reveal reveal-delay-2">Join our inner circle. Be the first to know when a new box drops, get exclusive member pricing, and receive curated gift guides for every occasion.</p>
+    <form class="nl-form reveal reveal-delay-3" onsubmit="handleNewsletter(event)">
+      <input class="nl-input" type="email" placeholder="your@email.com" required>
+      <button class="nl-btn" type="submit">Subscribe</button>
+    </form>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand-name">Box Craft Studios</div>
+      <p style="font-family:'EB Garamond',serif;font-style:italic;font-size:.95rem;color:rgba(245,240,232,.55);margin-bottom:.6rem;">If you can imagine it, we can build it.</p>
+      <p class="footer-brand-body">Premium curated boxes sourced from the world's finest artisans. Designed to be unwrapped slowly and remembered always.</p>
+      <div class="footer-brand-sep"></div>
+    </div>
+    <div>
+      <div class="footer-col-title">Collections</div>
+      <ul class="footer-links">
+        <li><a href="#collections">Wellness Box</a></li>
+        <li><a href="#collections">Gourmet Box</a></li>
+        <li><a href="#collections">The Signature</a></li>
+        <li><a href="#collections">Corporate Gifting</a></li>
+        <li><a href="#collections">Bespoke Orders</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links">
+        <li><a href="#philosophy">Our Story</a></li>
+        <li><a href="#experience">How It Works</a></li>
+        <li><a href="#testimonials">Reviews</a></li>
+        <li><a href="#" onclick="openInfoModal('careers');return false;">Careers</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Support</div>
+      <ul class="footer-links">
+        <li><a href="#" onclick="openInfoModal('faq');return false;">FAQ</a></li>
+        <li><a href="#" onclick="openInfoModal('shipping');return false;">Shipping Policy</a></li>
+        <li><a href="#" onclick="openInfoModal('returns');return false;">Returns</a></li>
+        <li><a href="#" onclick="openInfoModal('track');return false;">Track Order</a></li>
+        <li><a href="#" onclick="openInfoModal('contact');return false;">Contact Us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 Box Craft Studios. All rights reserved.</p>
+    <div class="footer-legal"><a href="#" onclick="openInfoModal('privacy');return false;">Privacy</a><a href="#" onclick="openInfoModal('terms');return false;">Terms</a><a href="#" onclick="openInfoModal('cookie');return false;">Cookie Policy</a></div>
+    <div class="footer-socials" id="contact">
+      <a href="https://www.instagram.com/boxcraftstudiocompany/" target="_blank" class="social-link">Instagram</a>
+      <a href="https://wa.me/919068370981" target="_blank" class="social-link">WhatsApp</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ── INFO MODAL ─────────────────────────────────────────── -->
+<div class="info-overlay" id="infoOverlay">
+  <div class="info-left">
+    <div class="info-deco-num" id="infoDecoNum"></div>
+    <div>
+      <div class="info-tag" id="infoTag"></div>
+      <div class="info-heading" id="infoHeading"></div>
+    </div>
+    <div class="info-left-bottom">
+      <div class="info-brand-mark">Box Craft Studios</div>
+      <div class="info-close-hint">Press Esc to close</div>
+    </div>
+  </div>
+  <div class="info-right" id="infoRight">
+    <button class="info-close" onclick="closeInfoModal()">✕</button>
+    <div class="info-body" id="infoBody"></div>
+  </div>
+</div>
+
+<!-- ── CART DRAWER ────────────────────────────────────────── -->
+<div class="cart-drawer-overlay" id="cartDrawerOverlay" onclick="closeCartDrawer()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-drawer-header">
+    <span class="cart-drawer-title">Your Bag</span>
+    <button class="cart-drawer-close" onclick="closeCartDrawer()">✕</button>
+  </div>
+  <div class="cart-drawer-items" id="cartDrawerItems"></div>
+  <div class="cart-drawer-footer" id="cartDrawerFooter" style="display:none">
+    <div class="cart-drawer-total">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-value" id="cartDrawerTotal"></span>
+    </div>
+    <button class="cart-checkout-btn" onclick="closeCartDrawer();openCheckout()">Proceed to Checkout</button>
+    <button class="cart-clear-btn" onclick="clearBag()">Clear Bag</button>
+  </div>
+</div>
+
+<!-- ── SEARCH OVERLAY ────────────────────────────────────── -->
+<div id="searchOverlay" style="display:none;position:fixed;inset:0;z-index:1400;background:rgba(28,21,16,.96);backdrop-filter:blur(14px);align-items:flex-start;justify-content:center;padding:6rem 2rem;">
+  <div style="width:100%;max-width:600px">
+    <input id="searchInput" type="text" placeholder="Search products…" style="width:100%;background:transparent;border:none;border-bottom:1px solid rgba(245,240,232,.3);color:var(--cream);font-family:'EB Garamond',serif;font-size:2rem;padding:.6rem 0;outline:none;caret-color:var(--gold);">
+    <div id="searchResults" style="margin-top:2rem;"></div>
+  </div>
+</div>
+
+<!-- ── AUTH MODAL ─────────────────────────────────────────── -->
+<div class="overlay" id="authOverlay">
+  <div class="auth-box">
+    <button class="auth-close" onclick="closeAuth()">✕</button>
+    <div class="auth-logo">Box Craft Studios</div>
+    <div class="auth-label" id="authLabel">Your Account</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Create Account</button>
+    </div>
+    <!-- Login Form -->
+    <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-field">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="loginEmail" placeholder="your@email.com" required>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="loginPassword" placeholder="••••••••" required>
+      </div>
+      <div class="form-error" id="loginError"></div>
+      <button class="auth-submit" type="submit" id="loginBtn">Sign In</button>
+    </form>
+    <!-- Register Form -->
+    <form class="auth-form" id="registerForm" style="display:none" onsubmit="handleRegister(event)">
+      <div class="form-field">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" id="regName" placeholder="Your name" required>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="regEmail" placeholder="your@email.com" required>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Phone (optional)</label>
+        <input class="form-input" type="tel" id="regPhone" placeholder="+91 98765 43210">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="regPassword" placeholder="Min 8 characters" required>
+      </div>
+      <div class="form-error" id="registerError"></div>
+      <button class="auth-submit" type="submit" id="registerBtn">Create Account</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── ADDRESS MODAL ──────────────────────────────────────── -->
+<div class="addr-modal" id="addrModal">
+  <div class="addr-box">
+    <button class="addr-close" onclick="closeAddrModal()">✕</button>
+    <!-- Address list view -->
+    <div id="addrListView">
+      <div class="addr-heading">My Addresses</div>
+      <div class="addr-sub">Manage your saved delivery addresses</div>
+      <div class="addr-list" id="addrList"></div>
+      <button class="auth-submit" onclick="showAddrForm(null)">+ Add New Address</button>
+    </div>
+    <!-- Address form view -->
+    <div id="addrFormView" style="display:none">
+      <div class="addr-heading" id="addrFormTitle">New Address</div>
+      <div class="addr-sub">We'll geocode your address and show it on the map</div>
+      <form id="addrForm" onsubmit="saveAddress(event)">
+        <div class="form-grid-2" style="margin-bottom:1rem">
+          <div class="form-field">
+            <label class="form-label">Label</label>
+            <select class="form-input" id="addrLabel">
+              <option>Home</option><option>Work</option><option>Other</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Full Name</label>
+            <input class="form-input" id="addrFullName" placeholder="Recipient name" required>
+          </div>
+        </div>
+        <div class="form-grid-2" style="margin-bottom:1rem">
+          <div class="form-field">
+            <label class="form-label">Phone</label>
+            <input class="form-input" id="addrPhone" placeholder="+91 98765 43210" required>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Pincode</label>
+            <input class="form-input" id="addrPincode" placeholder="6-digit pincode" maxlength="6" required>
+          </div>
+        </div>
+        <div class="form-field" style="margin-bottom:1rem">
+          <label class="form-label">Address Line 1</label>
+          <input class="form-input" id="addrLine1" placeholder="House / Flat no, Street" required>
+        </div>
+        <div class="form-field" style="margin-bottom:1rem">
+          <label class="form-label">Address Line 2 (optional)</label>
+          <input class="form-input" id="addrLine2" placeholder="Area, Colony, Sector">
+        </div>
+        <div class="form-grid-2" style="margin-bottom:1rem">
+          <div class="form-field">
+            <label class="form-label">City</label>
+            <input class="form-input" id="addrCity" placeholder="City" required>
+          </div>
+          <div class="form-field">
+            <label class="form-label">State</label>
+            <input class="form-input" id="addrState" placeholder="State" required>
+          </div>
+        </div>
+        <div class="form-field" style="margin-bottom:1rem">
+          <label class="form-label">Landmark (optional)</label>
+          <input class="form-input" id="addrLandmark" placeholder="Near landmark">
+        </div>
+        <label style="display:flex;align-items:center;gap:.6rem;font-size:.65rem;color:var(--text2);margin-bottom:1rem;cursor:none">
+          <input type="checkbox" id="addrDefault"> Set as default address
+        </label>
+        <!-- Leaflet Map -->
+        <div id="addrMap"></div>
+        <div class="form-error" id="addrError"></div>
+        <div style="display:flex;gap:1rem;margin-top:.5rem">
+          <button type="button" class="btn-outline" style="flex:1" onclick="showAddrList()">Back</button>
+          <button type="submit" class="auth-submit" style="flex:2;margin-top:0" id="addrSaveBtn">Save Address</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── CHECKOUT MODAL ─────────────────────────────────────── -->
+<div class="checkout-modal" id="checkoutModal">
+  <div class="checkout-box">
+    <button class="checkout-close" onclick="closeCheckout()">✕</button>
+    <div class="checkout-heading">Checkout</div>
+    <div class="checkout-grid">
+      <!-- Left: address + pay -->
+      <div>
+        <div class="checkout-section-title">Delivery Address</div>
+        <div id="checkoutAddrInfo" class="checkout-addr-info">No address selected</div>
+        <button class="checkout-addr-change" onclick="openAddressModalForCheckout()">Change Address</button>
+        <button class="pay-btn" id="payBtn" onclick="initiatePayment()">Place Order</button>
+        <div class="pay-note" id="payNote">Testing mode · Payment disabled</div>
+      </div>
+      <!-- Right: order summary -->
+      <div>
+        <div class="checkout-section-title">Order Summary</div>
+        <div class="order-summary-list" id="checkoutItems"></div>
+        <div class="order-summary-divider"></div>
+        <div class="order-total-row" style="margin-bottom:.4rem">
+          <span class="order-total-label">Subtotal</span>
+          <span style="font-size:.78rem;color:var(--text2)" id="checkoutSubtotal"></span>
+        </div>
+        <div class="order-total-row" style="margin-bottom:.9rem">
+          <span class="order-total-label">Shipping</span>
+          <span style="font-size:.78rem;color:var(--text2)" id="checkoutShipping"></span>
+        </div>
+        <div class="order-summary-divider"></div>
+        <div class="order-total-row" style="margin-top:.9rem">
+          <span class="order-total-label">Total</span>
+          <span class="order-total-value" id="checkoutTotal"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="product-modal" id="productModal">
+  <div class="modal-inner">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-grid">
+      <div class="modal-gallery">
+        <div class="gallery-main" id="galleryMain">
+          <div class="box-visual" style="width:190px;height:190px;background:var(--cream2)">
+            <div class="box-visual-line"></div>
+            <span class="box-visual-label" id="modalBoxLabel" style="font-size:1rem">Box Craft Studios</span>
+            <div class="box-visual-line"></div>
+          </div>
+        </div>
+        <div class="gallery-thumbs" id="galleryThumbs"></div>
+      </div>
+      <div class="modal-info">
+        <div class="modal-category" id="modalCategory"></div>
+        <h2 class="modal-name" id="modalName"></h2>
+        <div class="modal-rating"><div class="stars">★★★★★</div><span class="rating-count">(142 reviews)</span></div>
+        <div class="modal-divider"></div>
+        <div class="modal-price" id="modalPrice"></div>
+        <div class="modal-price-note">Inclusive of all taxes · Free shipping on bulk orders</div>
+        <p class="modal-desc" id="modalDesc"></p>
+        <div class="modal-contents-title">What's Inside</div>
+        <div class="contents-list" id="modalContents"></div>
+        <div class="qty-wrap">
+          <span class="qty-label">Qty</span>
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <div class="qty-num" id="qtyNum">1</div>
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+        <button class="modal-add-btn" onclick="addToCart()">Add to Bag</button>
+        <button class="modal-wish-btn">♡ &nbsp; Save to Wishlist</button>
+        <div class="modal-meta" id="modalMeta"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <div class="toast-title" id="toastTitle"></div>
+  <div class="toast-body" id="toastBody"></div>
+  <button class="toast-action" id="toastAction" style="display:none" onclick="openCartDrawer()">View Bag →</button>
+</div>
+
+<script>
+// ── API CONFIG ───────────────────────────────────────────────────────────────
+const API_BASE = 'http://localhost:8000/api';
+
+// ── PRODUCT CATALOG (mirrors backend) ───────────────────────────────────────
+const products = [
+  { id:1, category:'wellness', badge:'Bestseller', name:'The Wellness Ritual', price:'₹1,499', priceNum:1499, origPrice:null, rating:5, reviews:142, desc:'A thoughtfully curated box for those who believe self-care is a discipline. Sourced from artisans across India, every item has been chosen for its efficacy, beauty, and the ritual it creates.', contents:['Saffron & Sandalwood face serum — 30ml','Rose quartz gua sha tool','Artisan beeswax candle — 200g','Organic herbal bath salts — 150g','Handwoven cotton eye pillow','Personalised ritual guide'], meta:{'Box Dimensions':'32 × 24 × 12 cm','Items Inside':'6 premium pieces','Dispatch':'2–3 business days','Customisation':'Full personalisation'} },
+  { id:2, category:'gourmet', badge:null, name:'The Gourmet Edit', price:'₹2,499', priceNum:2499, origPrice:null, rating:5, reviews:89, desc:'A symphony of India\'s finest flavours. Single-origin chocolates, estate teas, and artisanal preserves — each chosen for extraordinary provenance.', contents:['Valrhona dark chocolate — 100g','Darjeeling first flush tea — 50g','Artisan fig & walnut preserve','Himalayan pink salt flakes','Cold-pressed olive oil — 100ml','Handmade shortbread — 8 pieces'], meta:{'Box Dimensions':'34 × 26 × 14 cm','Items Inside':'6 curated pieces','Dispatch':'2–3 business days','Customisation':'Note available'} },
+  { id:3, category:'gifting', badge:'Limited', name:'The Signature Box', price:'₹6,999', priceNum:6999, origPrice:null, rating:5, reviews:203, desc:'Our flagship. Eight extraordinary objects, hand-selected across categories — the definitive Box Craft Studios experience for those who deserve nothing less.', contents:['Handpoured soy candle — 300g','Crystal perfume bottle','Silk tassel bookmark','Single-origin chocolate — 120g','Artisan leather card holder','Handwoven stole','Pressed flower stationery set','Bespoke wax seal'], meta:{'Box Dimensions':'36 × 28 × 16 cm','Items Inside':'8 premium pieces','Dispatch':'3–4 business days','Customisation':'Full personalisation'} },
+  { id:4, category:'wellness', badge:'New', name:'Morning Alchemy', price:'₹129', priceNum:129, origPrice:null, rating:5, reviews:57, desc:'Transform your mornings. A precision-curated set built around the science and ritual of a powerful start.', contents:['Matcha ceremonial grade — 30g','Bamboo whisk set','Adaptogen blend sachets — 10 days','Mini jade roller','Morning affirmation journal','Mushroom coffee sachets — 5 pieces'], meta:{'Box Dimensions':'28 × 20 × 10 cm','Items Inside':'6 pieces','Dispatch':'2–3 business days','Customisation':'Note available'} },
+  { id:5, category:'gifting', badge:null, name:'Corporate Prestige', price:'₹4,999', priceNum:4999, origPrice:null, rating:5, reviews:38, desc:'When your brand\'s reputation depends on the gift. Fully brandable, minimum 10 units. Maximum impression, every time.', contents:['Custom-printed outer box','Premium desk accessory','Artisan leather notebook','Whisky chocolate — 120g','Handcrafted pen','Fine tea selection','Bespoke wax seal card'], meta:{'Minimum Order':'10 units','Lead Time':'7–10 business days','Branding':'Logo + custom note','Dispatch':'Pan-India courier'} },
+  { id:6, category:'gourmet', badge:'Fan Favourite', name:'The Tea Ceremony', price:'₹499', priceNum:499, origPrice:null, rating:5, reviews:116, desc:'A deep exploration of India\'s finest teas paired with the vessels and rituals to honour them.', contents:['Darjeeling first flush — 50g','Nilgiri green tea — 40g','Assam golden tips — 40g','Handthrown ceramic tea pot','Set of two ceramic cups','Bamboo tea tray'], meta:{'Box Dimensions':'30 × 26 × 14 cm','Items Inside':'6 pieces','Dispatch':'2–3 business days','Customisation':'Note available'} }
+];
+
+const boxBgs = ['#EDE8DC','#E8E0D0','#E4DDD0','#EAE2D5','#E2D9C8','#E8E2D8'];
+let currentQty = 1, cartCount = 0;
+let activeCurrency = sessionStorage.getItem('bcs_currency') || 'INR';
+let activeSymbol   = sessionStorage.getItem('bcs_symbol')   || '₹';
+// Fallback rates (1 INR = x) — used instantly, replaced by live rates when API loads
+let exchangeRates  = { USD:0.012, EUR:0.011, GBP:0.0095, AED:0.044, SGD:0.016, AUD:0.018, CAD:0.016 };
+
+function fmtPrice(inrAmount) {
+  if (activeCurrency === 'INR') {
+    return '₹' + Math.round(inrAmount).toLocaleString('en-IN');
+  }
+  const rate = exchangeRates[activeCurrency];
+  if (!rate) return '₹' + Math.round(inrAmount).toLocaleString('en-IN');
+  const converted = inrAmount * rate;
+  return activeSymbol + converted.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+function renderProducts(filter = 'all') {
+  const grid = document.getElementById('productsGrid');
+  const filtered = filter === 'all' ? products : products.filter(p => p.category === filter);
+  grid.innerHTML = filtered.map((p,i) => `
+    <div class="product-card reveal" style="transition-delay:${i*.08}s">
+      ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
+      <div class="product-img">
+        <div class="product-img-inner">
+          <div class="box-visual" style="background:${boxBgs[i%boxBgs.length]}">
+            <div class="box-visual-line"></div>
+            <span class="box-visual-label">${p.name.split(' ').pop().toUpperCase()}</span>
+            <div class="box-visual-line"></div>
+          </div>
+        </div>
+        <div class="product-hover-bar" onclick="openModal(${p.id})">View Details</div>
+      </div>
+      <div class="product-body">
+        <div class="product-category">${p.category}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.desc.slice(0,88)}…</div>
+        <div class="product-footer">
+          <div><span class="product-price">${fmtPrice(p.priceNum)}</span></div>
+          <button class="add-btn" onclick="quickAdd(${p.id},event)">+</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  observeReveal();
+}
+
+function filterProducts(filter, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProducts(filter);
+}
+
+function quickAdd(id, e) {
+  e.stopPropagation();
+  const p = products.find(x => x.id === id);
+  cartCount += 100;
+  updateBagCount();
+  showToast('Added to Bag', p.name + ' — 1 batch added.', true);
+}
+
+function openModal(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  currentQty = 1;
+  document.getElementById('qtyNum').textContent = 1;
+  document.getElementById('modalCategory').textContent = p.category.toUpperCase();
+  document.getElementById('modalName').textContent = p.name;
+  document.getElementById('modalPrice').textContent = fmtPrice(p.priceNum);
+  document.getElementById('modalDesc').textContent = p.desc;
+  document.getElementById('modalBoxLabel').textContent = p.name.split(' ').pop().toUpperCase();
+  document.getElementById('modalContents').innerHTML = p.contents.map(c => `<div class="content-item"><span class="content-dot"></span>${c}</div>`).join('');
+  document.getElementById('modalMeta').innerHTML = Object.entries(p.meta).map(([k,v]) => `<div class="meta-row"><span class="meta-key">${k}</span><span class="meta-val">${v}</span></div>`).join('');
+  document.getElementById('galleryThumbs').innerHTML = ['Front','Open','Detail','Contents'].map((l,i) => `<div class="thumb ${i===0?'active':''}" onclick="selectThumb(this)"><div class="thumb-mini"><span class="thumb-mini-label">${l[0]}</span></div></div>`).join('');
+  document.getElementById('productModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  window._cp = p;
+}
+
+function closeModal() { document.getElementById('productModal').classList.remove('open'); document.body.style.overflow = ''; }
+function selectThumb(el) { document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active')); el.classList.add('active'); }
+function changeQty(d) { currentQty = Math.max(1, currentQty + d); document.getElementById('qtyNum').textContent = currentQty; }
+function addToCart() { if (!window._cp) return; cartCount += currentQty * 100; updateBagCount(); showToast('Added to Bag', `${currentQty} batch${currentQty>1?'es':''} of ${window._cp.name} added.`, true); closeModal(); }
+document.getElementById('productModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+function showToast(title, body, showViewCart = false) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastBody').textContent = body;
+  const action = document.getElementById('toastAction');
+  action.style.display = showViewCart ? 'block' : 'none';
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function updateBagCount() {
+  const batches = cartCount / 100;
+  document.getElementById('cartCount').textContent = batches > 0 ? `(${batches})` : '';
+}
+
+function handleNewsletter(e) { e.preventDefault(); showToast('Welcome to Box Craft Studios', 'You\'re now on our inner circle list.'); e.target.reset(); }
+
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
+function animateRing() { rx+=(mx-rx)*.12; ry+=(my-ry)*.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animateRing); }
+animateRing();
+document.querySelectorAll('a,button,.product-card,.filter-btn,.thumb,.testi-card,.trust-item').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('cursor-expand'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-expand'));
+});
+
+function observeReveal() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el => obs.observe(el));
+}
+
+renderProducts();
+observeReveal();
+document.addEventListener('keydown', e => { if (e.key==='Escape') { closeModal(); closeAuth(); closeAddrModal(); closeCheckout(); closeInfoModal(); } });
+
+// ── API HELPERS ──────────────────────────────────────────────────────────────
+function getToken() { return localStorage.getItem('arcane_access_token'); }
+function getRefreshToken() { return localStorage.getItem('arcane_refresh_token'); }
+function saveTokens(access, refresh) {
+  localStorage.setItem('arcane_access_token', access);
+  localStorage.setItem('arcane_refresh_token', refresh);
+}
+function clearTokens() {
+  localStorage.removeItem('arcane_access_token');
+  localStorage.removeItem('arcane_refresh_token');
+  localStorage.removeItem('arcane_user');
+}
+function getUser() {
+  try { return JSON.parse(localStorage.getItem('arcane_user') || 'null'); } catch { return null; }
+}
+function saveUser(u) { localStorage.setItem('arcane_user', JSON.stringify(u)); }
+
+async function apiFetch(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  const token = getToken();
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(API_BASE + path, { ...opts, headers });
+  if (res.status === 401) {
+    // Try refresh
+    const refreshed = await tryRefresh();
+    if (refreshed) {
+      headers['Authorization'] = `Bearer ${getToken()}`;
+      const retry = await fetch(API_BASE + path, { ...opts, headers });
+      return retry;
+    }
+    handleLogout(true);
+    throw new Error('Session expired');
+  }
+  return res;
+}
+
+async function tryRefresh() {
+  const rt = getRefreshToken();
+  if (!rt) return false;
+  try {
+    const res = await fetch(API_BASE + '/auth/refresh', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: rt }),
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    saveTokens(data.access_token, data.refresh_token);
+    saveUser(data.user);
+    return true;
+  } catch { return false; }
+}
+
+// ── AUTH STATE ───────────────────────────────────────────────────────────────
+function updateNavAuth() {
+  const user = getUser();
+  const btnWrap = document.getElementById('navAuthButtons');
+  const userWrap = document.getElementById('navUser');
+  const nameEl = document.getElementById('navUserName');
+  if (user) {
+    btnWrap.style.display = 'none';
+    userWrap.classList.add('visible');
+    nameEl.textContent = user.full_name.split(' ')[0];
+  } else {
+    btnWrap.style.display = 'flex';
+    userWrap.classList.remove('visible');
+  }
+}
+updateNavAuth();
+
+// ── AUTH MODAL ───────────────────────────────────────────────────────────────
+function openAuth(tab = 'login') {
+  document.getElementById('authOverlay').classList.add('open');
+  switchTab(tab);
+  document.body.style.overflow = 'hidden';
+}
+function closeAuth() {
+  document.getElementById('authOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('loginError').textContent = '';
+  document.getElementById('registerError').textContent = '';
+}
+function switchTab(tab) {
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'flex' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'flex' : 'none';
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+}
+document.getElementById('authOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeAuth();
+});
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const errEl = document.getElementById('loginError');
+  btn.textContent = 'Signing in…'; btn.disabled = true;
+  errEl.textContent = '';
+  try {
+    const res = await fetch(API_BASE + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: document.getElementById('loginEmail').value,
+        password: document.getElementById('loginPassword').value,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.detail || 'Login failed'; return; }
+    saveTokens(data.access_token, data.refresh_token);
+    saveUser(data.user);
+    updateNavAuth();
+    closeAuth();
+    showToast('Welcome back', `Good to see you, ${data.user.full_name.split(' ')[0]}!`);
+    syncCartFromServer();
+  } catch {
+    errEl.textContent = 'Server unavailable. Check backend is running.';
+  } finally {
+    btn.textContent = 'Sign In'; btn.disabled = false;
+  }
+}
+
+async function handleRegister(e) {
+  e.preventDefault();
+  const btn = document.getElementById('registerBtn');
+  const errEl = document.getElementById('registerError');
+  btn.textContent = 'Creating account…'; btn.disabled = true;
+  errEl.textContent = '';
+  try {
+    const res = await fetch(API_BASE + '/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        full_name: document.getElementById('regName').value,
+        email: document.getElementById('regEmail').value,
+        phone: document.getElementById('regPhone').value || null,
+        password: document.getElementById('regPassword').value,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.detail || 'Registration failed'; return; }
+    saveTokens(data.access_token, data.refresh_token);
+    saveUser(data.user);
+    updateNavAuth();
+    closeAuth();
+    showToast('Welcome to Box Craft Studios', `Account created, ${data.user.full_name.split(' ')[0]}!`);
+  } catch {
+    errEl.textContent = 'Server unavailable. Check backend is running.';
+  } finally {
+    btn.textContent = 'Create Account'; btn.disabled = false;
+  }
+}
+
+async function handleLogout(silent = false) {
+  const rt = getRefreshToken();
+  try {
+    if (rt) {
+      await apiFetch('/auth/logout', {
+        method: 'POST',
+        body: JSON.stringify({ refresh_token: rt }),
+      });
+    }
+  } catch {}
+  clearTokens();
+  cartCount = 0; updateBagCount();
+  updateNavAuth();
+  if (!silent) showToast('Signed out', 'See you next time.');
+}
+
+// ── CART (server-synced when logged in) ─────────────────────────────────────
+// Local cart for guests; server cart for logged-in users
+let localCart = []; // [{product_id, quantity}]
+
+async function syncCartFromServer() {
+  if (!getToken()) return;
+  try {
+    const res = await apiFetch('/cart');
+    if (!res.ok) return;
+    const items = await res.json();
+    cartCount = items.reduce((s, i) => s + i.quantity, 0);
+    updateBagCount();
+  } catch {}
+}
+
+function quickAdd(id, e) {
+  e.stopPropagation();
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  if (getToken()) {
+    apiFetch('/cart', {
+      method: 'POST',
+      body: JSON.stringify({ product_id: id, quantity: 100 }),
+    }).then(() => syncCartFromServer()).catch(() => {});
+  } else {
+    const existing = localCart.find(i => i.product_id === id);
+    if (existing) existing.quantity += 100;
+    else localCart.push({ product_id: id, quantity: 100 });
+  }
+  cartCount += 100;
+  updateBagCount();
+  renderCartDrawer();
+  showToast('Added to Bag', p.name + ' — 1 batch added.', true);
+}
+
+function addToCart() {
+  if (!window._cp) return;
+  if (getToken()) {
+    apiFetch('/cart', {
+      method: 'POST',
+      body: JSON.stringify({ product_id: window._cp.id, quantity: currentQty * 100 }),
+    }).then(() => syncCartFromServer()).catch(() => {});
+  } else {
+    const existing = localCart.find(i => i.product_id === window._cp.id);
+    if (existing) existing.quantity += currentQty * 100;
+    else localCart.push({ product_id: window._cp.id, quantity: currentQty * 100 });
+  }
+  cartCount += currentQty * 100;
+  updateBagCount();
+  renderCartDrawer();
+  showToast('Added to Bag', `${currentQty} batch${currentQty > 1 ? 'es' : ''} of ${window._cp.name} added.`, true);
+  closeModal();
+}
+
+// ── ADDRESS MODAL ────────────────────────────────────────────────────────────
+let addrMap = null, addrMarker = null, editingAddrId = null, checkoutMode = false;
+
+function openAddressModal() {
+  checkoutMode = false;
+  document.getElementById('addrModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  showAddrList();
+}
+function openAddressModalForCheckout() {
+  checkoutMode = true;
+  document.getElementById('addrModal').classList.add('open');
+  // keep checkout open underneath
+  showAddrList();
+}
+function closeAddrModal() {
+  document.getElementById('addrModal').classList.remove('open');
+  if (!checkoutMode) document.body.style.overflow = '';
+}
+document.getElementById('addrModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAddrModal();
+});
+
+async function showAddrList() {
+  document.getElementById('addrListView').style.display = '';
+  document.getElementById('addrFormView').style.display = 'none';
+  if (!getToken()) {
+    document.getElementById('addrList').innerHTML =
+      '<p style="font-size:.7rem;color:var(--text3)">Please sign in to manage addresses.</p>';
+    return;
+  }
+  try {
+    const res = await apiFetch('/addresses');
+    const addrs = await res.json();
+    const list = document.getElementById('addrList');
+    if (!addrs.length) {
+      list.innerHTML = '<p style="font-size:.7rem;color:var(--text3)">No addresses yet.</p>';
+      return;
+    }
+    list.innerHTML = addrs.map(a => `
+      <div class="addr-card ${checkoutMode ? 'selectable' : ''}" id="addrCard_${a.id}" onclick="${checkoutMode ? `selectAddrForCheckout('${a.id}')` : ''}">
+        <div class="addr-card-info">
+          <div class="addr-card-label">${a.label}${a.is_default ? ' · Default' : ''}</div>
+          <div class="addr-card-name">${a.full_name} · ${a.phone}</div>
+          <div class="addr-card-line">${a.line1}${a.line2 ? ', ' + a.line2 : ''}<br>${a.city}, ${a.state} ${a.pincode}</div>
+        </div>
+        <div class="addr-card-actions">
+          <button class="addr-action-btn" onclick="showAddrForm('${a.id}');event.stopPropagation()">Edit</button>
+          <button class="addr-action-btn danger" onclick="deleteAddr('${a.id}');event.stopPropagation()">Delete</button>
+        </div>
+      </div>`).join('');
+  } catch {
+    document.getElementById('addrList').innerHTML =
+      '<p style="font-size:.7rem;color:var(--maroon)">Could not load addresses.</p>';
+  }
+}
+
+async function showAddrForm(id) {
+  editingAddrId = id;
+  document.getElementById('addrListView').style.display = 'none';
+  document.getElementById('addrFormView').style.display = '';
+  document.getElementById('addrFormTitle').textContent = id ? 'Edit Address' : 'New Address';
+  document.getElementById('addrError').textContent = '';
+
+  // Reset form
+  ['addrFullName','addrPhone','addrPincode','addrLine1','addrLine2','addrCity','addrState','addrLandmark'].forEach(f => {
+    document.getElementById(f).value = '';
+  });
+  document.getElementById('addrDefault').checked = false;
+
+  if (id) {
+    try {
+      const res = await apiFetch(`/addresses/${id}`);
+      const a = await res.json();
+      document.getElementById('addrLabel').value = a.label;
+      document.getElementById('addrFullName').value = a.full_name;
+      document.getElementById('addrPhone').value = a.phone;
+      document.getElementById('addrPincode').value = a.pincode;
+      document.getElementById('addrLine1').value = a.line1;
+      document.getElementById('addrLine2').value = a.line2 || '';
+      document.getElementById('addrCity').value = a.city;
+      document.getElementById('addrState').value = a.state;
+      document.getElementById('addrLandmark').value = a.landmark || '';
+      document.getElementById('addrDefault').checked = a.is_default;
+      initMap(a.latitude || 20.5937, a.longitude || 78.9629);
+    } catch {}
+  } else {
+    initMap(20.5937, 78.9629); // center of India
+  }
+}
+
+function initMap(lat, lng) {
+  setTimeout(() => {
+    const container = document.getElementById('addrMap');
+    if (addrMap) { addrMap.remove(); addrMap = null; addrMarker = null; }
+    addrMap = L.map('addrMap').setView([lat, lng], lat === 20.5937 ? 5 : 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19,
+    }).addTo(addrMap);
+    if (lat !== 20.5937) {
+      addrMarker = L.marker([lat, lng]).addTo(addrMap);
+    }
+    addrMap.on('click', function(e) {
+      if (addrMarker) addrMap.removeLayer(addrMarker);
+      addrMarker = L.marker(e.latlng).addTo(addrMap);
+    });
+  }, 100);
+}
+
+// Auto-geocode when pincode + city are filled
+document.addEventListener('DOMContentLoaded', () => {
+  ['addrPincode','addrCity','addrState'].forEach(fid => {
+    const el = document.getElementById(fid);
+    if (el) el.addEventListener('blur', autoGeocode);
+  });
+});
+
+async function autoGeocode() {
+  const pin = document.getElementById('addrPincode').value;
+  const city = document.getElementById('addrCity').value;
+  const state = document.getElementById('addrState').value;
+  if (pin.length !== 6 || !city) return;
+  try {
+    const q = encodeURIComponent(`${city}, ${state} ${pin}, India`);
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1&countrycodes=in`, {
+      headers: { 'User-Agent': 'arcane-boxes-app' }
+    });
+    const data = await res.json();
+    if (data.length && addrMap) {
+      const lat = parseFloat(data[0].lat), lng = parseFloat(data[0].lon);
+      addrMap.setView([lat, lng], 14);
+      if (addrMarker) addrMap.removeLayer(addrMarker);
+      addrMarker = L.marker([lat, lng]).addTo(addrMap);
+    }
+  } catch {}
+}
+
+async function saveAddress(e) {
+  e.preventDefault();
+  const btn = document.getElementById('addrSaveBtn');
+  const errEl = document.getElementById('addrError');
+  btn.textContent = 'Saving…'; btn.disabled = true;
+  errEl.textContent = '';
+  const payload = {
+    label: document.getElementById('addrLabel').value,
+    full_name: document.getElementById('addrFullName').value,
+    phone: document.getElementById('addrPhone').value,
+    pincode: document.getElementById('addrPincode').value,
+    line1: document.getElementById('addrLine1').value,
+    line2: document.getElementById('addrLine2').value || null,
+    city: document.getElementById('addrCity').value,
+    state: document.getElementById('addrState').value,
+    landmark: document.getElementById('addrLandmark').value || null,
+    is_default: document.getElementById('addrDefault').checked,
+  };
+  try {
+    const res = await apiFetch(
+      editingAddrId ? `/addresses/${editingAddrId}` : '/addresses',
+      { method: editingAddrId ? 'PUT' : 'POST', body: JSON.stringify(payload) }
+    );
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.detail || 'Could not save address'; return; }
+    showToast('Address saved', `${payload.label} address updated.`);
+    showAddrList();
+  } catch {
+    errEl.textContent = 'Server unavailable.';
+  } finally {
+    btn.textContent = 'Save Address'; btn.disabled = false;
+  }
+}
+
+async function deleteAddr(id) {
+  if (!confirm('Delete this address?')) return;
+  try {
+    await apiFetch(`/addresses/${id}`, { method: 'DELETE' });
+    showToast('Address removed', 'Deleted successfully.');
+    showAddrList();
+  } catch {}
+}
+
+// ── CHECKOUT ─────────────────────────────────────────────────────────────────
+let selectedAddressId = null, currentOrderId = null, cartItems = [];
+
+async function openCheckout() {
+  if (!getToken()) {
+    openAuth('login');
+    showToast('Sign in required', 'Please sign in to checkout.');
+    return;
+  }
+  // Load cart from server
+  cartItems = [];
+  try {
+    const res = await apiFetch('/cart');
+    cartItems = await res.json();
+  } catch {}
+
+  if (!cartItems.length && !localCart.length) {
+    showToast('Your Bag', 'Your bag is currently empty.');
+    return;
+  }
+
+  document.getElementById('checkoutModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderCheckoutItems(cartItems.length ? cartItems : localCart.map(i => ({ product_id: i.product_id, quantity: i.quantity })));
+  loadDefaultAddress();
+}
+
+function closeCheckout() {
+  document.getElementById('checkoutModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('checkoutModal').addEventListener('click', function(e) {
+  if (e.target === this) closeCheckout();
+});
+
+function renderCheckoutItems(items) {
+  const list = document.getElementById('checkoutItems');
+  let subtotal = 0;
+  list.innerHTML = items.map(item => {
+    const p = products.find(x => x.id === item.product_id);
+    if (!p) return '';
+    const total = p.priceNum * item.quantity;
+    subtotal += total;
+    return `<div class="order-summary-item">
+      <div><div class="order-item-name">${p.name}</div><div class="order-item-qty">Qty: ${item.quantity}</div></div>
+      <div class="order-item-price">₹${total.toLocaleString('en-IN')}</div>
+    </div>`;
+  }).join('');
+  const shipping = subtotal >= 10000 ? 0 : 149;
+  document.getElementById('checkoutSubtotal').textContent = fmtPrice(subtotal);
+  document.getElementById('checkoutShipping').textContent = shipping === 0 ? 'Free' : fmtPrice(shipping);
+  document.getElementById('checkoutTotal').textContent = fmtPrice(subtotal + shipping);
+}
+
+async function loadDefaultAddress() {
+  try {
+    const res = await apiFetch('/addresses');
+    const addrs = await res.json();
+    const def = addrs.find(a => a.is_default) || addrs[0];
+    if (def) setCheckoutAddress(def);
+  } catch {}
+}
+
+function setCheckoutAddress(addr) {
+  selectedAddressId = addr.id;
+  document.getElementById('checkoutAddrInfo').innerHTML =
+    `<strong>${addr.label}</strong> — ${addr.full_name}<br>
+     ${addr.line1}${addr.line2 ? ', ' + addr.line2 : ''}<br>
+     ${addr.city}, ${addr.state} ${addr.pincode}<br>
+     ${addr.phone}`;
+}
+
+function selectAddrForCheckout(id) {
+  apiFetch(`/addresses/${id}`).then(r => r.json()).then(addr => {
+    setCheckoutAddress(addr);
+    closeAddrModal();
+    document.getElementById('checkoutModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+}
+
+async function initiatePayment() {
+  if (!selectedAddressId) {
+    showToast('No address', 'Please select a delivery address.');
+    return;
+  }
+  const btn = document.getElementById('payBtn');
+  // Min order check
+  const cartForCheck = cartItems && cartItems.length ? cartItems : localCart.map(i => ({ product_id: i.product_id, quantity: i.quantity }));
+  const orderSubtotal = cartForCheck.reduce((sum, item) => {
+    const p = products.find(x => x.id === item.product_id);
+    return sum + (p ? p.priceNum * item.quantity : 0);
+  }, 0);
+  if (orderSubtotal < 100) {
+    showToast('Minimum order', 'Minimum order amount is ₹100.');
+    return;
+  }
+  btn.textContent = 'Processing…'; btn.disabled = true;
+  try {
+    const orderRes = await apiFetch('/orders', {
+      method: 'POST',
+      body: JSON.stringify({ address_id: selectedAddressId }),
+    });
+    if (!orderRes.ok) {
+      const err = await orderRes.json();
+      showToast('Order error', err.detail || 'Could not create order.');
+      return;
+    }
+    const order = await orderRes.json();
+    currentOrderId = order.id;
+    cartCount = 0; updateBagCount(); localCart = [];
+    closeCheckout();
+    showToast('Order Placed!', `Order #${order.id.slice(0,8).toUpperCase()} confirmed.`);
+  } catch(err) {
+    showToast('Error', 'Could not reach server.');
+  } finally {
+    btn.textContent = 'Place Order'; btn.disabled = false;
+  }
+}
+
+async function openOrdersPanel() {
+  if (!getToken()) { openAuth('login'); return; }
+  try {
+    const res = await apiFetch('/orders');
+    const orders = await res.json();
+    if (!orders.length) { showToast('My Orders', 'No orders yet.'); return; }
+    const summary = orders.map(o =>
+      `#${o.id.slice(0,8).toUpperCase()} — ₹${o.total.toLocaleString('en-IN')} — ${o.status}`
+    ).join('\n');
+    alert('Your Orders:\n\n' + summary);
+  } catch { showToast('Error', 'Could not load orders.'); }
+}
+
+
+// ── CURRENCY LOGIC ───────────────────────────────────────────────────────────
+async function loadExchangeRates() {
+  try {
+    const cached = sessionStorage.getItem('bcs_rates');
+    if (cached) { exchangeRates = JSON.parse(cached); renderProducts(); return; }
+    const res  = await fetch('https://api.frankfurter.app/latest?from=INR&to=USD,EUR,GBP,AED,SGD,AUD,CAD');
+    const data = await res.json();
+    exchangeRates = data.rates;
+    sessionStorage.setItem('bcs_rates', JSON.stringify(exchangeRates));
+    renderProducts(); // re-render with accurate live rates
+  } catch(e) { console.warn('Using fallback exchange rates'); }
+}
+function applyStoredCurrency() {
+  if (activeCurrency !== 'INR') {
+    document.getElementById('activeCurrencyCode').textContent = activeCurrency;
+    document.getElementById('activeCurrencySymbol').textContent = activeSymbol;
+    document.querySelectorAll('.currency-option').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.startsWith(activeCurrency));
+    });
+    renderProducts();
+  }
+}
+function toggleCurrencyMenu(e) {
+  e.stopPropagation();
+  document.getElementById('currencySelector').classList.toggle('open');
+}
+function setCurrency(code, symbol, e) {
+  e.stopPropagation();
+  activeCurrency = code; activeSymbol = symbol;
+  sessionStorage.setItem('bcs_currency', code);
+  sessionStorage.setItem('bcs_symbol', symbol);
+  document.getElementById('activeCurrencyCode').textContent  = code;
+  document.getElementById('activeCurrencySymbol').textContent = symbol;
+  document.querySelectorAll('.currency-option').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.startsWith(code));
+  });
+  document.getElementById('currencySelector').classList.remove('open');
+  renderProducts();
+}
+document.addEventListener('click', () => document.getElementById('currencySelector').classList.remove('open'));
+loadExchangeRates();
+
+// Init: sync cart if token present
+if (getToken()) syncCartFromServer();
+
+// ── INFO MODAL ───────────────────────────────────────────────────────────────
+const INFO_PAGES = {
+  faq: {
+    tag: 'Support',
+    heading: 'Frequently Asked Questions',
+    body: `
+      <h3>What does Box Craft Studios sell?</h3>
+      <p>We make and sell premium boxes — and only boxes. The box itself is the product. Every single one is empty by design. We craft exceptional packaging — rigid, beautiful, and built to be kept long after whatever was inside is gone. No filler, no contents, just a seriously well-made box.</p>
+      <h3>How do I place an order?</h3>
+      <p>Browse our collections, add your chosen box to your bag, select a delivery address, and confirm your order. No account required to browse, but you'll need to sign in to place an order.</p>
+      <h3>Are the boxes customisable?</h3>
+      <p>100%, yes. Every single box we make can be customised — size, material, finish, print, embossing, ribbon, colour, you name it. We are building a direct customisation tool on the website right now (coming very soon). Until then, just reach out to us directly and tell us what you have in mind — we'll handle the rest.</p>
+      <h3>Are only the designs on the website available?</h3>
+      <p>Absolutely not. The boxes listed here are just a starting point — a sample of what we can do. If you have an idea, a reference image, a sketch on a napkin, or just a vague feeling — bring it to us. We make everything. If you can imagine it, we can build it.</p>
+      <h3>Do you ship internationally?</h3>
+      <p>Yes — we ship to any part of the world. International delivery timelines vary by destination. You'll receive a shipping confirmation with tracking details once your order is dispatched.</p>
+      <h3>How long does delivery take?</h3>
+      <p>Domestic orders (India): 2–5 business days. International orders: 7–14 business days depending on destination and customs clearance.</p>
+      <h3>What payment methods do you accept?</h3>
+      <p>All major UPI apps, credit/debit cards, and net banking. Secure checkout powered by industry-standard SSL encryption.</p>
+      <h3>I have more questions — who do I contact?</h3>
+      <p>Reach out to our founders directly at <a href="mailto:shivanshkaushal5@gmail.com">shivanshkaushal5@gmail.com</a> or <a href="mailto:agrawal5vishal@gmail.com">agrawal5vishal@gmail.com</a> and we'll get back to you within 24 hours.</p>
+    `
+  },
+  shipping: {
+    tag: 'Shipping',
+    heading: 'Shipping Policy',
+    body: `
+      <h3>We Ship Everywhere</h3>
+      <p>Box Craft Studios ships to any part of the world — no exceptions. Whether you're ordering for someone in Mumbai or Milan, we'll make sure your box gets there.</p>
+      <h3>Dispatch Times</h3>
+      <p>We aim to dispatch every order as quickly as possible. Domestic orders are typically packed and handed to our courier partner within 1–2 business days. International orders within 2–3 business days.</p>
+      <h3>Estimated Delivery</h3>
+      <ul>
+        <li><strong>Within India:</strong> 2–5 business days after dispatch</li>
+        <li><strong>South Asia (Nepal, Sri Lanka, Bangladesh):</strong> 5–8 business days</li>
+        <li><strong>Asia Pacific / Middle East:</strong> 7–10 business days</li>
+        <li><strong>Europe / Americas / Rest of World:</strong> 10–14 business days</li>
+      </ul>
+      <p>These are estimates. Actual delivery may vary due to customs processing, public holidays, or courier delays beyond our control.</p>
+      <h3>Our Quality Promise</h3>
+      <p>Every Box Craft Studios order is hand-inspected before it leaves our studio. We take full responsibility for the quality and condition of what arrives at your door. If something isn't right, we'll make it right — no arguments.</p>
+      <h3>Tracking</h3>
+      <p>Once your order is dispatched, you will receive a tracking ID via email. Use it on our Track Order page to follow your box in real time.</p>
+      <h3>Free Shipping on Bulk Orders</h3>
+      <p>All bulk orders qualify for free shipping — no questions asked. For smaller single-box orders, a flat shipping fee of ₹149 applies. If you're ordering in volume, just reach out to us directly and we'll sort the logistics.</p>
+    `
+  },
+  returns: {
+    tag: 'Returns',
+    heading: 'Returns & Refund Policy',
+    body: `
+      <h3>7-Day Return Window</h3>
+      <p>If you are not satisfied with the quality of your order for any reason, you may request a return within 7 days of delivery. No lengthy forms, no runaround.</p>
+      <h3>How to Request a Return</h3>
+      <p>Email us at <a href="mailto:shivanshkaushal5@gmail.com">shivanshkaushal5@gmail.com</a> or <a href="mailto:agrawal5vishal@gmail.com">agrawal5vishal@gmail.com</a> with your order number and a brief description of your concern. We'll respond within 24 hours with next steps.</p>
+      <h3>Why Our Return Rate Is Near Zero</h3>
+      <p>Before any bulk or corporate order is confirmed, we send a demo box first. You get to see, feel, and evaluate the actual product before committing. This means by the time your order ships, you already know exactly what you're getting.</p>
+      <p>For individual retail orders, every product in our catalogue is photographed, described in full, and reviewed. We don't list anything we wouldn't be proud to receive ourselves.</p>
+      <h3>Refund Processing</h3>
+      <p>Approved refunds are processed within 5–7 business days back to your original payment method.</p>
+      <h3>Non-Returnable Items</h3>
+      <p>Personalised or custom-engraved items cannot be returned unless they arrive damaged or defective. Consumable items (teas, chocolates, bath salts) are non-returnable once opened.</p>
+    `
+  },
+  track: {
+    tag: 'Orders',
+    heading: 'Track Your Order',
+    body: `
+      <h3>How to Track</h3>
+      <p>Once your order is dispatched, you will receive a shipping confirmation email at the address linked to your account. This email contains your <strong>Tracking ID</strong> and a direct link to the courier's tracking page.</p>
+      <h3>Using Your Tracking ID</h3>
+      <p>Copy your Tracking ID from the email and visit the courier's website directly to see real-time updates on your shipment — including current location, estimated delivery date, and delivery confirmation.</p>
+      <h3>Haven't Received a Tracking Email?</h3>
+      <ul>
+        <li>Check your spam/junk folder first.</li>
+        <li>Allow up to 2 business days after placing your order for dispatch.</li>
+        <li>If it's been more than 3 business days and you've heard nothing, reach out to us.</li>
+      </ul>
+      <h3>Contact Us About an Order</h3>
+      <p>For any order-related queries — delays, missing parcels, or delivery issues — email our founders at <a href="mailto:shivanshkaushal5@gmail.com">shivanshkaushal5@gmail.com</a> or <a href="mailto:agrawal5vishal@gmail.com">agrawal5vishal@gmail.com</a> with your order number and we'll look into it immediately.</p>
+    `
+  },
+  contact: {
+    tag: 'Get in Touch',
+    heading: 'Contact Us',
+    body: `
+      <h3>Direct Line to the Founder</h3>
+      <p>Box Craft Studios is a founder-led company. If you have a question, a concern, a partnership idea, or just want to say hello — you're writing directly to the person who built this.</p>
+      <p style="margin-top:1.5rem;">
+        <strong style="font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);">Email</strong><br>
+        <a href="mailto:shivanshkaushal5@gmail.com" style="font-family:'EB Garamond',serif;font-size:1.4rem;color:var(--dark);">shivanshkaushal5@gmail.com</a><br>
+        <a href="mailto:agrawal5vishal@gmail.com" style="font-family:'EB Garamond',serif;font-size:1.4rem;color:var(--dark);">agrawal5vishal@gmail.com</a>
+      </p>
+      <p style="margin-top:1.5rem;">
+        <strong style="font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);">WhatsApp</strong><br>
+        <a href="https://wa.me/919068370981" target="_blank" style="font-family:'EB Garamond',serif;font-size:1.4rem;color:var(--dark);">+91 90683 70981</a>
+      </p>
+      <p style="margin-top:1.5rem;">
+        <strong style="font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text3);">Instagram</strong><br>
+        <a href="https://www.instagram.com/boxcraftstudiocompany/" target="_blank" style="font-family:'EB Garamond',serif;font-size:1.4rem;color:var(--dark);">@boxcraftstudiocompany</a>
+      </p>
+      <p style="margin-top:2rem;font-size:.68rem;color:var(--text3);">We typically respond within 24 hours. For urgent order issues, WhatsApp is the fastest way to reach us.</p>
+    `
+  },
+  careers: {
+    tag: 'Careers',
+    heading: 'Join Box Craft Studios',
+    body: `
+      <h3>Open Position</h3>
+      <div class="closed-badge">Applications Closed</div>
+      <p><strong style="font-family:'EB Garamond',serif;font-size:1.2rem;">Data Scientist</strong></p>
+      <p style="font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:1.2rem;">Full-Time · Remote-Friendly · India</p>
+      <p>We are looking for a Data Scientist to help us build intelligent systems around our product catalogue, customer behaviour, and supply chain. You'll work directly with the founding team with end-to-end ownership of the ML lifecycle.</p>
+      <h3>What You'll Work On</h3>
+      <ul>
+        <li>Own the full ML lifecycle — from problem definition and data collection through to model deployment and monitoring</li>
+        <li>Build recommendation systems to personalise the box discovery experience</li>
+        <li>Develop demand forecasting models to help us manage inventory across artisan partners</li>
+        <li>Analyse customer retention and LTV patterns to inform growth strategy</li>
+        <li>Set up data pipelines and maintain clean, reliable feature stores</li>
+        <li>Collaborate with the backend team to integrate ML models into production APIs</li>
+      </ul>
+      <h3>What We're Looking For</h3>
+      <ul>
+        <li>Strong grounding in statistics, probability, and linear algebra</li>
+        <li>Hands-on experience with Python (pandas, scikit-learn, PyTorch or TensorFlow)</li>
+        <li>Experience shipping at least one ML model to production</li>
+        <li>Familiarity with SQL and working with structured/semi-structured data</li>
+        <li>Understanding of model evaluation, A/B testing, and experiment design</li>
+        <li>Good communication — you can explain a confusion matrix to a non-technical stakeholder</li>
+      </ul>
+      <h3>Nice to Have</h3>
+      <ul>
+        <li>Experience with recommendation systems or NLP</li>
+        <li>Familiarity with MLflow, Airflow, or similar orchestration tools</li>
+        <li>Early-stage startup experience</li>
+      </ul>
+      <p style="margin-top:2rem;padding:1.2rem;background:rgba(139,0,0,.06);border-left:3px solid var(--maroon);font-size:.72rem;color:var(--text2);">
+        <strong>We are not currently accepting applications for this role.</strong> The position has been filled. Keep an eye on this page — we'll update it when new roles open up. You're welcome to send a speculative application to <a href="mailto:shivanshkaushal5@gmail.com">shivanshkaushal5@gmail.com</a> or <a href="mailto:agrawal5vishal@gmail.com">agrawal5vishal@gmail.com</a> and we'll keep your profile on file.
+      </p>
+    `
+  }
+  ,privacy: {
+    tag: 'Legal',
+    heading: 'Privacy Policy',
+    body: `
+      <h3>Last updated: April 2026</h3>
+      <p>Box Craft Studios ("we", "us", "our") is committed to protecting your personal information. This policy explains what we collect, why we collect it, and how we use it.</p>
+      <h3>What We Collect</h3>
+      <ul>
+        <li><strong>Account information:</strong> your full name, email address, and optionally your phone number when you register.</li>
+        <li><strong>Delivery addresses:</strong> name, phone, street address, city, state, pincode, country, and landmark. We also store the geocoded latitude/longitude of your address to assist with delivery accuracy.</li>
+        <li><strong>Order history:</strong> details of every order you place including products, quantities, and order totals.</li>
+        <li><strong>Cart data:</strong> items you add to your bag are stored on our servers when you are signed in.</li>
+        <li><strong>Authentication tokens:</strong> we store access and refresh tokens in your browser's localStorage to keep you signed in securely.</li>
+      </ul>
+      <h3>What We Do Not Collect</h3>
+      <ul>
+        <li>Payment card numbers or banking details — payments are processed by third-party providers and we never see your card data.</li>
+        <li>Passwords in plain text — all passwords are hashed using industry-standard bcrypt before storage.</li>
+      </ul>
+      <h3>How We Use Your Data</h3>
+      <ul>
+        <li>To fulfil and deliver your orders</li>
+        <li>To manage your account and authenticate you</li>
+        <li>To communicate with you about your orders</li>
+        <li>To improve our products and service</li>
+      </ul>
+      <h3>Third Parties</h3>
+      <p>We currently do not share your data with any third-party analytics or advertising platforms. In the future, as the site scales, we may integrate tools such as Google Analytics, Meta Pixel, or email marketing platforms. This policy will be updated before any such integrations go live.</p>
+      <h3>Cookies & Local Storage</h3>
+      <p>We currently use browser localStorage (not cookies) to store your authentication tokens. When we introduce analytics, advertising, or payment integrations, we will update our Cookie Policy accordingly and provide appropriate consent mechanisms.</p>
+      <h3>Data Retention</h3>
+      <p>Your data is retained for as long as your account is active. You may request deletion of your account and associated data at any time by emailing us.</p>
+      <h3>Your Rights</h3>
+      <p>You have the right to access, correct, or request deletion of your personal data. Contact us at <a href="mailto:shivanshkaushal5@gmail.com">shivanshkaushal5@gmail.com</a> or <a href="mailto:agrawal5vishal@gmail.com">agrawal5vishal@gmail.com</a>.</p>
+    `
+  },
+  terms: {
+    tag: 'Legal',
+    heading: 'Terms of Service',
+    body: `
+      <h3>Last updated: April 2026</h3>
+      <p>By accessing or using the Box Craft Studios website, you agree to be bound by these Terms of Service. Please read them carefully.</p>
+      <h3>Use of the Site</h3>
+      <p>You must be at least 18 years old to place an order. You agree not to use the site for any unlawful purpose or in any way that could harm Box Craft Studios or other users.</p>
+      <h3>Account Responsibility</h3>
+      <p>You are responsible for maintaining the confidentiality of your account credentials. Any activity that occurs under your account is your responsibility. Notify us immediately at <a href="mailto:shivanshkaushal5@gmail.com">shivanshkaushal5@gmail.com</a> if you suspect unauthorised access.</p>
+      <h3>Orders & Pricing</h3>
+      <p>All prices are listed in Indian Rupees (INR) unless a currency conversion is selected. Prices are subject to change without notice. Placing an order constitutes an offer to purchase — we reserve the right to cancel any order for any reason, including pricing errors, and will provide a full refund in such cases.</p>
+      <h3>Shipping & Delivery</h3>
+      <p>We aim to dispatch all orders promptly. Delivery timelines are estimates and not guarantees. Box Craft Studios is not liable for delays caused by couriers, customs, or events outside our control.</p>
+      <h3>Returns & Refunds</h3>
+      <p>Please refer to our Returns Policy for full details. Approved refunds are processed within 5–7 business days.</p>
+      <h3>Intellectual Property</h3>
+      <p>All content on this site — including product photography, copy, branding, and design — is the property of Box Craft Studios. You may not reproduce, distribute, or use any content without written permission.</p>
+      <h3>Limitation of Liability</h3>
+      <p>Box Craft Studios shall not be liable for any indirect, incidental, or consequential damages arising from your use of the site or products. Our maximum liability in any circumstance is limited to the value of the order in question.</p>
+      <h3>Changes to Terms</h3>
+      <p>We may update these terms at any time. Continued use of the site after changes constitutes acceptance of the new terms.</p>
+      <h3>Governing Law</h3>
+      <p>These terms are governed by the laws of India. Any disputes shall be subject to the jurisdiction of the courts of India.</p>
+    `
+  },
+  cookie: {
+    tag: 'Legal',
+    heading: 'Cookie Policy',
+    body: `
+      <h3>Last updated: April 2026</h3>
+      <p>This Cookie Policy explains how Box Craft Studios uses cookies and similar technologies on our website. We want to be fully transparent about what we store in your browser and why.</p>
+      <h3>What We Currently Use</h3>
+      <p>Right now, we do <strong>not</strong> use cookies. Instead, we use your browser's <strong>localStorage</strong> to store the following:</p>
+      <ul>
+        <li><strong>arcane_access_token</strong> — your session token, used to authenticate API requests. Expires in 30 minutes.</li>
+        <li><strong>arcane_refresh_token</strong> — used to silently refresh your session without requiring you to log in again. Expires in 7 days.</li>
+        <li><strong>arcane_user</strong> — your basic profile information (name, email) so we can display it without an extra API call.</li>
+      </ul>
+      <p>These are stored locally in your browser only. They are not cookies and are not sent to any third party.</p>
+      <h3>What We Will Add in the Future</h3>
+      <p>As Box Craft Studios scales, we plan to introduce the following, each of which may set cookies:</p>
+      <ul>
+        <li><strong>Analytics (e.g. Google Analytics):</strong> to understand how visitors use the site — page views, session duration, drop-off points. This data is anonymised and aggregated.</li>
+        <li><strong>Marketing pixels (e.g. Meta Pixel):</strong> to measure the effectiveness of Instagram and Facebook advertising campaigns.</li>
+        <li><strong>Payment processors (e.g. Razorpay):</strong> when payments go live, Razorpay may set its own session cookies as part of the checkout process.</li>
+        <li><strong>Live chat / support tools:</strong> if we add a WhatsApp widget or similar, it may set cookies.</li>
+      </ul>
+      <p>Before any of these are activated, this policy will be updated and you will be given the option to accept or decline non-essential cookies through a cookie consent banner.</p>
+      <h3>How to Control Cookies</h3>
+      <p>You can clear localStorage at any time through your browser's developer tools or settings. When we introduce actual cookies, you will be able to manage your preferences through the consent banner or through your browser settings.</p>
+      <h3>Questions</h3>
+      <p>If you have any questions about how we handle your data, contact us at <a href="mailto:shivanshkaushal5@gmail.com">shivanshkaushal5@gmail.com</a> or <a href="mailto:agrawal5vishal@gmail.com">agrawal5vishal@gmail.com</a>.</p>
+    `
+  }
+};
+
+const PAGE_DECOS = { faq:'01', shipping:'02', returns:'03', track:'04', contact:'05', careers:'06', privacy:'07', terms:'08', cookie:'09' };
+function openInfoModal(page) {
+  const data = INFO_PAGES[page];
+  if (!data) return;
+  document.getElementById('infoTag').textContent = data.tag;
+  document.getElementById('infoHeading').innerHTML = data.heading;
+  document.getElementById('infoBody').innerHTML = data.body;
+  document.getElementById('infoDecoNum').textContent = PAGE_DECOS[page] || '';
+  document.getElementById('infoRight') && (document.getElementById('infoRight').scrollTop = 0);
+  document.getElementById('infoOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeInfoModal() {
+  document.getElementById('infoOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('infoOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeInfoModal();
+});
+
+// ── CART DRAWER ──────────────────────────────────────────────────────────────
+function openCartDrawer() {
+  renderCartDrawer();
+  document.getElementById('cartDrawer').classList.add('open');
+  document.getElementById('cartDrawerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCartDrawer() {
+  document.getElementById('cartDrawer').classList.remove('open');
+  document.getElementById('cartDrawerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+async function renderCartDrawer() {
+  const itemsEl = document.getElementById('cartDrawerItems');
+  const footerEl = document.getElementById('cartDrawerFooter');
+  let items = [];
+  if (getToken()) {
+    try { const r = await apiFetch('/cart'); items = await r.json(); } catch {}
+  } else {
+    items = localCart.map(i => ({ product_id: i.product_id, quantity: i.quantity, id: 'local_' + i.product_id }));
+  }
+  if (!items.length) {
+    itemsEl.innerHTML = '<div class="cart-drawer-empty">Your bag is empty</div>';
+    footerEl.style.display = 'none';
+    return;
+  }
+  let total = 0;
+  itemsEl.innerHTML = items.map(item => {
+    const p = products.find(x => x.id === item.product_id);
+    if (!p) return '';
+    const lineTotal = p.priceNum * item.quantity;
+    total += lineTotal;
+    const batches = item.quantity / 100;
+    return `<div class="cart-drawer-item">
+      <div class="cart-item-info">
+        <div class="cart-item-name">${p.name}</div>
+        <div class="cart-item-qty">${batches} batch${batches !== 1 ? 'es' : ''} · ${item.quantity} units</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.8rem">
+        <span class="cart-item-price">${fmtPrice(lineTotal)}</span>
+        <button class="cart-item-remove" onclick="removeCartItem('${item.id}', ${item.product_id})" title="Remove">×</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('cartDrawerTotal').textContent = fmtPrice(total);
+  footerEl.style.display = 'block';
+}
+async function removeCartItem(itemId, productId) {
+  if (getToken() && !itemId.startsWith('local_')) {
+    try { await apiFetch(`/cart/${itemId}`, { method: 'DELETE' }); } catch {}
+    await syncCartFromServer();
+  } else {
+    const idx = localCart.findIndex(i => i.product_id === productId);
+    if (idx !== -1) { cartCount -= localCart[idx].quantity; localCart.splice(idx, 1); }
+    updateBagCount();
+  }
+  renderCartDrawer();
+}
+async function clearBag() {
+  if (getToken()) {
+    try { await apiFetch('/cart', { method: 'DELETE' }); } catch {}
+  }
+  localCart = []; cartCount = 0; updateBagCount();
+  renderCartDrawer();
+  showToast('Bag cleared', 'All items have been removed.');
+}
+
+// ── PROFILE DROPDOWN (click-based) ───────────────────────────────────────────
+document.getElementById('navUser').addEventListener('click', function(e) {
+  e.stopPropagation();
+  this.classList.toggle('open');
+});
+document.addEventListener('click', function() {
+  document.getElementById('navUser').classList.remove('open');
+});
+
+// ── SEARCH ───────────────────────────────────────────────────────────────────
+function openSearch() {
+  document.getElementById('searchOverlay').classList.add('open');
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchResults').innerHTML = '';
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('searchInput').focus(), 50);
+}
+function closeSearch() {
+  document.getElementById('searchOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('searchInput').addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  const res = document.getElementById('searchResults');
+  if (!q) { res.innerHTML = ''; return; }
+  const hits = products.filter(p =>
+    p.name.toLowerCase().includes(q) ||
+    p.desc.toLowerCase().includes(q) ||
+    p.category.toLowerCase().includes(q)
+  );
+  if (!hits.length) { res.innerHTML = '<p class="search-empty">No products found.</p>'; return; }
+  res.innerHTML = hits.map(p => `
+    <div class="search-result-item" onclick="closeSearch();openModal(${p.id})">
+      <div>
+        <div class="search-result-name">${p.name}</div>
+        <div class="search-result-cat">${p.category}</div>
+      </div>
+      <div class="search-result-price">${p.price}</div>
+    </div>
+  `).join('');
+});
+document.getElementById('searchOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeSearch();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSearch(); });
+
+// ── BOXY CHAT ASSISTANT ───────────────────────────────────────────────────────
+(function() {
+  const chatHistory = [];
+
+  function toggleChat() {
+    const panel = document.getElementById('boxyPanel');
+    const isOpen = panel.classList.toggle('open');
+    document.getElementById('boxyBtn').setAttribute('aria-expanded', isOpen);
+    if (isOpen && chatHistory.length === 0) {
+      appendMessage('assistant', 'Hello! I\'m Boxy, your Box Craft Studios assistant. How can I help you today?');
+    }
+    if (isOpen) {
+      setTimeout(() => document.getElementById('boxyInput').focus(), 100);
+    }
+  }
+
+  function appendMessage(role, text) {
+    const wrap = document.getElementById('boxyMessages');
+    const div = document.createElement('div');
+    div.className = 'boxy-msg boxy-msg--' + role;
+    div.textContent = text;
+    wrap.appendChild(div);
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  function setTyping(show) {
+    document.getElementById('boxyTyping').style.display = show ? 'flex' : 'none';
+    const wrap = document.getElementById('boxyMessages');
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('boxyInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    input.disabled = true;
+    document.getElementById('boxySend').disabled = true;
+
+    appendMessage('user', msg);
+    chatHistory.push({ role: 'user', content: msg });
+    setTyping(true);
+
+    try {
+      const res = await fetch(API_BASE + '/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg, history: chatHistory.slice(0, -1) })
+      });
+      if (!res.ok) throw new Error('Request failed');
+      const data = await res.json();
+      setTyping(false);
+      appendMessage('assistant', data.reply);
+      chatHistory.push({ role: 'assistant', content: data.reply });
+    } catch {
+      setTyping(false);
+      appendMessage('assistant', 'Sorry, I\'m having trouble connecting right now. Please try again shortly.');
+    }
+
+    input.disabled = false;
+    document.getElementById('boxySend').disabled = false;
+    input.focus();
+  }
+
+  window.toggleBoxyChat = toggleChat;
+  window.boxyKeydown = function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
+  window.boxySend = sendMessage;
+})();
+</script>
+
+<!-- BOXY CHAT WIDGET -->
+<style>
+#boxyBtn {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 1000;
+  width: 85px; height: 85px; border-radius: 50%;
+  background: var(--dark); border: 1px solid var(--brown2);
+  color: var(--cream); cursor: none;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(28,21,16,.35);
+  transition: background .25s, transform .2s;
+}
+#boxyBtn:hover { background: var(--maroon); transform: scale(1.07); }
+#boxyBtn svg { width: 36px; height: 36px; }
+
+#boxyPanel {
+  position: fixed; bottom: 7rem; right: 2rem; z-index: 1000;
+  width: 370px; height: 75vh; max-height: 820px;
+  background: var(--cream); border: 1px solid var(--border2);
+  display: flex; flex-direction: column;
+  box-shadow: 0 8px 40px rgba(28,21,16,.22);
+  transform: translateY(12px) scale(.97); opacity: 0; pointer-events: none;
+  transition: transform .28s cubic-bezier(.25,.46,.45,.94), opacity .28s;
+}
+#boxyPanel.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+
+.boxy-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .9rem 1.1rem; border-bottom: 1px solid var(--border);
+  background: var(--dark);
+}
+.boxy-header-title {
+  font-family: 'EB Garamond', serif; font-size: 1rem; color: var(--cream);
+  letter-spacing: .06em; display: flex; align-items: center; gap: .55rem;
+}
+.boxy-header-title span { font-family: 'Jost', sans-serif; font-size: .5rem; letter-spacing: .22em; text-transform: uppercase; color: var(--gold2); }
+.boxy-close {
+  background: none; border: none; color: rgba(245,240,232,.5); cursor: none;
+  font-size: 1.1rem; line-height: 1; padding: .2rem .4rem; transition: color .2s;
+}
+.boxy-close:hover { color: var(--cream); }
+
+#boxyMessages {
+  flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: .75rem;
+  scroll-behavior: smooth;
+}
+#boxyMessages::-webkit-scrollbar { width: 3px; }
+#boxyMessages::-webkit-scrollbar-thumb { background: var(--warm); }
+
+.boxy-msg {
+  max-width: 82%; font-size: .74rem; line-height: 1.7; padding: .6rem .85rem;
+  border: 1px solid transparent;
+}
+.boxy-msg--assistant {
+  background: var(--cream2); border-color: var(--border); color: var(--text);
+  align-self: flex-start; border-radius: 0 6px 6px 6px;
+}
+.boxy-msg--user {
+  background: var(--dark); color: var(--cream);
+  align-self: flex-end; border-radius: 6px 0 6px 6px;
+}
+
+#boxyTyping {
+  display: none; align-items: center; gap: .3rem; padding: .5rem .85rem; align-self: flex-start;
+}
+.boxy-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--brown);
+  animation: boxyDot 1.2s ease-in-out infinite;
+}
+.boxy-dot:nth-child(2) { animation-delay: .2s; }
+.boxy-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes boxyDot { 0%,80%,100% { opacity: .3; transform: scale(.8); } 40% { opacity: 1; transform: scale(1); } }
+
+.boxy-footer {
+  border-top: 1px solid var(--border); padding: .7rem .9rem;
+  display: flex; align-items: center; gap: .6rem; background: var(--cream2);
+}
+#boxyInput {
+  flex: 1; background: var(--cream); border: 1px solid var(--border2);
+  font-family: 'Jost', sans-serif; font-size: .72rem; color: var(--text);
+  padding: .55rem .75rem; outline: none; resize: none;
+  transition: border-color .2s;
+}
+#boxyInput:focus { border-color: var(--brown); }
+#boxySend {
+  background: var(--dark); border: none; color: var(--cream);
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  cursor: none; flex-shrink: 0; transition: background .2s;
+}
+#boxySend:hover:not(:disabled) { background: var(--maroon); }
+#boxySend:disabled { opacity: .45; }
+#boxySend svg { width: 14px; height: 14px; }
+</style>
+
+<button id="boxyBtn" onclick="toggleBoxyChat()" aria-label="Chat with Boxy" aria-expanded="false" aria-controls="boxyPanel">
+  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- antenna -->
+    <line x1="32" y1="6" x2="32" y2="14" stroke="#E8D4A0" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="32" cy="4.5" r="3" fill="#C9A85C"/>
+    <!-- head -->
+    <rect x="12" y="14" width="40" height="28" rx="6" fill="#2A2118" stroke="#A8884A" stroke-width="1.5"/>
+    <!-- eyes -->
+    <rect x="18" y="22" width="8" height="7" rx="2" fill="#C9A85C"/>
+    <rect x="38" y="22" width="8" height="7" rx="2" fill="#C9A85C"/>
+    <rect x="20" y="24" width="4" height="3" rx="1" fill="#1C1510"/>
+    <rect x="40" y="24" width="4" height="3" rx="1" fill="#1C1510"/>
+    <!-- mouth -->
+    <rect x="20" y="33" width="24" height="5" rx="2.5" fill="#4A3D2C"/>
+    <rect x="22" y="34.5" width="4" height="2" rx="1" fill="#C9A85C"/>
+    <rect x="28" y="34.5" width="4" height="2" rx="1" fill="#C9A85C"/>
+    <rect x="34" y="34.5" width="4" height="2" rx="1" fill="#C9A85C"/>
+    <!-- neck -->
+    <rect x="28" y="42" width="8" height="4" rx="1" fill="#4A3D2C"/>
+    <!-- body -->
+    <rect x="16" y="46" width="32" height="14" rx="4" fill="#2A2118" stroke="#A8884A" stroke-width="1.5"/>
+    <!-- chest light -->
+    <circle cx="32" cy="53" r="3.5" fill="#C9A85C" opacity="0.9"/>
+    <circle cx="32" cy="53" r="1.8" fill="#E8D4A0"/>
+    <!-- arms -->
+    <rect x="6" y="47" width="9" height="5" rx="2.5" fill="#2A2118" stroke="#A8884A" stroke-width="1.5"/>
+    <rect x="49" y="47" width="9" height="5" rx="2.5" fill="#2A2118" stroke="#A8884A" stroke-width="1.5"/>
+  </svg>
+</button>
+
+<div id="boxyPanel" role="dialog" aria-label="Boxy Chat Assistant">
+  <div class="boxy-header">
+    <div class="boxy-header-title">
+      Boxy <span>AI Assistant</span>
+    </div>
+    <button class="boxy-close" onclick="toggleBoxyChat()" aria-label="Close chat">✕</button>
+  </div>
+  <div id="boxyMessages">
+    <div id="boxyTyping">
+      <div class="boxy-dot"></div>
+      <div class="boxy-dot"></div>
+      <div class="boxy-dot"></div>
+    </div>
+  </div>
+  <div class="boxy-footer">
+    <input id="boxyInput" type="text" placeholder="Ask Boxy anything…" onkeydown="boxyKeydown(event)" autocomplete="off"/>
+    <button id="boxySend" onclick="boxySend()" aria-label="Send">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+</body>
+</html>

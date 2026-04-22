@@ -517,6 +517,7 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
 .form-error { font-size:.62rem; color:var(--maroon); min-height:.9rem; }
 .auth-submit { margin-top:.5rem; padding:.9rem; background:var(--dark); color:var(--cream); border:none; font-family:'Jost',sans-serif; font-size:.58rem; letter-spacing:.22em; text-transform:uppercase; cursor:none; transition:background .3s; }
 .auth-submit:hover { background:var(--maroon); }
+.auth-link-btn { background:none; border:none; color:var(--maroon); font-family:'Jost',sans-serif; font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; cursor:none; text-decoration:underline; padding:0; }
 .auth-divider { text-align:center; font-size:.55rem; letter-spacing:.15em; text-transform:uppercase; color:var(--text3); margin:.4rem 0; }
 
 /* ── NAV AUTH BUTTONS ────────────────────────────────────────────────────────── */
@@ -1029,6 +1030,11 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
       </div>
       <div class="form-error" id="loginError"></div>
       <button class="auth-submit" type="submit" id="loginBtn">Sign In</button>
+      <div style="display:flex;gap:0.5rem;justify-content:center;margin-top:0.5rem;">
+        <button type="button" class="auth-link-btn" onclick="">Forgot Password</button>
+        <span style="color:var(--mid)">·</span>
+        <button type="button" class="auth-link-btn" onclick="">Reset Password</button>
+      </div>
     </form>
     <!-- Register Form -->
     <form class="auth-form" id="registerForm" style="display:none" onsubmit="handleRegister(event)">
@@ -1046,7 +1052,11 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
       </div>
       <div class="form-field">
         <label class="form-label">Password</label>
-        <input class="form-input" type="password" id="regPassword" placeholder="Min 8 characters" required>
+        <input class="form-input" type="password" id="regPassword" placeholder="Min 8 chars, upper, lower, number, special" required>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Confirm Password</label>
+        <input class="form-input" type="password" id="regConfirmPassword" placeholder="Re-enter your password" required>
       </div>
       <div class="form-error" id="registerError"></div>
       <button class="auth-submit" type="submit" id="registerBtn">Create Account</button>
@@ -1477,6 +1487,17 @@ async function handleRegister(e) {
   e.preventDefault();
   const btn = document.getElementById('registerBtn');
   const errEl = document.getElementById('registerError');
+  const password = document.getElementById('regPassword').value;
+  const confirmPassword = document.getElementById('regConfirmPassword').value;
+  const strongPwd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+  if (!strongPwd.test(password)) {
+    errEl.textContent = 'Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.';
+    return;
+  }
+  if (password !== confirmPassword) {
+    errEl.textContent = 'Passwords do not match.';
+    return;
+  }
   btn.textContent = 'Creating account…'; btn.disabled = true;
   errEl.textContent = '';
   try {

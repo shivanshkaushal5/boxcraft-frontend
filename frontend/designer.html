@@ -239,14 +239,14 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
    ════════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --studio-bg:       #0F0F14;   /* deep dark panels                     */
-  --studio-bg2:      #17171E;   /* lifted hover / row tint              */
-  --studio-bg3:      #1F1F28;   /* button / input tile                  */
-  --studio-border:   rgba(255,255,255,.07);
-  --studio-border2:  rgba(255,255,255,.15);
-  --studio-text:     rgba(255,255,255,.92);
-  --studio-text2:    rgba(255,255,255,.58);
-  --studio-text3:    rgba(255,255,255,.34);
+  --studio-bg:       #F7F5F2;   /* off-white panels                     */
+  --studio-bg2:      #EDE9E3;   /* warm off-white hover                 */
+  --studio-bg3:      #E4DED6;   /* button / input tile                  */
+  --studio-border:   rgba(0,0,0,.08);
+  --studio-border2:  rgba(0,0,0,.16);
+  --studio-text:     rgba(20,18,15,.90);
+  --studio-text2:    rgba(20,18,15,.55);
+  --studio-text3:    rgba(20,18,15,.35);
   --studio-accent:   #C8304A;   /* crimson — matches Download Preview   */
   --studio-floor:    #090910;   /* near-black viewport                  */
 }
@@ -320,8 +320,8 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 22px; height: 56px;
   background: var(--studio-bg);
-  border: 1px solid rgba(200,48,74,.20);
-  color: rgba(255,255,255,.40);
+  border: 1px solid rgba(0,0,0,.12);
+  color: rgba(20,18,15,.35);
   cursor: pointer !important;
   display: flex; align-items: center; justify-content: center;
   z-index: 50;
@@ -395,26 +395,26 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
 .cam-btn:hover { background: rgba(200,48,74,.12); color: var(--studio-accent); }
 .cam-btn svg { width: 13px; height: 13px; }
 
-/* ── NAV ─────────────────────────────────────────────────────────────────────── */
-.site-nav { background: var(--studio-bg) !important; border-bottom-color: var(--studio-border) !important; }
-.nav-logo { color: rgba(28,20,8,.92) !important; }
-.nav-logo-sub { color: rgba(28,20,8,.38) !important; }
+/* ── NAV — stays dark ────────────────────────────────────────────────────────── */
+.site-nav { background: #0F0F14 !important; border-bottom-color: rgba(255,255,255,.07) !important; }
+.nav-logo { color: rgba(255,255,255,.90) !important; }
+.nav-logo-sub { color: rgba(255,255,255,.35) !important; }
 .nav-tag { color: var(--studio-accent) !important; }
 .nav-tag::before { background: var(--studio-accent) !important; }
-.nav-back { color: rgba(28,20,8,.40) !important; }
+.nav-back { color: rgba(255,255,255,.40) !important; }
 .nav-back:hover { color: var(--studio-accent) !important; }
-.btn-nav-outline { color: rgba(28,20,8,.65) !important; border-color: rgba(200,48,74,.28) !important; }
-.btn-nav-outline:hover { background: rgba(200,48,74,.08) !important; color: var(--studio-accent) !important; border-color: rgba(200,48,74,.45) !important; }
+.btn-nav-outline { color: rgba(255,255,255,.65) !important; border-color: rgba(255,255,255,.20) !important; }
+.btn-nav-outline:hover { background: rgba(200,48,74,.12) !important; color: var(--studio-accent) !important; border-color: rgba(200,48,74,.50) !important; }
 .btn-nav-primary { background: #C8304A !important; color: #fff !important; font-weight: 600 !important; }
 .btn-nav-primary:hover { background: #E03555 !important; }
 
-/* Body background warm white */
-body { background: var(--studio-bg) !important; }
-.designer { background: var(--studio-bg); position: sticky; }
+/* Body + designer background — dark base, panels sit on top */
+body { background: #0F0F14 !important; }
+.designer { background: #0F0F14; position: sticky; }
 
-/* Scrollbar everywhere */
+/* Scrollbar — track matches panel, thumb is crimson */
 ::-webkit-scrollbar-track { background: var(--studio-bg2) !important; }
-::-webkit-scrollbar-thumb { background: rgba(200,48,74,.30) !important; }
+::-webkit-scrollbar-thumb { background: #C8304A !important; }
 
 /* ══════════════════════════════════════════════════════════════════════════
    ICON RAIL + FLOATING DRAWERS  (Pacdora-style)
@@ -1135,10 +1135,10 @@ let textBorderStyle = 'solid'; // 'solid' | 'dashed' | 'double' | 'metallic'
 // PALETTE (localStorage-backed)
 // ═══════════════════════════════════════════════════════
 const DEFAULT_PALETTE = [
-  '#D4C5A4','#EDE8DC','#F8F5EF','#2A2118','#1C1510',
-  '#4A3D2C','#8B7355','#A8884A','#C9A85C','#E8D4A0',
-  '#6B1E2C','#8B2A3A','#3D2A40','#1E3A4A','#1A3D2C',
-  '#5C7A9A','#8BB5D4','#9AB87A','#D4A574','#C47A85'
+  '#f56d36','#D4C5A4','#EDE8DC','#F8F5EF','#2A2118',
+  '#1C1510','#4A3D2C','#8B7355','#A8884A','#C9A85C',
+  '#E8D4A0','#6B1E2C','#8B2A3A','#3D2A40','#1E3A4A',
+  '#1A3D2C','#5C7A9A','#8BB5D4','#9AB87A','#D4A574'
 ];
 
 let palette = JSON.parse(localStorage.getItem('bcs_palette') || 'null') || [...DEFAULT_PALETTE];

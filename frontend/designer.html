@@ -311,7 +311,7 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
 #editorCanvas { border: 1px solid var(--studio-border) !important; background: var(--studio-bg3) !important; }
 
 /* ── VIEWPORT — deep dark studio floor ───────────────────────────────────────── */
-#viewport { background: #C8304A !important; }
+#viewport { background: #FFFFFF !important; }
 .vp-hint { color: rgba(255,255,255,.22) !important; }
 .face-label { background: rgba(10,10,18,.88) !important; color: rgba(255,255,255,.90) !important; border-color: rgba(200,48,74,.22) !important; }
 
@@ -1436,7 +1436,7 @@ function init3D() {
   renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(vp.offsetWidth, vp.offsetHeight);
-  renderer.setClearColor(0xC8304A); // match studio floor so no black bleeding at top
+  renderer.setClearColor(0xFFFFFF); // match studio floor so no black bleeding at top
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   // ── Real-world colour pipeline ──────────────────────────────────────────────
@@ -1483,7 +1483,7 @@ function init3D() {
   // ── Infinite grey studio floor — Pacdora style ─────────────────────────────
   // Background + fog both match so the grid fades to nothing at the horizon,
   // giving the illusion of an infinitely large surface.
-  const bgColor = new THREE.Color(0xC8304A);
+  const bgColor = new THREE.Color(0xFFFFFF);
   scene.background = bgColor;
   scene.fog = new THREE.Fog(bgColor, 50, 130);
 

@@ -736,7 +736,7 @@ body { background: #0F0F14 !important; }
         <input type="color" id="foamColorPicker" value="#E8E0D4" onchange="setFoamColor(this.value)">
         <span style="font-size:.46rem;color:var(--studio-text3);letter-spacing:.08em">Current colour</span>
       </div>
-      <div class="drawer-sub-title" style="margin-top:.7rem">Hole Size</div>
+      <div class="drawer-sub-title" style="margin-top:.7rem">Size / Depth</div>
       <div class="dim-row">
         <input type="range" id="slotSizeSlider" min="0.3" max="1.4" step="0.05" value="1.0" oninput="setSlotScale(this.value)" style="flex:1;accent-color:var(--studio-accent)">
         <span id="slotSizeVal" style="font-size:.52rem;color:var(--studio-text3);min-width:30px;text-align:right">100%</span>
@@ -3760,39 +3760,49 @@ const INSERTS = [
   {
     id: 'bottle',
     label: 'Bottle Holder',
-    sub: 'Tall cylindrical slot',
-    icon: `<svg viewBox="0 0 36 28"><rect x="2" y="5" width="32" height="18" rx="2" fill="#D4C9B0"/><rect x="13" y="7" width="10" height="14" rx="3" fill="#3A3028"/></svg>`,
+    sub: 'Vertical cylindrical slot',
+    icon: `<svg viewBox="0 0 36 28"><rect x="2" y="5" width="32" height="18" rx="2" fill="#D4C9B0"/><ellipse cx="18" cy="14" rx="5" ry="5" fill="#3A3028"/><ellipse cx="18" cy="14" rx="3" ry="3" fill="#1a1410"/></svg>`,
     build: (W,H,D,T,mat) => {
-      const g = new THREE.Group();
+      const g  = new THREE.Group();
       const iW = W-T*2, iD = D-T*2;
-      const fH = H * 0.72;
-      // Horizontal cylinder along X (width) axis
-      // Radius based on height so it fits inside the foam block
-      const r  = Math.min(fH * 0.38, iD * 0.38) * slotScale;
-      const len = iW; // runs full width
+      // slotScale drives foam wall height — slider up = deeper holder
+      const fH     = H * 0.3 * slotScale;
+      const r      = Math.min(iW, iD) * 0.25;   // fixed hole radius
+      const wallT  = r * 0.75;                   // foam ring wall thickness
+      const outerR = r + wallT;
+      const N      = 18;                          // segments → smooth circle
+      const Y      = fH / 2 + T;
 
-      // Dark cylinder tunnel (horizontal, rotated along Z→X: rotateZ 90°)
-      const floorCyl = new THREE.Mesh(
-        new THREE.CylinderGeometry(r, r, len, 28), slotMat()
+      // Dark floor disc at the bottom of the cylindrical hole
+      const floorDisc = new THREE.Mesh(
+        new THREE.CylinderGeometry(r, r, T * 0.8, 32), slotMat()
       );
-      floorCyl.rotation.z = Math.PI / 2; // lay it sideways along X
-      floorCyl.position.set(0, r + T, 0);
-      g.add(floorCyl);
+      floorDisc.position.set(0, T * 1.4, 0);
+      g.add(floorDisc);
 
-      // Foam rims — top slab above cylinder, bottom slab, front/back slabs
-      const rimTop = fH - (r + T);            // foam above the hole
-      const rimBot = T;                        // thin floor
-      const rimFB  = Math.max(0.01, iD/2 - r); // foam front/back of hole
+      // Foam ring wall — N box segments arranged in a circle
+      for (let i = 0; i < N; i++) {
+        const angle    = (i / N) * Math.PI * 2;
+        const arcLen   = (2 * Math.PI * outerR / N) * 1.1; // slight overlap prevents gaps
+        const posX     = (r + wallT / 2) * Math.cos(angle);
+        const posZ     = (r + wallT / 2) * Math.sin(angle);
+        const seg      = new THREE.Mesh(new THREE.BoxGeometry(arcLen, fH, wallT), mat);
+        seg.rotation.y = -angle;
+        seg.position.set(posX, Y, posZ);
+        g.add(seg);
+      }
 
-      const Y_top = (r + T) + r + rimTop/2;
-      const Y_mid = r + T;
-
-      // Top foam slab
-      addTo(g, new THREE.BoxGeometry(iW, rimTop, iD), mat, 0, Y_top, 0);
-      // Front foam slab
-      addTo(g, new THREE.BoxGeometry(iW, r*2, rimFB), mat, 0, Y_mid,  r + rimFB/2);
-      // Back foam slab
-      addTo(g, new THREE.BoxGeometry(iW, r*2, rimFB), mat, 0, Y_mid, -(r + rimFB/2));
+      // Outer foam — fills corners between ring and box walls
+      const rimLR = Math.max(0, iW / 2 - outerR);
+      const rimFB = Math.max(0, iD / 2 - outerR);
+      if (rimLR > 0.005) {
+        addTo(g, new THREE.BoxGeometry(rimLR, fH, iD), mat, -(outerR + rimLR / 2), Y, 0);
+        addTo(g, new THREE.BoxGeometry(rimLR, fH, iD), mat,  (outerR + rimLR / 2), Y, 0);
+      }
+      if (rimFB > 0.005) {
+        addTo(g, new THREE.BoxGeometry(iW, fH, rimFB), mat, 0, Y,  (outerR + rimFB / 2));
+        addTo(g, new THREE.BoxGeometry(iW, fH, rimFB), mat, 0, Y, -(outerR + rimFB / 2));
+      }
       return g;
     }
   },
@@ -3813,7 +3823,8 @@ function renderInsertButtons() {
   INSERTS.forEach(ins => {
     const b = document.createElement('button');
     b.className = 'insert-btn' + (activeInsert === ins.id ? ' active' : '');
-    b.innerHTML = `${ins.icon}${ins.label}<span>${ins.sub}</span>`;
+    const icon = ins.icon.replace(/#D4C9B0/g, foamColor);
+    b.innerHTML = `${icon}${ins.label}<span>${ins.sub}</span>`;
     b.onclick = () => setInsert(ins.id);
     grid.appendChild(b);
   });
@@ -3862,6 +3873,7 @@ function setFoamColor(c) {
   const picker = document.getElementById('foamColorPicker');
   if (picker) picker.value = c;
   renderFoamPalette();
+  renderInsertButtons();
   if (activeInsert && activeInsert !== 'none') setInsert(activeInsert);
 }
 

@@ -37,8 +37,8 @@ html { height: 100%; }
 body { height: 100%; overflow-y: auto; background: var(--cream); color: var(--text); font-family: 'Jost', sans-serif; font-weight: 300; }
 
 /* ── CUSTOM CURSOR (viewport only) ────────────────────────────────────────── */
-#cursor      { position: fixed; width: 8px; height: 8px; background: rgba(28,20,8,0.75); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); opacity: 0; transition: opacity .2s, width .3s, height .3s; }
-#cursor-ring { position: fixed; width: 30px; height: 30px; border: 1px solid rgba(28,20,8,0.32); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); opacity: 0; transition: opacity .2s, width .3s, height .3s; }
+#cursor      { position: fixed; width: 8px; height: 8px; background: rgba(255,255,255,0.90); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); opacity: 0; transition: opacity .2s, width .3s, height .3s; }
+#cursor-ring { position: fixed; width: 30px; height: 30px; border: 1px solid rgba(232,184,75,0.55); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); opacity: 0; transition: opacity .2s, width .3s, height .3s; }
 /* ── Force normal cursor outside viewport ────────────────────────────────── */
 #viewport { cursor: none; }
 
@@ -239,16 +239,16 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
    ════════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --studio-bg:       #FEFDFB;   /* warm white panels                    */
-  --studio-bg2:      #F4EDE1;   /* beige hover / row tint               */
-  --studio-bg3:      #EDE4D4;   /* beige input / button tile            */
-  --studio-border:   rgba(160,130,80,.16);
-  --studio-border2:  rgba(160,130,80,.32);
-  --studio-text:     rgba(28,20,8,.88);
-  --studio-text2:    rgba(28,20,8,.55);
-  --studio-text3:    rgba(28,20,8,.35);
-  --studio-accent:   #B8934A;   /* soft warm gold                       */
-  --studio-floor:    #E8E8E8;   /* light grey matching 3D bg            */
+  --studio-bg:       #0F0F14;   /* deep dark panels                     */
+  --studio-bg2:      #17171E;   /* lifted hover / row tint              */
+  --studio-bg3:      #1F1F28;   /* button / input tile                  */
+  --studio-border:   rgba(255,255,255,.07);
+  --studio-border2:  rgba(255,255,255,.15);
+  --studio-text:     rgba(255,255,255,.92);
+  --studio-text2:    rgba(255,255,255,.58);
+  --studio-text3:    rgba(255,255,255,.34);
+  --studio-accent:   #E8B84B;   /* vivid warm gold                      */
+  --studio-floor:    #090910;   /* near-black viewport                  */
 }
 
 /* ── SIDEBARS — light, warm, collapsible ───────────────────────────────────── */
@@ -303,25 +303,25 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
 /* Font select */
 .font-select { background: var(--studio-bg3) !important; border: 1px solid var(--studio-border) !important; color: var(--studio-text) !important; }
 
-/* Apply button — gold primary */
-.apply-btn { background: var(--studio-accent) !important; color: #FEFDFB !important; font-weight: 600 !important; }
-.apply-btn:hover { background: #C9A55E !important; }
+/* Apply button — crimson CTA */
+.apply-btn { background: #C8304A !important; color: #fff !important; font-weight: 600 !important; letter-spacing: .18em; }
+.apply-btn:hover { background: #E03555 !important; }
 
 /* Editor canvas */
 #editorCanvas { border: 1px solid var(--studio-border) !important; background: var(--studio-bg3) !important; }
 
-/* ── VIEWPORT — infinite grey studio floor ───────────────────────────────────── */
-#viewport { background: #E8E8E8 !important; }
-.vp-hint { color: rgba(0,0,0,.22) !important; }
-.face-label { background: rgba(254,253,251,.88) !important; color: rgba(28,20,8,.88) !important; border-color: rgba(160,130,80,.22) !important; }
+/* ── VIEWPORT — deep dark studio floor ───────────────────────────────────────── */
+#viewport { background: #090910 !important; }
+.vp-hint { color: rgba(255,255,255,.22) !important; }
+.face-label { background: rgba(10,10,18,.88) !important; color: rgba(255,255,255,.90) !important; border-color: rgba(232,184,75,.22) !important; }
 
 /* ── PANEL TOGGLES (thin edge chips) ────────────────────────────────────────── */
 .panel-toggle {
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 22px; height: 56px;
   background: var(--studio-bg);
-  border: 1px solid var(--studio-border);
-  color: var(--studio-text2);
+  border: 1px solid rgba(232,184,75,.20);
+  color: rgba(255,255,255,.40);
   cursor: pointer !important;
   display: flex; align-items: center; justify-content: center;
   z-index: 50;
@@ -329,7 +329,7 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
   border-radius: 0 4px 4px 0;
 }
 .panel-toggle.right { border-radius: 4px 0 0 4px; }
-.panel-toggle:hover { background: var(--studio-bg2); color: var(--studio-accent); }
+.panel-toggle:hover { background: rgba(232,184,75,.10); color: var(--studio-accent); }
 .panel-toggle svg { width: 11px; height: 11px; transition: transform .28s; }
 .panel-toggle.flipped svg { transform: rotate(180deg); }
 
@@ -337,28 +337,28 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
 .float-bar {
   position: absolute; bottom: 1.6rem; left: 50%; transform: translateX(-50%);
   display: flex; align-items: center; gap: .1rem;
-  background: rgba(254,253,251,.90);
-  backdrop-filter: blur(14px) saturate(1.1);
-  -webkit-backdrop-filter: blur(14px) saturate(1.1);
-  border: 1px solid rgba(160,130,80,.22);
+  background: rgba(15,15,20,.94);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border: 1px solid rgba(232,184,75,.18);
   border-radius: 8px;
   padding: .35rem .45rem;
   z-index: 40;
-  box-shadow: 0 8px 32px rgba(100,75,30,.12), 0 2px 8px rgba(100,75,30,.08);
+  box-shadow: 0 8px 40px rgba(0,0,0,.55), 0 2px 10px rgba(0,0,0,.35);
 }
 .fb-btn {
-  background: none; border: none; color: rgba(28,20,8,.60);
+  background: none; border: none; color: rgba(255,255,255,.55);
   width: 30px; height: 30px;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer !important;
   border-radius: 5px;
   transition: background .18s, color .18s;
 }
-.fb-btn:hover { background: rgba(160,130,80,.10); color: var(--studio-accent); }
+.fb-btn:hover { background: rgba(232,184,75,.12); color: var(--studio-accent); }
 .fb-btn svg { width: 14px; height: 14px; }
-.fb-sep { width: 1px; height: 18px; background: rgba(160,130,80,.18); margin: 0 .35rem; }
-.fb-label { color: rgba(28,20,8,.40); font-size: .44rem; letter-spacing: .2em; text-transform: uppercase; padding: 0 .35rem; }
-.fb-slider { appearance: none; -webkit-appearance: none; width: 80px; height: 3px; background: rgba(160,130,80,.18); border-radius: 2px; outline: none; cursor: pointer !important; }
+.fb-sep { width: 1px; height: 18px; background: rgba(255,255,255,.10); margin: 0 .35rem; }
+.fb-label { color: rgba(255,255,255,.32); font-size: .44rem; letter-spacing: .2em; text-transform: uppercase; padding: 0 .35rem; }
+.fb-slider { appearance: none; -webkit-appearance: none; width: 80px; height: 3px; background: rgba(255,255,255,.12); border-radius: 2px; outline: none; cursor: pointer !important; }
 .fb-slider::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 12px; height: 12px; background: var(--studio-accent); border-radius: 50%; cursor: pointer !important; }
 .fb-slider::-moz-range-thumb { width: 12px; height: 12px; background: var(--studio-accent); border-radius: 50%; cursor: pointer !important; border: none; }
 
@@ -375,24 +375,24 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
 .cam-rail {
   position: absolute; top: 50%; right: 1rem; transform: translateY(-50%);
   display: flex; flex-direction: column; gap: .3rem;
-  background: rgba(254,253,251,.90);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(160,130,80,.22);
+  background: rgba(15,15,20,.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(232,184,75,.18);
   border-radius: 8px; padding: .35rem;
   z-index: 35;
   transition: right .28s cubic-bezier(.4,0,.2,1);
-  box-shadow: 0 8px 32px rgba(100,75,30,.10);
+  box-shadow: 0 8px 40px rgba(0,0,0,.45);
 }
 .cam-btn {
-  background: none; border: none; color: rgba(28,20,8,.55);
+  background: none; border: none; color: rgba(255,255,255,.50);
   width: 28px; height: 28px;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer !important;
   border-radius: 5px;
   transition: background .18s, color .18s;
 }
-.cam-btn:hover { background: rgba(160,130,80,.10); color: var(--studio-accent); }
+.cam-btn:hover { background: rgba(232,184,75,.12); color: var(--studio-accent); }
 .cam-btn svg { width: 13px; height: 13px; }
 
 /* ── NAV ─────────────────────────────────────────────────────────────────────── */
@@ -405,8 +405,8 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
 .nav-back:hover { color: var(--studio-accent) !important; }
 .btn-nav-outline { color: rgba(28,20,8,.65) !important; border-color: rgba(160,130,80,.28) !important; }
 .btn-nav-outline:hover { background: rgba(160,130,80,.08) !important; color: var(--studio-accent) !important; border-color: rgba(160,130,80,.45) !important; }
-.btn-nav-primary { background: var(--studio-accent) !important; color: #FEFDFB !important; font-weight: 600 !important; }
-.btn-nav-primary:hover { background: #C9A55E !important; }
+.btn-nav-primary { background: #C8304A !important; color: #fff !important; font-weight: 600 !important; }
+.btn-nav-primary:hover { background: #E03555 !important; }
 
 /* Body background warm white */
 body { background: var(--studio-bg) !important; }
@@ -427,23 +427,23 @@ body { background: var(--studio-bg) !important; }
   top: 50%;
   transform: translateY(-50%);
   z-index: 55;
-  background: rgba(254,253,251,.92);
-  backdrop-filter: blur(18px) saturate(1.1);
-  -webkit-backdrop-filter: blur(18px) saturate(1.1);
-  border: 1px solid rgba(160,130,80,.20);
+  background: rgba(15,15,20,.95);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid rgba(232,184,75,.18);
   border-radius: 14px;
   padding: .5rem .35rem;
   display: flex;
   flex-direction: column;
   gap: .12rem;
-  box-shadow: 0 12px 40px rgba(100,75,30,.14), 0 3px 10px rgba(100,75,30,.08);
+  box-shadow: 0 12px 48px rgba(0,0,0,.60), 0 3px 12px rgba(0,0,0,.35);
 }
 
 /* ── Rail icon buttons ───────────────────────────────────────────────────── */
 .rail-btn {
   background: none;
   border: none;
-  color: rgba(28,20,8,.45);
+  color: rgba(255,255,255,.45);
   width: 50px;
   height: 50px;
   display: flex;
@@ -458,11 +458,11 @@ body { background: var(--studio-bg) !important; }
   flex-shrink: 0;
 }
 .rail-btn:hover {
-  background: rgba(160,130,80,.10);
-  color: rgba(28,20,8,.88);
+  background: rgba(232,184,75,.12);
+  color: rgba(255,255,255,.90);
 }
 .rail-btn.active {
-  background: rgba(184,147,74,.15);
+  background: rgba(232,184,75,.18);
   color: var(--studio-accent);
 }
 .rail-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
@@ -472,7 +472,7 @@ body { background: var(--studio-bg) !important; }
 }
 
 /* ── Separator line ──────────────────────────────────────────────────────── */
-.rail-sep { height: 1px; background: rgba(160,130,80,.15); margin: .2rem .3rem; }
+.rail-sep { height: 1px; background: rgba(255,255,255,.08); margin: .2rem .3rem; }
 
 /* ── Drawer container ────────────────────────────────────────────────────── */
 #drawerContainer {
@@ -486,7 +486,7 @@ body { background: var(--studio-bg) !important; }
   align-items: center;
 }
 
-/* ── Individual drawer card — warm white ─────────────────────────────────── */
+/* ── Individual drawer card — rich dark ─────────────────────────────────── */
 .drawer {
   position: absolute;
   left: 0;
@@ -496,17 +496,17 @@ body { background: var(--studio-bg) !important; }
   max-height: calc(100vh - 140px);
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(160,130,80,.22) transparent;
-  background: rgba(254,253,251,.97);
-  backdrop-filter: blur(22px) saturate(1.1);
-  -webkit-backdrop-filter: blur(22px) saturate(1.1);
-  border: 1px solid rgba(160,130,80,.20);
+  scrollbar-color: rgba(232,184,75,.25) transparent;
+  background: rgba(15,15,22,.97);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(232,184,75,.18);
   border-radius: 13px;
   padding: 1rem 1rem 1.1rem;
   opacity: 0;
   pointer-events: none;
   transition: opacity .2s cubic-bezier(.4,0,.2,1), transform .2s cubic-bezier(.4,0,.2,1);
-  box-shadow: 0 20px 60px rgba(100,75,30,.15), 0 4px 14px rgba(100,75,30,.08);
+  box-shadow: 0 24px 70px rgba(0,0,0,.70), 0 4px 16px rgba(0,0,0,.45);
 }
 .drawer::-webkit-scrollbar { width: 3px; }
 .drawer::-webkit-scrollbar-thumb { background: rgba(160,130,80,.25); border-radius: 2px; }
@@ -539,31 +539,31 @@ body { background: var(--studio-bg) !important; }
   font-size: .40rem;
   letter-spacing: .24em;
   text-transform: uppercase;
-  color: rgba(28,20,8,.35);
+  color: rgba(255,255,255,.32);
   margin-bottom: .42rem;
 }
 
-/* ── DIMENSIONS POPUP — warm white ──────────────────────────────────────── */
+/* ── DIMENSIONS POPUP — rich dark ──────────────────────────────────────── */
 #dimPopup {
   display: none;
   position: absolute;
   bottom: calc(1.6rem + 52px);
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(254,253,251,.97);
-  backdrop-filter: blur(18px) saturate(1.1);
-  -webkit-backdrop-filter: blur(18px) saturate(1.1);
-  border: 1px solid rgba(160,130,80,.20);
+  background: rgba(15,15,22,.97);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid rgba(232,184,75,.18);
   border-radius: 10px;
   padding: .85rem 1rem;
   z-index: 45;
   min-width: 290px;
-  box-shadow: 0 12px 40px rgba(100,75,30,.14);
+  box-shadow: 0 12px 48px rgba(0,0,0,.65);
 }
 #dimPopup.show { display: block; }
 .dp-title {
   font-size: .42rem; letter-spacing: .24em; text-transform: uppercase;
-  color: rgba(28,20,8,.35); margin-bottom: .65rem;
+  color: rgba(255,255,255,.32); margin-bottom: .65rem;
 }
 .dp-row {
   display: flex; align-items: center; gap: .5rem; margin-bottom: .32rem;
@@ -590,20 +590,20 @@ body { background: var(--studio-bg) !important; }
   transition: background .15s, color .15s, border-color .15s;
 }
 .dp-chip:hover {
-  background: rgba(184,147,74,.15); color: var(--studio-accent);
-  border-color: rgba(184,147,74,.35);
+  background: rgba(232,184,75,.15); color: var(--studio-accent);
+  border-color: rgba(232,184,75,.35);
 }
 
 /* ── FOAM PALETTE ────────────────────────────────────────────────────────── */
 /* ── Viewport text toolbar buttons ─────────────────────────────────────────── */
 .vptb-btn {
-  background: rgba(237,228,212,.70); border: 1px solid rgba(160,130,80,.20);
-  border-radius: 5px; color: rgba(28,20,8,.75);
+  background: rgba(20,20,28,.85); border: 1px solid rgba(232,184,75,.18);
+  border-radius: 5px; color: rgba(255,255,255,.80);
   font-size: .65rem; padding: .1rem .45rem;
   cursor: pointer !important; transition: background .15s;
   line-height: 1.4;
 }
-.vptb-btn:hover { background: rgba(184,147,74,.18); color: var(--studio-accent); border-color: rgba(184,147,74,.35); }
+.vptb-btn:hover { background: rgba(232,184,75,.18); color: var(--studio-accent); border-color: rgba(232,184,75,.40); }
 
 #foamPaletteWrap {
   display: flex; flex-wrap: wrap; gap: .3rem;
@@ -627,13 +627,13 @@ body { background: var(--studio-bg) !important; }
 <!-- Nav -->
 <nav class="site-nav">
   <div class="nav-top">
-    <a href="Final_index.html" class="nav-logo">
+    <a href="index.html" class="nav-logo">
       Box Craft Studios
       <span class="nav-logo-sub">Premium Packaging</span>
     </a>
     <span class="nav-tag">3D Designer</span>
     <div class="nav-actions">
-      <a href="Final_index.html" class="nav-back">
+      <a href="index.html" class="nav-back">
         <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 2L4 7l5 5"/></svg>
         Back to Store
       </a>
@@ -1066,6 +1066,14 @@ body { background: var(--studio-bg) !important; }
 </section>
 
 <script>
+// Auth guard — redirect to index if not logged in
+(function() {
+  const token = localStorage.getItem('arcane_access_token');
+  if (!token) {
+    window.location.href = 'index.html?open_auth=1';
+  }
+})();
+
 // ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════

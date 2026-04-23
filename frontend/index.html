@@ -515,6 +515,7 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
 .form-input { padding:.78rem 1rem; border:1px solid var(--border2); background:var(--cream2); color:var(--text); font-family:'Jost',sans-serif; font-size:.78rem; outline:none; transition:border-color .25s; }
 .form-input:focus { border-color:var(--brown); }
 .form-error { font-size:.62rem; color:var(--maroon); min-height:.9rem; }
+.form-success { font-size:.62rem; color:#2e7d32; min-height:.9rem; }
 .auth-submit { margin-top:.5rem; padding:.9rem; background:var(--dark); color:var(--cream); border:none; font-family:'Jost',sans-serif; font-size:.58rem; letter-spacing:.22em; text-transform:uppercase; cursor:none; transition:background .3s; }
 .auth-submit:hover { background:var(--maroon); }
 .auth-link-btn { background:none; border:none; color:var(--maroon); font-family:'Jost',sans-serif; font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; cursor:none; text-decoration:underline; padding:0; }
@@ -894,12 +895,13 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
   <div style="position:relative;z-index:1;max-width:640px;margin:0 auto;">
     <p style="font-size:.53rem;letter-spacing:.45em;text-transform:uppercase;color:var(--gold);margin-bottom:1.8rem;display:flex;align-items:center;justify-content:center;gap:.8rem;">
       <span style="display:inline-block;width:22px;height:1px;background:var(--gold);"></span>
-      Coming Soon
+      Bespoke Experience
       <span style="display:inline-block;width:22px;height:1px;background:var(--gold);"></span>
     </p>
     <h2 style="font-family:'EB Garamond',serif;font-size:clamp(2.5rem,5vw,4.2rem);font-weight:400;color:var(--cream);line-height:1.1;margin-bottom:1.4rem;">Customize<br><em style="font-style:italic;color:var(--gold3);">Your Box</em></h2>
-    <p style="font-size:.78rem;color:rgba(245,240,232,.5);line-height:1.9;margin-bottom:2.8rem;max-width:480px;margin-left:auto;margin-right:auto;">We are crafting something truly personal — a fully bespoke box-building experience. Choose your products, your packaging, your message. Every detail, yours.</p>
-    <div style="display:inline-block;border:1px solid rgba(245,240,232,.15);padding:1rem 2.5rem;font-size:.55rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(245,240,232,.35);">Launching Soon</div>
+    <p style="font-size:.78rem;color:rgba(245,240,232,.5);line-height:1.9;margin-bottom:2.8rem;max-width:480px;margin-left:auto;margin-right:auto;">Design something truly personal — choose your products, your packaging, your message. Paint every face of your box in our 3D designer. Every detail, yours.</p>
+    <button onclick="openDesigner()" style="background:var(--maroon);color:var(--cream);border:none;padding:1.1rem 3rem;font-family:'Jost',sans-serif;font-size:.55rem;letter-spacing:.3em;text-transform:uppercase;cursor:none;transition:background .3s;">Open Designer</button>
+    <p style="margin-top:1.2rem;font-size:.52rem;letter-spacing:.15em;color:rgba(245,240,232,.25);">Sign in required to save your designs</p>
   </div>
 </section>
 
@@ -1014,7 +1016,7 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
     <button class="auth-close" onclick="closeAuth()">✕</button>
     <div class="auth-logo">Box Craft Studios</div>
     <div class="auth-label" id="authLabel">Your Account</div>
-    <div class="auth-tabs">
+    <div class="auth-tabs" id="authTabs">
       <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
       <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Create Account</button>
     </div>
@@ -1031,9 +1033,9 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
       <div class="form-error" id="loginError"></div>
       <button class="auth-submit" type="submit" id="loginBtn">Sign In</button>
       <div style="display:flex;gap:0.5rem;justify-content:center;margin-top:0.5rem;">
-        <button type="button" class="auth-link-btn" onclick="">Forgot Password</button>
+        <button type="button" class="auth-link-btn" onclick="switchTab('forgot')">Forgot Password</button>
         <span style="color:var(--mid)">·</span>
-        <button type="button" class="auth-link-btn" onclick="">Reset Password</button>
+        <button type="button" class="auth-link-btn" onclick="switchTab('reset')">Reset Password</button>
       </div>
     </form>
     <!-- Register Form -->
@@ -1060,6 +1062,46 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
       </div>
       <div class="form-error" id="registerError"></div>
       <button class="auth-submit" type="submit" id="registerBtn">Create Account</button>
+    </form>
+    <!-- Forgot Password Form -->
+    <form class="auth-form" id="forgotForm" style="display:none" onsubmit="handleForgotPassword(event)">
+      <p style="color:var(--mid);font-size:.8rem;line-height:1.6;margin-bottom:.5rem;">
+        Enter your email and we'll send you a link to reset your password.
+      </p>
+      <div class="form-field">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="forgotEmail" placeholder="your@email.com" required>
+      </div>
+      <div class="form-error" id="forgotError"></div>
+      <div class="form-success" id="forgotSuccess"></div>
+      <button class="auth-submit" type="submit" id="forgotBtn">Send Reset Link</button>
+      <div style="text-align:center;margin-top:.5rem;">
+        <button type="button" class="auth-link-btn" onclick="switchTab('login')">← Back to Sign In</button>
+      </div>
+    </form>
+    <!-- Reset Password Form -->
+    <form class="auth-form" id="resetForm" style="display:none" onsubmit="handleResetPassword(event)">
+      <p style="color:var(--mid);font-size:.8rem;line-height:1.6;margin-bottom:.5rem;">
+        Paste the reset token from your email, then enter a new password.
+      </p>
+      <div class="form-field">
+        <label class="form-label">Reset Token</label>
+        <input class="form-input" type="text" id="resetToken" placeholder="Paste token from email" required>
+      </div>
+      <div class="form-field">
+        <label class="form-label">New Password</label>
+        <input class="form-input" type="password" id="resetPassword" placeholder="Min 8 chars, upper, lower, number, special" required>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Confirm New Password</label>
+        <input class="form-input" type="password" id="resetConfirmPassword" placeholder="Re-enter new password" required>
+      </div>
+      <div class="form-error" id="resetError"></div>
+      <div class="form-success" id="resetSuccess"></div>
+      <button class="auth-submit" type="submit" id="resetBtn">Update Password</button>
+      <div style="text-align:center;margin-top:.5rem;">
+        <button type="button" class="auth-link-btn" onclick="switchTab('login')">← Back to Sign In</button>
+      </div>
     </form>
   </div>
 </div>
@@ -1431,7 +1473,34 @@ function updateNavAuth() {
 }
 updateNavAuth();
 
+// Auto-open auth modal from URL params
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const resetToken = params.get('reset_token');
+  const openAuth_ = params.get('open_auth');
+  if (resetToken) {
+    setTimeout(() => {
+      openAuth('reset');
+      document.getElementById('resetToken').value = resetToken;
+    }, 100);
+  } else if (openAuth_) {
+    setTimeout(() => openAuth('login'), 100);
+    const url = new URL(window.location.href);
+    url.searchParams.delete('open_auth');
+    window.history.replaceState({}, '', url);
+  }
+})();
+
 // ── AUTH MODAL ───────────────────────────────────────────────────────────────
+function openDesigner() {
+  if (getToken()) {
+    window.location.href = 'designer.html';
+  } else {
+    openAuth('login');
+    showToast('Sign in required', 'Please sign in to use the box designer.');
+  }
+}
+
 function openAuth(tab = 'login') {
   document.getElementById('authOverlay').classList.add('open');
   switchTab(tab);
@@ -1440,14 +1509,25 @@ function openAuth(tab = 'login') {
 function closeAuth() {
   document.getElementById('authOverlay').classList.remove('open');
   document.body.style.overflow = '';
-  document.getElementById('loginError').textContent = '';
-  document.getElementById('registerError').textContent = '';
+  ['loginError','registerError','forgotError','forgotSuccess','resetError','resetSuccess'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '';
+  });
 }
 function switchTab(tab) {
-  document.getElementById('loginForm').style.display = tab === 'login' ? 'flex' : 'none';
-  document.getElementById('registerForm').style.display = tab === 'register' ? 'flex' : 'none';
+  const allForms = ['loginForm','registerForm','forgotForm','resetForm'];
+  allForms.forEach(id => document.getElementById(id).style.display = 'none');
+  const show = { login: 'loginForm', register: 'registerForm', forgot: 'forgotForm', reset: 'resetForm' };
+  if (show[tab]) document.getElementById(show[tab]).style.display = 'flex';
+
+  const tabsEl = document.getElementById('authTabs');
+  const isMainTab = tab === 'login' || tab === 'register';
+  tabsEl.style.display = isMainTab ? 'flex' : 'none';
   document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
   document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+
+  const labels = { login: 'Your Account', register: 'Create Account', forgot: 'Forgot Password', reset: 'Reset Password' };
+  document.getElementById('authLabel').textContent = labels[tab] || 'Your Account';
 }
 document.getElementById('authOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeAuth();
@@ -1522,6 +1602,71 @@ async function handleRegister(e) {
     errEl.textContent = 'Server unavailable. Check backend is running.';
   } finally {
     btn.textContent = 'Create Account'; btn.disabled = false;
+  }
+}
+
+async function handleForgotPassword(e) {
+  e.preventDefault();
+  const btn = document.getElementById('forgotBtn');
+  const errEl = document.getElementById('forgotError');
+  const successEl = document.getElementById('forgotSuccess');
+  errEl.textContent = ''; successEl.textContent = '';
+  btn.textContent = 'Sending…'; btn.disabled = true;
+  try {
+    const res = await fetch(API_BASE + '/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: document.getElementById('forgotEmail').value }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.detail || 'Something went wrong.'; return; }
+    successEl.textContent = data.message;
+    document.getElementById('forgotEmail').value = '';
+  } catch {
+    errEl.textContent = 'Server unavailable. Check backend is running.';
+  } finally {
+    btn.textContent = 'Send Reset Link'; btn.disabled = false;
+  }
+}
+
+async function handleResetPassword(e) {
+  e.preventDefault();
+  const btn = document.getElementById('resetBtn');
+  const errEl = document.getElementById('resetError');
+  const successEl = document.getElementById('resetSuccess');
+  errEl.textContent = ''; successEl.textContent = '';
+
+  const newPwd = document.getElementById('resetPassword').value;
+  const confirmPwd = document.getElementById('resetConfirmPassword').value;
+  const strongPwd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+\[\]{};':"\\|,.<>\/?]).{8,}$/;
+  if (!strongPwd.test(newPwd)) {
+    errEl.textContent = 'Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.';
+    return;
+  }
+  if (newPwd !== confirmPwd) { errEl.textContent = 'Passwords do not match.'; return; }
+
+  btn.textContent = 'Updating…'; btn.disabled = true;
+  try {
+    const res = await fetch(API_BASE + '/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: document.getElementById('resetToken').value.trim(), new_password: newPwd }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.detail || 'Reset failed.'; return; }
+    successEl.textContent = 'Password updated! You can now sign in.';
+    document.getElementById('resetToken').value = '';
+    document.getElementById('resetPassword').value = '';
+    document.getElementById('resetConfirmPassword').value = '';
+    // Remove token from URL without reload
+    const url = new URL(window.location.href);
+    url.searchParams.delete('reset_token');
+    window.history.replaceState({}, '', url);
+    setTimeout(() => switchTab('login'), 2000);
+  } catch {
+    errEl.textContent = 'Server unavailable. Check backend is running.';
+  } finally {
+    btn.textContent = 'Update Password'; btn.disabled = false;
   }
 }
 

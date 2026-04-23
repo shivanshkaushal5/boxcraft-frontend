@@ -3551,7 +3551,8 @@ const FOAM_SWATCHES = ['#E8E0D4','#D4C9B0','#F5F0E8','#2A2118','#6B1E2C','#1E3A4
 // ── Helpers ────────────────────────────────────────────
 // Returns a dark material representing the slot cavity floor
 function slotMat() {
-  return new THREE.MeshBasicMaterial({ color: adjustHex(foamColor, -50) });
+  const c = new THREE.Color(adjustHex(foamColor, -50)).convertSRGBToLinear();
+  return new THREE.MeshBasicMaterial({ color: c });
 }
 // Shorthand to add a mesh to a group
 function addTo(g, geo, mat, x, y, z) {
@@ -3754,57 +3755,6 @@ const INSERTS = [
     }
   },
 
-  // ── Bottle Holder ─────────────────────────────────────
-  {
-    id: 'bottle',
-    label: 'Bottle Holder',
-    sub: 'Vertical cylindrical slot',
-    icon: `<svg viewBox="0 0 36 28"><rect x="2" y="5" width="32" height="18" rx="2" fill="#D4C9B0"/><ellipse cx="18" cy="14" rx="5" ry="5" fill="#3A3028"/><ellipse cx="18" cy="14" rx="3" ry="3" fill="#1a1410"/></svg>`,
-    build: (W,H,D,T,mat) => {
-      const g  = new THREE.Group();
-      const iW = W-T*2, iD = D-T*2;
-      // slotScale drives foam wall height — slider up = deeper holder
-      const fH     = H * 0.72 * slotScale;
-      const r      = Math.min(iW, iD) * 0.28;   // fixed hole radius
-      const wallT  = r * 0.75;                   // foam ring wall thickness
-      const outerR = r + wallT;
-      const N      = 18;                          // segments → smooth circle
-      const Y      = fH / 2 + T;
-
-      // Dark floor disc at the bottom of the cylindrical hole
-      const floorDisc = new THREE.Mesh(
-        new THREE.CylinderGeometry(r, r, T * 0.8, 32), slotMat()
-      );
-      floorDisc.position.set(0, T * 1.4, 0);
-      g.add(floorDisc);
-
-      // Foam ring wall — N box segments arranged in a circle
-      for (let i = 0; i < N; i++) {
-        const angle    = (i / N) * Math.PI * 2;
-        const arcLen   = (2 * Math.PI * outerR / N) * 1.1; // slight overlap prevents gaps
-        const posX     = (r + wallT / 2) * Math.cos(angle);
-        const posZ     = (r + wallT / 2) * Math.sin(angle);
-        const seg      = new THREE.Mesh(new THREE.BoxGeometry(arcLen, fH, wallT), mat);
-        seg.rotation.y = -angle;
-        seg.position.set(posX, Y, posZ);
-        g.add(seg);
-      }
-
-      // Outer foam — fills corners between ring and box walls
-      const rimLR = Math.max(0, iW / 2 - outerR);
-      const rimFB = Math.max(0, iD / 2 - outerR);
-      if (rimLR > 0.005) {
-        addTo(g, new THREE.BoxGeometry(rimLR, fH, iD), mat, -(outerR + rimLR / 2), Y, 0);
-        addTo(g, new THREE.BoxGeometry(rimLR, fH, iD), mat,  (outerR + rimLR / 2), Y, 0);
-      }
-      if (rimFB > 0.005) {
-        addTo(g, new THREE.BoxGeometry(iW, fH, rimFB), mat, 0, Y,  (outerR + rimFB / 2));
-        addTo(g, new THREE.BoxGeometry(iW, fH, rimFB), mat, 0, Y, -(outerR + rimFB / 2));
-      }
-      return g;
-    }
-  },
-
   // ── No Insert ─────────────────────────────────────────
   {
     id: 'none',
@@ -3821,8 +3771,7 @@ function renderInsertButtons() {
   INSERTS.forEach(ins => {
     const b = document.createElement('button');
     b.className = 'insert-btn' + (activeInsert === ins.id ? ' active' : '');
-    const icon = ins.icon.replace(/#D4C9B0/g, foamColor);
-    b.innerHTML = `${icon}${ins.label}<span>${ins.sub}</span>`;
+    b.innerHTML = `${ins.icon}${ins.label}<span>${ins.sub}</span>`;
     b.onclick = () => setInsert(ins.id);
     grid.appendChild(b);
   });
@@ -3871,7 +3820,6 @@ function setFoamColor(c) {
   const picker = document.getElementById('foamColorPicker');
   if (picker) picker.value = c;
   renderFoamPalette();
-  renderInsertButtons();
   if (activeInsert && activeInsert !== 'none') setInsert(activeInsert);
 }
 
@@ -3889,7 +3837,8 @@ function setInsert(id) {
   if (!ins) return;
 
   const W = boxW, H = boxH, D = boxD, T = 0.22;
-  const mat = new THREE.MeshBasicMaterial({ color: foamColor, side: THREE.DoubleSide });
+  const fc = new THREE.Color(foamColor).convertSRGBToLinear();
+  const mat = new THREE.MeshBasicMaterial({ color: fc, side: THREE.DoubleSide });
   foamGroup = ins.build(W, H, D, T, mat);
   if (foamGroup) {
     // Foam casts and receives shadows so it's visually distinct from the box interior

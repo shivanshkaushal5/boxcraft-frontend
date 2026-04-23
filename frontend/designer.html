@@ -311,7 +311,7 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
 #editorCanvas { border: 1px solid var(--studio-border) !important; background: var(--studio-bg3) !important; }
 
 /* ── VIEWPORT — deep dark studio floor ───────────────────────────────────────── */
-#viewport { background: #090910 !important; }
+#viewport { background: #f56d36 !important; }
 .vp-hint { color: rgba(255,255,255,.22) !important; }
 .face-label { background: rgba(10,10,18,.88) !important; color: rgba(255,255,255,.90) !important; border-color: rgba(200,48,74,.22) !important; }
 
@@ -486,7 +486,7 @@ body { background: #0F0F14 !important; }
   align-items: center;
 }
 
-/* ── Individual drawer card — rich dark ─────────────────────────────────── */
+/* ── Individual drawer card — off-white ─────────────────────────────────── */
 .drawer {
   position: absolute;
   left: 0;
@@ -496,17 +496,17 @@ body { background: #0F0F14 !important; }
   max-height: calc(100vh - 140px);
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(200,48,74,.25) transparent;
-  background: rgba(15,15,22,.97);
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  border: 1px solid rgba(200,48,74,.18);
+  scrollbar-color: #C8304A transparent;
+  background: #F7F5F2;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid rgba(0,0,0,.10);
   border-radius: 13px;
   padding: 1rem 1rem 1.1rem;
   opacity: 0;
   pointer-events: none;
   transition: opacity .2s cubic-bezier(.4,0,.2,1), transform .2s cubic-bezier(.4,0,.2,1);
-  box-shadow: 0 24px 70px rgba(0,0,0,.70), 0 4px 16px rgba(0,0,0,.45);
+  box-shadow: 0 20px 60px rgba(0,0,0,.35), 0 4px 14px rgba(0,0,0,.18);
 }
 .drawer::-webkit-scrollbar { width: 3px; }
 .drawer::-webkit-scrollbar-thumb { background: rgba(200,48,74,.25); border-radius: 2px; }
@@ -539,7 +539,7 @@ body { background: #0F0F14 !important; }
   font-size: .40rem;
   letter-spacing: .24em;
   text-transform: uppercase;
-  color: rgba(255,255,255,.32);
+  color: rgba(20,18,15,.35);
   margin-bottom: .42rem;
 }
 
@@ -1436,7 +1436,7 @@ function init3D() {
   renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(vp.offsetWidth, vp.offsetHeight);
-  renderer.setClearColor(0xE8E8E8); // match studio floor so no black bleeding at top
+  renderer.setClearColor(0xf56d36); // match studio floor so no black bleeding at top
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   // ── Real-world colour pipeline ──────────────────────────────────────────────
@@ -1483,7 +1483,7 @@ function init3D() {
   // ── Infinite grey studio floor — Pacdora style ─────────────────────────────
   // Background + fog both match so the grid fades to nothing at the horizon,
   // giving the illusion of an infinitely large surface.
-  const bgColor = new THREE.Color(0xE8E8E8);
+  const bgColor = new THREE.Color(0xf56d36);
   scene.background = bgColor;
   scene.fog = new THREE.Fog(bgColor, 50, 130);
 

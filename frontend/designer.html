@@ -38,7 +38,7 @@ body { height: 100%; overflow-y: auto; background: var(--cream); color: var(--te
 
 /* ── CUSTOM CURSOR (viewport only) ────────────────────────────────────────── */
 #cursor      { position: fixed; width: 8px; height: 8px; background: rgba(255,255,255,0.90); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); opacity: 0; transition: opacity .2s, width .3s, height .3s; }
-#cursor-ring { position: fixed; width: 30px; height: 30px; border: 1px solid rgba(232,184,75,0.55); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); opacity: 0; transition: opacity .2s, width .3s, height .3s; }
+#cursor-ring { position: fixed; width: 30px; height: 30px; border: 1px solid rgba(200,48,74,0.55); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); opacity: 0; transition: opacity .2s, width .3s, height .3s; }
 /* ── Force normal cursor outside viewport ────────────────────────────────── */
 #viewport { cursor: none; }
 
@@ -247,7 +247,7 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
   --studio-text:     rgba(255,255,255,.92);
   --studio-text2:    rgba(255,255,255,.58);
   --studio-text3:    rgba(255,255,255,.34);
-  --studio-accent:   #E8B84B;   /* vivid warm gold                      */
+  --studio-accent:   #C8304A;   /* crimson — matches Download Preview   */
   --studio-floor:    #090910;   /* near-black viewport                  */
 }
 
@@ -257,7 +257,7 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
 .panel.collapsed { width: 0 !important; min-width: 0 !important; flex: 0 0 0 !important; padding: 0 !important; opacity: 0; overflow: hidden; pointer-events: none; border-width: 0 !important; }
 .panel::-webkit-scrollbar { width: 4px; }
 .panel::-webkit-scrollbar-track { background: transparent; }
-.panel::-webkit-scrollbar-thumb { background: rgba(160,130,80,.25); border-radius: 2px; }
+.panel::-webkit-scrollbar-thumb { background: rgba(200,48,74,.25); border-radius: 2px; }
 
 /* Section labels */
 .panel-label { color: var(--studio-text3) !important; font-size: .44rem !important; letter-spacing: .32em !important; margin-bottom: .55rem !important; }
@@ -313,14 +313,14 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
 /* ── VIEWPORT — deep dark studio floor ───────────────────────────────────────── */
 #viewport { background: #090910 !important; }
 .vp-hint { color: rgba(255,255,255,.22) !important; }
-.face-label { background: rgba(10,10,18,.88) !important; color: rgba(255,255,255,.90) !important; border-color: rgba(232,184,75,.22) !important; }
+.face-label { background: rgba(10,10,18,.88) !important; color: rgba(255,255,255,.90) !important; border-color: rgba(200,48,74,.22) !important; }
 
 /* ── PANEL TOGGLES (thin edge chips) ────────────────────────────────────────── */
 .panel-toggle {
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 22px; height: 56px;
   background: var(--studio-bg);
-  border: 1px solid rgba(232,184,75,.20);
+  border: 1px solid rgba(200,48,74,.20);
   color: rgba(255,255,255,.40);
   cursor: pointer !important;
   display: flex; align-items: center; justify-content: center;
@@ -329,7 +329,7 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
   border-radius: 0 4px 4px 0;
 }
 .panel-toggle.right { border-radius: 4px 0 0 4px; }
-.panel-toggle:hover { background: rgba(232,184,75,.10); color: var(--studio-accent); }
+.panel-toggle:hover { background: rgba(200,48,74,.10); color: var(--studio-accent); }
 .panel-toggle svg { width: 11px; height: 11px; transition: transform .28s; }
 .panel-toggle.flipped svg { transform: rotate(180deg); }
 
@@ -340,7 +340,7 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
   background: rgba(15,15,20,.94);
   backdrop-filter: blur(18px) saturate(1.4);
   -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  border: 1px solid rgba(232,184,75,.18);
+  border: 1px solid rgba(200,48,74,.18);
   border-radius: 8px;
   padding: .35rem .45rem;
   z-index: 40;
@@ -354,7 +354,7 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
   border-radius: 5px;
   transition: background .18s, color .18s;
 }
-.fb-btn:hover { background: rgba(232,184,75,.12); color: var(--studio-accent); }
+.fb-btn:hover { background: rgba(200,48,74,.12); color: var(--studio-accent); }
 .fb-btn svg { width: 14px; height: 14px; }
 .fb-sep { width: 1px; height: 18px; background: rgba(255,255,255,.10); margin: 0 .35rem; }
 .fb-label { color: rgba(255,255,255,.32); font-size: .44rem; letter-spacing: .2em; text-transform: uppercase; padding: 0 .35rem; }
@@ -378,7 +378,7 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
   background: rgba(15,15,20,.94);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(232,184,75,.18);
+  border: 1px solid rgba(200,48,74,.18);
   border-radius: 8px; padding: .35rem;
   z-index: 35;
   transition: right .28s cubic-bezier(.4,0,.2,1);
@@ -392,7 +392,7 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
   border-radius: 5px;
   transition: background .18s, color .18s;
 }
-.cam-btn:hover { background: rgba(232,184,75,.12); color: var(--studio-accent); }
+.cam-btn:hover { background: rgba(200,48,74,.12); color: var(--studio-accent); }
 .cam-btn svg { width: 13px; height: 13px; }
 
 /* ── NAV ─────────────────────────────────────────────────────────────────────── */
@@ -403,8 +403,8 @@ input[type=number], input[type=text], input[type=color] { cursor: text !importan
 .nav-tag::before { background: var(--studio-accent) !important; }
 .nav-back { color: rgba(28,20,8,.40) !important; }
 .nav-back:hover { color: var(--studio-accent) !important; }
-.btn-nav-outline { color: rgba(28,20,8,.65) !important; border-color: rgba(160,130,80,.28) !important; }
-.btn-nav-outline:hover { background: rgba(160,130,80,.08) !important; color: var(--studio-accent) !important; border-color: rgba(160,130,80,.45) !important; }
+.btn-nav-outline { color: rgba(28,20,8,.65) !important; border-color: rgba(200,48,74,.28) !important; }
+.btn-nav-outline:hover { background: rgba(200,48,74,.08) !important; color: var(--studio-accent) !important; border-color: rgba(200,48,74,.45) !important; }
 .btn-nav-primary { background: #C8304A !important; color: #fff !important; font-weight: 600 !important; }
 .btn-nav-primary:hover { background: #E03555 !important; }
 
@@ -414,7 +414,7 @@ body { background: var(--studio-bg) !important; }
 
 /* Scrollbar everywhere */
 ::-webkit-scrollbar-track { background: var(--studio-bg2) !important; }
-::-webkit-scrollbar-thumb { background: rgba(160,130,80,.30) !important; }
+::-webkit-scrollbar-thumb { background: rgba(200,48,74,.30) !important; }
 
 /* ══════════════════════════════════════════════════════════════════════════
    ICON RAIL + FLOATING DRAWERS  (Pacdora-style)
@@ -430,7 +430,7 @@ body { background: var(--studio-bg) !important; }
   background: rgba(15,15,20,.95);
   backdrop-filter: blur(20px) saturate(1.4);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  border: 1px solid rgba(232,184,75,.18);
+  border: 1px solid rgba(200,48,74,.18);
   border-radius: 14px;
   padding: .5rem .35rem;
   display: flex;
@@ -458,11 +458,11 @@ body { background: var(--studio-bg) !important; }
   flex-shrink: 0;
 }
 .rail-btn:hover {
-  background: rgba(232,184,75,.12);
+  background: rgba(200,48,74,.12);
   color: rgba(255,255,255,.90);
 }
 .rail-btn.active {
-  background: rgba(232,184,75,.18);
+  background: rgba(200,48,74,.18);
   color: var(--studio-accent);
 }
 .rail-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
@@ -496,11 +496,11 @@ body { background: var(--studio-bg) !important; }
   max-height: calc(100vh - 140px);
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(232,184,75,.25) transparent;
+  scrollbar-color: rgba(200,48,74,.25) transparent;
   background: rgba(15,15,22,.97);
   backdrop-filter: blur(24px) saturate(1.4);
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  border: 1px solid rgba(232,184,75,.18);
+  border: 1px solid rgba(200,48,74,.18);
   border-radius: 13px;
   padding: 1rem 1rem 1.1rem;
   opacity: 0;
@@ -509,7 +509,7 @@ body { background: var(--studio-bg) !important; }
   box-shadow: 0 24px 70px rgba(0,0,0,.70), 0 4px 16px rgba(0,0,0,.45);
 }
 .drawer::-webkit-scrollbar { width: 3px; }
-.drawer::-webkit-scrollbar-thumb { background: rgba(160,130,80,.25); border-radius: 2px; }
+.drawer::-webkit-scrollbar-thumb { background: rgba(200,48,74,.25); border-radius: 2px; }
 
 .drawer.open {
   opacity: 1;
@@ -525,7 +525,7 @@ body { background: var(--studio-bg) !important; }
   color: var(--studio-accent);
   margin-bottom: .75rem;
   padding-bottom: .55rem;
-  border-bottom: 1px solid rgba(160,130,80,.14);
+  border-bottom: 1px solid rgba(200,48,74,.14);
   display: flex;
   align-items: center;
   gap: .5rem;
@@ -553,7 +553,7 @@ body { background: var(--studio-bg) !important; }
   background: rgba(15,15,22,.97);
   backdrop-filter: blur(20px) saturate(1.4);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  border: 1px solid rgba(232,184,75,.18);
+  border: 1px solid rgba(200,48,74,.18);
   border-radius: 10px;
   padding: .85rem 1rem;
   z-index: 45;
@@ -581,7 +581,7 @@ body { background: var(--studio-bg) !important; }
 }
 .dp-presets {
   display: flex; gap: .28rem; flex-wrap: wrap; margin-top: .6rem;
-  padding-top: .55rem; border-top: 1px solid rgba(160,130,80,.14);
+  padding-top: .55rem; border-top: 1px solid rgba(200,48,74,.14);
 }
 .dp-chip {
   background: var(--studio-bg3); border: 1px solid var(--studio-border);
@@ -590,20 +590,20 @@ body { background: var(--studio-bg) !important; }
   transition: background .15s, color .15s, border-color .15s;
 }
 .dp-chip:hover {
-  background: rgba(232,184,75,.15); color: var(--studio-accent);
-  border-color: rgba(232,184,75,.35);
+  background: rgba(200,48,74,.15); color: var(--studio-accent);
+  border-color: rgba(200,48,74,.35);
 }
 
 /* ── FOAM PALETTE ────────────────────────────────────────────────────────── */
 /* ── Viewport text toolbar buttons ─────────────────────────────────────────── */
 .vptb-btn {
-  background: rgba(20,20,28,.85); border: 1px solid rgba(232,184,75,.18);
+  background: rgba(20,20,28,.85); border: 1px solid rgba(200,48,74,.18);
   border-radius: 5px; color: rgba(255,255,255,.80);
   font-size: .65rem; padding: .1rem .45rem;
   cursor: pointer !important; transition: background .15s;
   line-height: 1.4;
 }
-.vptb-btn:hover { background: rgba(232,184,75,.18); color: var(--studio-accent); border-color: rgba(232,184,75,.40); }
+.vptb-btn:hover { background: rgba(200,48,74,.18); color: var(--studio-accent); border-color: rgba(200,48,74,.40); }
 
 #foamPaletteWrap {
   display: flex; flex-wrap: wrap; gap: .3rem;
@@ -611,7 +611,7 @@ body { background: var(--studio-bg) !important; }
   margin-bottom: .38rem;
 }
 #foamPaletteWrap::-webkit-scrollbar { width: 3px; }
-#foamPaletteWrap::-webkit-scrollbar-thumb { background: rgba(160,130,80,.22); }
+#foamPaletteWrap::-webkit-scrollbar-thumb { background: rgba(200,48,74,.22); }
 
 </style>
 </head>
@@ -886,14 +886,14 @@ body { background: var(--studio-bg) !important; }
     <div id="vpTextBar" style="
       display:none; position:absolute; top:1rem; left:50%; transform:translateX(-50%);
       background:rgba(254,253,251,.95); backdrop-filter:blur(18px);
-      border:1px solid rgba(160,130,80,.22); border-radius:10px;
+      border:1px solid rgba(200,48,74,.22); border-radius:10px;
       padding:.45rem .7rem; z-index:60;
       display:none; align-items:center; gap:.55rem;
       box-shadow:0 8px 32px rgba(100,75,30,.12);
       white-space:nowrap; pointer-events:auto;
     ">
       <span style="font-size:.38rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(28,20,8,.35)">Text</span>
-      <div style="width:1px;height:16px;background:rgba(160,130,80,.18)"></div>
+      <div style="width:1px;height:16px;background:rgba(200,48,74,.18)"></div>
       <!-- Size -->
       <button onclick="adjustSelectedTextSize(-4)" class="vptb-btn">−</button>
       <span id="vpTextSizeVal" style="font-size:.52rem;color:var(--studio-accent);min-width:28px;text-align:center">24</span>
@@ -901,20 +901,20 @@ body { background: var(--studio-bg) !important; }
       <input type="range" id="vpTextSizeSlider" min="6" max="256" value="24"
              style="width:80px;accent-color:var(--studio-accent);cursor:pointer"
              oninput="setSelectedTextSize(+this.value)">
-      <div style="width:1px;height:16px;background:rgba(160,130,80,.18)"></div>
+      <div style="width:1px;height:16px;background:rgba(200,48,74,.18)"></div>
       <!-- Colour -->
       <span style="font-size:.38rem;color:rgba(28,20,8,.38)">Clr</span>
       <input type="color" id="vpTextColorPicker" value="#000000"
              onchange="setSelectedTextColor(this.value)"
              style="width:22px;height:22px;border:none;background:none;cursor:pointer;padding:0;border-radius:3px">
-      <div style="width:1px;height:16px;background:rgba(160,130,80,.18)"></div>
+      <div style="width:1px;height:16px;background:rgba(200,48,74,.18)"></div>
       <!-- Opacity -->
       <span style="font-size:.38rem;color:rgba(28,20,8,.38)">Opacity</span>
       <input type="range" id="vpTextOpacity" min="10" max="100" value="100"
              style="width:60px;accent-color:var(--studio-accent);cursor:pointer"
              oninput="setSelectedTextOpacity(+this.value)">
       <span id="vpTextOpacityVal" style="font-size:.42rem;color:rgba(28,20,8,.45);min-width:22px">100%</span>
-      <div style="width:1px;height:16px;background:rgba(160,130,80,.18)"></div>
+      <div style="width:1px;height:16px;background:rgba(200,48,74,.18)"></div>
       <!-- Delete -->
       <button onclick="deleteSelectedTextItem()"
               style="background:rgba(210,50,50,.75);border:none;border-radius:5px;
@@ -1021,21 +1021,21 @@ body { background: var(--studio-bg) !important; }
 <div id="dielineModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(20,15,8,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;">
   <div style="background:#FEFDFB;border-radius:16px;box-shadow:0 24px 80px rgba(80,55,20,.28);max-width:96vw;max-height:93vh;display:flex;flex-direction:column;overflow:hidden;">
     <!-- header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem .8rem;border-bottom:1px solid rgba(160,130,80,.18);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem .8rem;border-bottom:1px solid rgba(200,48,74,.18);">
       <div>
         <div style="font-family:Playfair Display,serif;font-size:1.15rem;color:#1C1408;font-weight:600;letter-spacing:-.01em;">Dieline</div>
         <div style="font-size:.65rem;color:rgba(28,20,8,.45);letter-spacing:.06em;text-transform:uppercase;margin-top:.1rem;">Unfolded flat pattern · ready to print</div>
       </div>
       <div style="display:flex;gap:.5rem;align-items:center;">
-        <button onclick="downloadDieline()" style="background:#B8934A;color:#fff;border:none;border-radius:8px;padding:.42rem 1rem;font-size:.72rem;font-family:Jost,sans-serif;font-weight:600;letter-spacing:.04em;cursor:pointer;display:flex;align-items:center;gap:.4rem;">
+        <button onclick="downloadDieline()" style="background:#C8304A;color:#fff;border:none;border-radius:8px;padding:.42rem 1rem;font-size:.72rem;font-family:Jost,sans-serif;font-weight:600;letter-spacing:.04em;cursor:pointer;display:flex;align-items:center;gap:.4rem;">
           <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 2v7M4 7l3 3 3-3M2 11h10"/></svg>
           Download PNG
         </button>
-        <button onclick="closeDieline()" style="background:rgba(160,130,80,.12);border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:1.1rem;color:#8A6830;display:flex;align-items:center;justify-content:center;">✕</button>
+        <button onclick="closeDieline()" style="background:rgba(200,48,74,.12);border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:1.1rem;color:#8A6830;display:flex;align-items:center;justify-content:center;">✕</button>
       </div>
     </div>
     <!-- legend -->
-    <div style="display:flex;gap:1.5rem;padding:.6rem 1.4rem;border-bottom:1px solid rgba(160,130,80,.12);background:rgba(244,237,225,.4);">
+    <div style="display:flex;gap:1.5rem;padding:.6rem 1.4rem;border-bottom:1px solid rgba(200,48,74,.12);background:rgba(244,237,225,.4);">
       <span style="font-size:.64rem;color:rgba(28,20,8,.5);display:flex;align-items:center;gap:.35rem;font-family:Jost,sans-serif;">
         <span style="display:inline-block;width:22px;height:2px;background:#1C1408;border-radius:1px;"></span>Cut line
       </span>
@@ -2955,12 +2955,16 @@ function clearFace() {
 }
 
 function applyToAll() {
+  // Snapshot before the loop — without this, clearing activeFace mid-loop
+  // corrupts all subsequent faces (they copy a blank canvas).
+  const snapshot = document.createElement('canvas');
+  snapshot.width = snapshot.height = TEX_SIZE;
+  snapshot.getContext('2d').drawImage(faceCanvases[activeFace], 0, 0);
+
   for (let i = 0; i < 6; i++) {
-    // Copy active base paint to every other face base canvas
     const bCtx = faceCanvases[i].getContext('2d');
     bCtx.clearRect(0, 0, TEX_SIZE, TEX_SIZE);
-    bCtx.drawImage(faceCanvases[activeFace], 0, 0);
-    // Composite to output (no images/text carry over)
+    bCtx.drawImage(snapshot, 0, 0);
     const oCtx = faceCtxs[i];
     oCtx.clearRect(0, 0, TEX_SIZE, TEX_SIZE);
     oCtx.drawImage(faceCanvases[i], 0, 0);
@@ -3172,7 +3176,7 @@ function toggleMoveMode() {
   if (_moveMode) {
     controls.enabled = false;
     btn.style.color      = 'var(--studio-accent)';
-    btn.style.background = 'rgba(184,147,74,.15)';
+    btn.style.background = 'rgba(200,48,74,.15)';
     document.getElementById('viewport').style.cursor = 'move';
   } else {
     controls.enabled = true;

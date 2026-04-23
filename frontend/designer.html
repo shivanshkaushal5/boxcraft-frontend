@@ -109,6 +109,13 @@ body { height: 100%; overflow-y: auto; background: var(--cream); color: var(--te
 .style-btn:hover, .style-btn.active { background: var(--dark); color: var(--cream); border-color: var(--dark); }
 .style-btn.active span, .style-btn:hover span { color: rgba(245,240,232,.5); }
 
+/* ── SCENE PRESETS ─────────────────────────────────────────────────────────── */
+.scene-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .3rem; }
+.scene-card { position: relative; border: 2px solid var(--studio-border2); border-radius: 6px; overflow: hidden; cursor: none; transition: border-color .18s; background: none; padding: 0; }
+.scene-card:hover, .scene-card.active { border-color: var(--studio-accent); }
+.scene-thumb { width: 100%; aspect-ratio: 4/3; display: block; }
+.scene-card-label { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15,15,20,.72); color: rgba(248,244,238,.9); font-family: 'Jost', sans-serif; font-size: .44rem; letter-spacing: .1em; text-transform: uppercase; text-align: center; padding: .28rem .2rem; }
+
 /* ── PRESETS ───────────────────────────────────────────────────────────────── */
 .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; }
 .preset-btn { background: var(--cream2); border: 1px solid var(--border); padding: .5rem .3rem; font-family: 'Jost', sans-serif; font-size: .52rem; color: var(--text); cursor: none; text-align: center; line-height: 1.65; transition: all .2s; }
@@ -670,6 +677,11 @@ body { background: #0F0F14 !important; }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
       <span>Paint</span>
     </button>
+    <div class="rail-sep"></div>
+    <button class="rail-btn" id="rail-scene" onclick="openDrawer('scene')" title="Scene">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="8" cy="9" r="2"/><path d="m21 15-5-5-6 5"/></svg>
+      <span>Scene</span>
+    </button>
   </div>
 
   <!-- ── DRAWERS ── -->
@@ -873,6 +885,25 @@ body { background: #0F0F14 !important; }
           <button class="action-btn" onclick="clearFace()">Clear Face</button>
           <button class="action-btn" onclick="applyToAll()">Apply to All</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Scene drawer -->
+    <div class="drawer" id="drawer-scene">
+      <div class="drawer-title">Scene</div>
+      <div class="scene-grid">
+        <button class="scene-card active" id="scene-none" onclick="setScene('none')">
+          <canvas class="scene-thumb" id="scene-thumb-none"></canvas>
+          <div class="scene-card-label">None</div>
+        </button>
+        <button class="scene-card" id="scene-golden" onclick="setScene('golden')">
+          <canvas class="scene-thumb" id="scene-thumb-golden"></canvas>
+          <div class="scene-card-label">Golden Hour</div>
+        </button>
+        <button class="scene-card" id="scene-desert" onclick="setScene('desert')">
+          <canvas class="scene-thumb" id="scene-thumb-desert"></canvas>
+          <div class="scene-card-label">Desert Table</div>
+        </button>
       </div>
     </div>
 
@@ -1100,6 +1131,9 @@ const MAX_UNDO  = 30;
 let scene, camera, renderer, controls, boxGroup;
 let panels = [];
 let innerMat = null;
+let studioFineGrid, studioMajorGrid;
+let sceneGroup = null;
+let activeScene = 'none';
 let boxW = 12, boxH = 4, boxD = 6;
 
 // Text layer system
@@ -1498,14 +1532,14 @@ function init3D() {
   scene.add(floorShadow);
 
   // Fine grid — 1-unit cells, subtle
-  const fineGrid = new THREE.GridHelper(300, 300, 0xCCCCCC, 0xCCCCCC);
-  fineGrid.position.y = 0;
-  scene.add(fineGrid);
+  studioFineGrid = new THREE.GridHelper(300, 300, 0xCCCCCC, 0xCCCCCC);
+  studioFineGrid.position.y = 0;
+  scene.add(studioFineGrid);
 
   // Major grid — 10-unit cells, slightly more visible
-  const majorGrid = new THREE.GridHelper(300, 30, 0xAAAAAA, 0xAAAAAA);
-  majorGrid.position.y = 0.002;
-  scene.add(majorGrid);
+  studioMajorGrid = new THREE.GridHelper(300, 30, 0xAAAAAA, 0xAAAAAA);
+  studioMajorGrid.position.y = 0.002;
+  scene.add(studioMajorGrid);
 
   // Shadow-only overlay plane — wider + softer than before for pro product-shot feel
   const shadowPlane = new THREE.Mesh(
@@ -3120,6 +3154,214 @@ function openDrawer(name) {
   if (dimBtn) dimBtn.style.color = '';
 }
 
+// ═══════════════════════════════════════════════════════
+// SCENE PRESETS
+// ═══════════════════════════════════════════════════════
+function setScene(id) {
+  activeScene = id;
+
+  // Update active state on cards
+  document.querySelectorAll('.scene-card').forEach(c => c.classList.remove('active'));
+  const card = document.getElementById('scene-' + id);
+  if (card) card.classList.add('active');
+
+  // Remove previous scene props
+  if (sceneGroup) { scene.remove(sceneGroup); sceneGroup = null; }
+
+  if (id === 'none') {
+    // ── Restore default studio look ──────────────────────────
+    const white = new THREE.Color(0xFFFFFF);
+    scene.background = white;
+    scene.fog = new THREE.Fog(white, 50, 130);
+    renderer.setClearColor(0xFFFFFF);
+    if (studioFineGrid)  studioFineGrid.visible  = true;
+    if (studioMajorGrid) studioMajorGrid.visible = true;
+    return;
+  }
+
+  if (id === 'desert') {
+    // ── Desert Table: box on table, dying tree, sand dunes ───
+    const sandSky = new THREE.Color(0xE8B46A);
+    scene.background = sandSky;
+    scene.fog = new THREE.Fog(sandSky, 45, 120);
+    renderer.setClearColor(0xE8B46A);
+    if (studioFineGrid)  studioFineGrid.visible  = false;
+    if (studioMajorGrid) studioMajorGrid.visible = false;
+
+    sceneGroup = new THREE.Group();
+
+    // Sand floor (far below table)
+    const sandMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(0xC8904A).convertSRGBToLinear(), shininess: 2 });
+    const sand = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), sandMat);
+    sand.rotation.x = -Math.PI / 2; sand.position.y = -3.8;
+    sand.receiveShadow = true;
+    sceneGroup.add(sand);
+
+    // Wooden table — tabletop surface flush with y=0
+    const woodMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(0x7A4E2A).convertSRGBToLinear(), shininess: 22 });
+    const tabletop = new THREE.Mesh(new THREE.BoxGeometry(11, 0.4, 8), woodMat);
+    tabletop.position.set(0, -0.2, 0);
+    tabletop.castShadow = true; tabletop.receiveShadow = true;
+    sceneGroup.add(tabletop);
+    [[-4.6, -2.1, -3.2], [4.6, -2.1, -3.2], [-4.6, -2.1, 3.2], [4.6, -2.1, 3.2]].forEach(([x, y, z]) => {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.38, 3.6, 0.38), woodMat);
+      leg.position.set(x, y, z); leg.castShadow = true;
+      sceneGroup.add(leg);
+    });
+
+    // Dead tree — right background
+    const barkMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(0x6B4828).convertSRGBToLinear(), shininess: 4 });
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.46, 7.5, 7), barkMat);
+    trunk.position.set(17, -0.05, -16); trunk.castShadow = true;
+    sceneGroup.add(trunk);
+
+    const branch = (px, py, pz, len, rx, ry, rz) => {
+      const b = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.16, len, 5), barkMat);
+      b.position.set(px, py, pz); b.rotation.set(rx, ry, rz); b.castShadow = true;
+      sceneGroup.add(b);
+    };
+    branch(15.5, 1.2,  -16, 2.6,  0,  0,  0.75);
+    branch(18.5, 2.0,  -16, 2.2,  0,  0, -0.55);
+    branch(15.0, 3.2,  -16, 3.2,  0,  0,  1.00);
+    branch(19.0, 4.0,  -16, 2.4,  0, 0.3,-0.65);
+    branch(14.5, 4.6,  -16, 1.6,  0,  0,  1.30);
+    branch(19.2, 5.2,  -16, 1.3,  0,  0, -1.05);
+    branch(16.5, 5.8,  -16, 1.8,  0,  0,  0.40);
+
+    // Sand dunes silhouette in the distance
+    const duneMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(0xB87840).convertSRGBToLinear(), shininess: 1 });
+    [[-18, -3.8, -22, 13], [22, -3.8, -28, 20], [-4, -3.8, -30, 16]].forEach(([x, y, z, r]) => {
+      const d = new THREE.Mesh(new THREE.SphereGeometry(r, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), duneMat);
+      d.position.set(x, y, z); sceneGroup.add(d);
+    });
+
+    scene.add(sceneGroup);
+  }
+
+  if (id === 'golden') {
+    // ── Golden Hour: warm amber sky, tall pillars, long shadows ──
+    const sky = new THREE.Color(0xF5C060);
+    scene.background = sky;
+    scene.fog = new THREE.Fog(sky, 50, 130);
+    renderer.setClearColor(0xF5C060);
+    if (studioFineGrid)  studioFineGrid.visible  = false;
+    if (studioMajorGrid) studioMajorGrid.visible = false;
+
+    sceneGroup = new THREE.Group();
+
+    // Warm sand floor
+    const floorMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(0xE8963A).convertSRGBToLinear(), shininess: 8 });
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), floorMat);
+    floor.rotation.x = -Math.PI / 2; floor.position.y = -0.05;
+    floor.receiveShadow = true;
+    sceneGroup.add(floor);
+
+    // Golden cylindrical pillars
+    const pillarMat = () => new THREE.MeshPhongMaterial({
+      color: new THREE.Color(0xD4891A).convertSRGBToLinear(), shininess: 40,
+    });
+    const pillars = [
+      { r: 1.0, h: 12, x: -10, z: -5 },
+      { r: 0.7, h:  8, x:  9,  z: -3 },
+      { r: 1.4, h: 18, x: -16, z:  2 },
+      { r: 0.5, h:  6, x:  13, z:  5 },
+      { r: 0.9, h: 14, x:   4, z: -9 },
+    ];
+    pillars.forEach(p => {
+      const mesh = new THREE.Mesh(new THREE.CylinderGeometry(p.r, p.r, p.h, 24), pillarMat());
+      mesh.position.set(p.x, p.h / 2, p.z);
+      mesh.castShadow = true; mesh.receiveShadow = true;
+      sceneGroup.add(mesh);
+    });
+
+    // Flat terracotta accent blocks
+    const accMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(0xC1440E).convertSRGBToLinear(), shininess: 20 });
+    [[5, 1, 0.4, 7, 0.2, 6], [8, 0.5, 0.3, -5, 0.15, 8]].forEach(([w,h,d,x,y,z]) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), accMat);
+      m.position.set(x, y, z); m.castShadow = true;
+      sceneGroup.add(m);
+    });
+
+    scene.add(sceneGroup);
+  }
+
+}
+
+// Draw static thumbnails for scene cards after page load
+function renderSceneThumbs() {
+  // None thumb — white with grey grid lines
+  (function() {
+    const c = document.getElementById('scene-thumb-none');
+    if (!c) return;
+    c.width = 120; c.height = 90;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, 120, 90);
+    ctx.strokeStyle = '#CCCCCC'; ctx.lineWidth = .5;
+    for (let x = 0; x <= 120; x += 12) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 90); ctx.stroke(); }
+    for (let y = 0; y <= 90; y += 12)  { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(120, y); ctx.stroke(); }
+    // tiny box silhouette
+    ctx.fillStyle = '#DDDDDD'; ctx.fillRect(42, 28, 36, 28);
+    ctx.fillStyle = '#BBBBBB'; ctx.fillRect(42, 22, 36, 8);
+  })();
+
+  // Desert Table thumb
+  (function() {
+    const c = document.getElementById('scene-thumb-desert');
+    if (!c) return;
+    c.width = 120; c.height = 90;
+    const ctx = c.getContext('2d');
+    // warm sky gradient
+    const sky = ctx.createLinearGradient(0, 0, 0, 90);
+    sky.addColorStop(0, '#E8C880'); sky.addColorStop(1, '#D4903C');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, 120, 90);
+    // sand dunes
+    ctx.fillStyle = '#B87840';
+    ctx.beginPath(); ctx.ellipse(20, 82, 28, 14, 0, Math.PI, 0, true); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(95, 86, 32, 18, 0, Math.PI, 0, true); ctx.fill();
+    // sand floor
+    ctx.fillStyle = '#C8904A'; ctx.fillRect(0, 68, 120, 22);
+    // wooden table
+    ctx.fillStyle = '#7A4E2A'; ctx.fillRect(30, 52, 60, 4);   // tabletop
+    ctx.fillRect(32, 56, 4, 14); ctx.fillRect(84, 56, 4, 14); // legs
+    // box on table
+    ctx.fillStyle = '#E0D8CC'; ctx.fillRect(46, 34, 28, 18);
+    ctx.fillStyle = '#C8C0B4'; ctx.fillRect(46, 28, 28, 7);
+    // dead tree right
+    ctx.fillStyle = '#6B4828';
+    ctx.fillRect(102, 18, 4, 38);  // trunk
+    ctx.save(); ctx.translate(104, 28); ctx.rotate(0.7); ctx.fillRect(0, 0, 2, 14); ctx.restore();
+    ctx.save(); ctx.translate(104, 32); ctx.rotate(-0.5); ctx.fillRect(0, 0, 2, 12); ctx.restore();
+    ctx.save(); ctx.translate(104, 22); ctx.rotate(1.0); ctx.fillRect(0, 0, 1.5, 10); ctx.restore();
+  })();
+
+  // Golden Hour thumb
+  (function() {
+    const c = document.getElementById('scene-thumb-golden');
+    if (!c) return;
+    c.width = 120; c.height = 90;
+    const ctx = c.getContext('2d');
+    // warm sky gradient
+    const sky = ctx.createLinearGradient(0, 0, 0, 90);
+    sky.addColorStop(0, '#F5C060'); sky.addColorStop(1, '#F08020');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, 120, 90);
+    // sand floor
+    ctx.fillStyle = '#E8963A'; ctx.fillRect(0, 64, 120, 26);
+    // golden pillars
+    ctx.fillStyle = '#D4891A';
+    ctx.fillRect(10, 18, 10, 46); // tall left
+    ctx.fillRect(92, 32, 8, 32);  // medium right
+    ctx.fillRect(72, 10, 7, 54);  // tallest
+    ctx.fillRect(30, 48, 6, 16);  // short
+    // long diagonal shadows
+    ctx.fillStyle = 'rgba(120,50,0,0.2)';
+    ctx.beginPath(); ctx.moveTo(20,64); ctx.lineTo(55,64); ctx.lineTo(22,68); ctx.closePath(); ctx.fill();
+    // box silhouette
+    ctx.fillStyle = '#F0E8D0'; ctx.fillRect(46, 38, 28, 22);
+    ctx.fillStyle = '#D8C8A0'; ctx.fillRect(46, 32, 28, 7);
+  })();
+
+}
+
 // ── Dimensions popup ───────────────────────────────────────
 function toggleDimPopup() {
   const popup = document.getElementById('dimPopup');
@@ -3857,6 +4099,7 @@ window.addEventListener('load', () => {
   renderGallery();
   renderInsertButtons();
   selectFace(4);
+  renderSceneThumbs();
 
   // ── Box move-mode drag handlers ────────────────────────────────────────────
   const vp = document.getElementById('viewport');

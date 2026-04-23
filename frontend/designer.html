@@ -3551,9 +3551,7 @@ const FOAM_SWATCHES = ['#E8E0D4','#D4C9B0','#F5F0E8','#2A2118','#6B1E2C','#1E3A4
 // ── Helpers ────────────────────────────────────────────
 // Returns a dark material representing the slot cavity floor
 function slotMat() {
-  return new THREE.MeshStandardMaterial({
-    color: adjustHex(foamColor, -68), roughness: 1.0, metalness: 0.0
-  });
+  return new THREE.MeshBasicMaterial({ color: adjustHex(foamColor, -50) });
 }
 // Shorthand to add a mesh to a group
 function addTo(g, geo, mat, x, y, z) {
@@ -3766,8 +3764,8 @@ const INSERTS = [
       const g  = new THREE.Group();
       const iW = W-T*2, iD = D-T*2;
       // slotScale drives foam wall height — slider up = deeper holder
-      const fH     = H * 0.3 * slotScale;
-      const r      = Math.min(iW, iD) * 0.25;   // fixed hole radius
+      const fH     = H * 0.72 * slotScale;
+      const r      = Math.min(iW, iD) * 0.28;   // fixed hole radius
       const wallT  = r * 0.75;                   // foam ring wall thickness
       const outerR = r + wallT;
       const N      = 18;                          // segments → smooth circle
@@ -3891,7 +3889,7 @@ function setInsert(id) {
   if (!ins) return;
 
   const W = boxW, H = boxH, D = boxD, T = 0.22;
-  const mat = new THREE.MeshStandardMaterial({ color: foamColor, side: THREE.DoubleSide, roughness: 1.0, metalness: 0.0 });
+  const mat = new THREE.MeshBasicMaterial({ color: foamColor, side: THREE.DoubleSide });
   foamGroup = ins.build(W, H, D, T, mat);
   if (foamGroup) {
     // Foam casts and receives shadows so it's visually distinct from the box interior

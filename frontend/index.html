@@ -165,6 +165,19 @@ nav { position: sticky; top: 0; z-index: 900; background: var(--cream); border-b
 .product-price-orig { font-size: .7rem; color: var(--text3); text-decoration: line-through; margin-right: .4rem; }
 .add-btn { width: 32px; height: 32px; border: 1px solid var(--border2); background: none; color: var(--brown); display: flex; align-items: center; justify-content: center; font-size: .95rem; cursor: none; transition: all .25s; }
 .add-btn:hover { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+.product-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+.enquire-btn { display: inline-block; font-family: 'Jost', sans-serif; font-size: .55rem; letter-spacing: .2em; text-transform: uppercase; color: var(--dark); text-decoration: none; border-bottom: 1px solid var(--border2); padding-bottom: 2px; transition: color .25s, border-color .25s; cursor: none; }
+.enquire-btn:hover { color: var(--maroon); border-color: var(--maroon); }
+.modal-enquire-btn { display: block; width: 100%; padding: .9rem; background: #25D366; color: #fff; border: none; font-family: 'Jost', sans-serif; font-size: .58rem; letter-spacing: .22em; text-transform: uppercase; text-align: center; text-decoration: none; cursor: none; transition: background .3s; margin-top: 1.5rem; }
+.modal-enquire-btn:hover { background: #1ebe5a; }
+.card-carousel-nav { position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%); display: flex; justify-content: space-between; padding: 0 .5rem; z-index: 3; opacity: 0; transition: opacity .25s; pointer-events: none; }
+.product-card:hover .card-carousel-nav { opacity: 1; pointer-events: all; }
+.card-nav-btn { background: rgba(28,21,16,.55); color: var(--cream); border: none; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: none; transition: background .2s; line-height: 1; }
+.card-nav-btn:hover { background: rgba(28,21,16,.85); }
+.card-dots { position: absolute; bottom: .6rem; left: 0; right: 0; display: flex; justify-content: center; gap: .35rem; z-index: 3; }
+.card-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(245,240,232,.45); cursor: none; transition: background .2s; display: inline-block; }
+.card-dot.active { background: var(--cream); }
+.modal-thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* PROCESS */
 .process { background: var(--dark); padding: 6rem 4rem; position: relative; overflow: hidden; }
@@ -270,48 +283,45 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
 .social-link:hover { color: var(--cream); }
 
 /* MODAL */
-.product-modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(28,21,16,.97); backdrop-filter: blur(14px); overflow-y: auto; }
-.product-modal.open { display: block; }
-.modal-inner { max-width: 1100px; margin: 0 auto; padding: 5rem 4rem; min-height: 100vh; }
-.modal-close { position: fixed; top: 1.8rem; right: 2.2rem; background: none; border: 1px solid rgba(245,240,232,.12); color: rgba(245,240,232,.4); width: 44px; height: 44px; font-size: 1rem; cursor: none; display: flex; align-items: center; justify-content: center; transition: all .3s; z-index: 10; }
-.modal-close:hover { border-color: var(--cream); color: var(--cream); }
-.modal-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 5rem; align-items: start; }
-.modal-gallery { position: sticky; top: 2rem; }
-.gallery-main { background: var(--cream3); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; margin-bottom: .75rem; }
-.gallery-thumbs { display: flex; gap: .4rem; }
-.thumb { width: 70px; aspect-ratio: 1; background: var(--cream2); border: 1px solid var(--border); cursor: none; transition: border-color .25s; display: flex; align-items: center; justify-content: center; }
-.thumb.active { border-color: var(--dark); }
-.thumb:hover { border-color: var(--brown); }
-.thumb-mini { width: 26px; height: 26px; border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; }
-.thumb-mini-label { font-family: 'EB Garamond', serif; font-size: .52rem; color: var(--brown3); }
-.modal-info { padding-top: 1rem; }
-.modal-category { font-size: .52rem; letter-spacing: .35em; text-transform: uppercase; color: var(--gold2); margin-bottom: .75rem; }
-.modal-name { font-family: 'EB Garamond', serif; font-size: clamp(1.9rem, 3vw, 2.7rem); font-weight: 400; line-height: 1.1; color: var(--cream); margin-bottom: .75rem; }
-.modal-rating { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.5rem; }
-.stars { color: var(--gold2); font-size: .68rem; letter-spacing: .05em; }
-.rating-count { font-size: .58rem; color: rgba(245,240,232,.3); }
-.modal-divider { height: 1px; background: rgba(245,240,232,.07); margin-bottom: 1.5rem; }
-.modal-price { font-family: 'EB Garamond', serif; font-size: 2.1rem; color: var(--cream); }
-.modal-price-note { font-size: .58rem; color: rgba(245,240,232,.28); margin-top: .3rem; }
-.modal-desc { font-size: .76rem; color: rgba(245,240,232,.5); line-height: 1.9; margin: 1.4rem 0; }
-.modal-contents-title { font-size: .55rem; letter-spacing: .25em; text-transform: uppercase; color: rgba(245,240,232,.35); margin-bottom: .9rem; }
-.contents-list { display: flex; flex-direction: column; gap: .45rem; margin-bottom: 1.4rem; }
-.content-item { display: flex; align-items: center; gap: .7rem; font-size: .7rem; color: rgba(245,240,232,.5); }
-.content-dot { width: 3px; height: 3px; background: var(--gold2); border-radius: 50%; flex-shrink: 0; }
-.qty-wrap { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; }
-.qty-label { font-size: .55rem; letter-spacing: .2em; text-transform: uppercase; color: rgba(245,240,232,.3); }
-.qty-ctrl { display: flex; }
-.qty-btn { width: 32px; height: 32px; border: 1px solid rgba(245,240,232,.1); background: none; color: rgba(245,240,232,.45); font-size: .9rem; cursor: none; transition: all .2s; }
-.qty-btn:hover { border-color: var(--cream); color: var(--cream); }
-.qty-num { width: 42px; height: 32px; border-top: 1px solid rgba(245,240,232,.1); border-bottom: 1px solid rgba(245,240,232,.1); background: rgba(245,240,232,.04); color: var(--cream); text-align: center; line-height: 32px; font-size: .8rem; }
-.modal-add-btn { width: 100%; padding: 1rem; background: var(--cream); border: none; color: var(--dark); font-family: 'Jost', sans-serif; font-size: .58rem; letter-spacing: .22em; text-transform: uppercase; cursor: none; transition: background .3s; margin-bottom: .55rem; }
-.modal-add-btn:hover { background: var(--gold3); }
-.modal-wish-btn { width: 100%; padding: .82rem; background: none; border: 1px solid rgba(245,240,232,.1); color: rgba(245,240,232,.45); font-family: 'Jost', sans-serif; font-size: .56rem; letter-spacing: .2em; text-transform: uppercase; cursor: none; transition: all .3s; }
-.modal-wish-btn:hover { border-color: rgba(245,240,232,.25); color: var(--cream); }
-.modal-meta { margin-top: 1.8rem; padding-top: 1.4rem; border-top: 1px solid rgba(245,240,232,.07); display: flex; flex-direction: column; gap: .55rem; }
-.meta-row { display: flex; justify-content: space-between; align-items: center; }
-.meta-key { font-size: .52rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(245,240,232,.22); }
-.meta-val { font-size: .68rem; color: rgba(245,240,232,.45); }
+/* ── PRODUCT DETAIL OVERLAY ─────────────────────────────────────────────────── */
+.product-modal { display:none; position:fixed; inset:0; z-index:1000; background:rgba(28,21,16,.98); overflow:hidden; }
+.product-modal.open { display:flex; }
+.modal-close { position:fixed; top:1.8rem; right:2.2rem; background:none; border:1px solid rgba(245,240,232,.12); color:rgba(245,240,232,.4); width:44px; height:44px; font-size:1rem; cursor:none; display:flex; align-items:center; justify-content:center; transition:all .3s; z-index:10; }
+.modal-close:hover { border-color:var(--cream); color:var(--cream); }
+.detail-gallery { width:55%; height:100vh; flex-shrink:0; display:flex; flex-direction:column; background:#111; }
+.detail-main-wrap { flex:1; overflow:hidden; position:relative; cursor:zoom-in; }
+.detail-main-wrap img { width:100%; height:100%; object-fit:cover; transition:transform .7s cubic-bezier(.25,.46,.45,.94); display:block; }
+.detail-main-wrap:hover img { transform:scale(1.07); }
+.detail-thumbs { display:flex; gap:2px; height:88px; flex-shrink:0; background:#0d0d0d; padding:2px; }
+.detail-thumb { flex:1; overflow:hidden; cursor:none; opacity:.45; transition:opacity .25s; }
+.detail-thumb.active { opacity:1; outline:1px solid rgba(245,240,232,.35); }
+.detail-thumb:hover { opacity:.8; }
+.detail-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.detail-info { flex:1; overflow-y:auto; padding:4.5rem 4.5rem 5rem 5rem; scrollbar-width:thin; scrollbar-color:rgba(245,240,232,.08) transparent; }
+.detail-info::-webkit-scrollbar { width:2px; }
+.detail-info::-webkit-scrollbar-thumb { background:rgba(245,240,232,.1); }
+.detail-eyebrow { font-size:.5rem; letter-spacing:.42em; text-transform:uppercase; color:var(--gold2); margin-bottom:1rem; }
+.detail-name { font-family:'EB Garamond',serif; font-size:clamp(2.2rem,3vw,3.2rem); font-weight:400; line-height:1.05; color:var(--cream); margin-bottom:2rem; }
+.detail-story { font-family:'EB Garamond',serif; font-style:italic; font-size:1.05rem; line-height:1.8; color:rgba(245,240,232,.58); border-left:2px solid var(--gold); padding-left:1.6rem; margin-bottom:2.5rem; }
+.detail-divider { height:1px; background:rgba(245,240,232,.06); margin:2rem 0; }
+.detail-desc { font-size:.76rem; color:rgba(245,240,232,.48); line-height:2.1; margin-bottom:2.5rem; }
+.detail-section-label { font-size:.48rem; letter-spacing:.38em; text-transform:uppercase; color:rgba(245,240,232,.28); margin-bottom:1.2rem; display:flex; align-items:center; gap:.8rem; }
+.detail-section-label::before { content:''; width:18px; height:1px; background:rgba(245,240,232,.15); }
+.detail-materials { display:flex; flex-direction:column; gap:.75rem; margin-bottom:2.8rem; }
+.detail-material { display:flex; align-items:center; gap:1rem; font-size:.72rem; color:rgba(245,240,232,.5); letter-spacing:.02em; }
+.detail-material::before { content:''; width:4px; height:4px; background:var(--gold2); border-radius:50%; flex-shrink:0; }
+.detail-contents { display:flex; flex-direction:column; gap:.55rem; margin-bottom:2.8rem; }
+.detail-content-item { display:flex; align-items:center; gap:.8rem; font-size:.7rem; color:rgba(245,240,232,.38); }
+.detail-content-item::before { content:''; width:3px; height:3px; background:rgba(245,240,232,.2); border-radius:50%; flex-shrink:0; }
+.detail-ctas { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; margin-bottom:2.2rem; }
+.detail-cta-primary { padding:.95rem .6rem; background:#25D366; color:#fff; font-family:'Jost',sans-serif; font-size:.54rem; letter-spacing:.18em; text-transform:uppercase; text-align:center; text-decoration:none; cursor:none; transition:background .3s; display:block; }
+.detail-cta-primary:hover { background:#1db954; }
+.detail-cta-outline { padding:.92rem .6rem; background:none; color:rgba(245,240,232,.65); border:1px solid rgba(245,240,232,.14); font-family:'Jost',sans-serif; font-size:.54rem; letter-spacing:.18em; text-transform:uppercase; text-align:center; text-decoration:none; cursor:none; transition:all .3s; display:block; }
+.detail-cta-outline:hover { border-color:rgba(245,240,232,.5); color:var(--cream); }
+.detail-meta { padding-top:1.8rem; border-top:1px solid rgba(245,240,232,.06); display:flex; flex-direction:column; gap:0; }
+.detail-meta-row { display:flex; justify-content:space-between; align-items:center; padding:.65rem 0; border-bottom:1px solid rgba(245,240,232,.04); }
+.detail-meta-key { font-size:.48rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(245,240,232,.2); }
+.detail-meta-val { font-size:.68rem; color:rgba(245,240,232,.48); }
 
 /* TOAST */
 .toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 2000; background: var(--dark); border: 1px solid rgba(245,240,232,.08); border-left: 3px solid var(--maroon); padding: 1.1rem 1.5rem; min-width: 255px; transform: translateY(100px); opacity: 0; transition: all .4s; }
@@ -617,7 +627,7 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
   .testi-grid { grid-template-columns: repeat(2, 1fr); }
   .trust-inner { grid-template-columns: repeat(2, 1fr); }
   .footer-main { grid-template-columns: 1fr 1fr; gap: 3rem; }
-  .modal-grid { grid-template-columns: 1fr; }
+  .detail-gallery { width: 100%; height: 50vh; } .product-modal { flex-direction: column; overflow-y: auto; }
   .nav-top { padding: .8rem 2rem; }
   .nav-bottom { gap: 1.5rem; padding: .7rem 2rem; }
   .collections { padding: 5rem 2.5rem; }
@@ -632,7 +642,7 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
   .trust-inner { grid-template-columns: 1fr; }
   .footer-main { grid-template-columns: 1fr; padding: 4rem 1.5rem; }
   .footer-bottom { flex-direction: column; gap: 1rem; padding: 1.5rem; text-align: center; }
-  .modal-inner { padding: 4rem 1.2rem; }
+  .detail-info { padding: 3rem 1.5rem 4rem; }
   .collections { padding: 4rem 1.5rem; }
   .editorial-text { padding: 3.5rem 1.5rem; }
   .process { padding: 5rem 1.5rem; }
@@ -788,9 +798,9 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
     </div>
     <div class="filter-row">
       <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
-      <button class="filter-btn" onclick="filterProducts('wellness', this)">Wellness</button>
-      <button class="filter-btn" onclick="filterProducts('gourmet', this)">Gourmet</button>
       <button class="filter-btn" onclick="filterProducts('gifting', this)">Gifting</button>
+      <button class="filter-btn" onclick="filterProducts('corporate', this)">Corporate</button>
+      <button class="filter-btn" onclick="filterProducts('luxury', this)">Luxury</button>
     </div>
   </div>
   <div class="products-grid" id="productsGrid"></div>
@@ -1224,42 +1234,28 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
 </div>
 
 <div class="product-modal" id="productModal">
-  <div class="modal-inner">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-grid">
-      <div class="modal-gallery">
-        <div class="gallery-main" id="galleryMain">
-          <div class="box-visual" style="width:190px;height:190px;background:var(--cream2)">
-            <div class="box-visual-line"></div>
-            <span class="box-visual-label" id="modalBoxLabel" style="font-size:1rem">Box Craft Studios</span>
-            <div class="box-visual-line"></div>
-          </div>
-        </div>
-        <div class="gallery-thumbs" id="galleryThumbs"></div>
-      </div>
-      <div class="modal-info">
-        <div class="modal-category" id="modalCategory"></div>
-        <h2 class="modal-name" id="modalName"></h2>
-        <div class="modal-rating"><div class="stars">★★★★★</div><span class="rating-count">(142 reviews)</span></div>
-        <div class="modal-divider"></div>
-        <div class="modal-price" id="modalPrice"></div>
-        <div class="modal-price-note">Inclusive of all taxes · Free shipping on bulk orders</div>
-        <p class="modal-desc" id="modalDesc"></p>
-        <div class="modal-contents-title">What's Inside</div>
-        <div class="contents-list" id="modalContents"></div>
-        <div class="qty-wrap">
-          <span class="qty-label">Qty</span>
-          <div class="qty-ctrl">
-            <button class="qty-btn" onclick="changeQty(-1)">−</button>
-            <div class="qty-num" id="qtyNum">1</div>
-            <button class="qty-btn" onclick="changeQty(1)">+</button>
-          </div>
-        </div>
-        <button class="modal-add-btn" onclick="addToCart()">Add to Bag</button>
-        <button class="modal-wish-btn">♡ &nbsp; Save to Wishlist</button>
-        <div class="modal-meta" id="modalMeta"></div>
-      </div>
+  <button class="modal-close" onclick="closeModal()">✕</button>
+  <div class="detail-gallery">
+    <div class="detail-main-wrap" id="detailMainWrap">
+      <img id="modalMainImg" src="" alt="">
     </div>
+    <div class="detail-thumbs" id="galleryThumbs"></div>
+  </div>
+  <div class="detail-info">
+    <div class="detail-eyebrow" id="modalCategory"></div>
+    <h2 class="detail-name" id="modalName"></h2>
+    <p class="detail-story" id="modalStory"></p>
+    <div class="detail-divider"></div>
+    <p class="detail-desc" id="modalDesc"></p>
+    <div class="detail-section-label">Crafted With</div>
+    <div class="detail-materials" id="modalMaterials"></div>
+    <div class="detail-section-label">What's Inside</div>
+    <div class="detail-contents" id="modalContents"></div>
+    <div class="detail-ctas">
+      <a class="detail-cta-primary" id="modalEnquireBtn" href="#" target="_blank">Enquire Price →</a>
+      <a class="detail-cta-outline" id="modalDielineBtn" href="#" target="_blank">Request Die-line →</a>
+    </div>
+    <div class="detail-meta" id="modalMeta"></div>
   </div>
 </div>
 
@@ -1275,12 +1271,53 @@ const API_BASE = 'https://boxcraftstudios.onrender.com/api';
 
 // ── PRODUCT CATALOG (mirrors backend) ───────────────────────────────────────
 const products = [
-  { id:1, category:'wellness', badge:'Bestseller', name:'The Wellness Ritual', price:'₹1,499', priceNum:1499, origPrice:null, rating:5, reviews:142, desc:'A thoughtfully curated box for those who believe self-care is a discipline. Sourced from artisans across India, every item has been chosen for its efficacy, beauty, and the ritual it creates.', contents:['Saffron & Sandalwood face serum — 30ml','Rose quartz gua sha tool','Artisan beeswax candle — 200g','Organic herbal bath salts — 150g','Handwoven cotton eye pillow','Personalised ritual guide'], meta:{'Box Dimensions':'32 × 24 × 12 cm','Items Inside':'6 premium pieces','Dispatch':'2–3 business days','Customisation':'Full personalisation'} },
-  { id:2, category:'gourmet', badge:null, name:'The Gourmet Edit', price:'₹2,499', priceNum:2499, origPrice:null, rating:5, reviews:89, desc:'A symphony of India\'s finest flavours. Single-origin chocolates, estate teas, and artisanal preserves — each chosen for extraordinary provenance.', contents:['Valrhona dark chocolate — 100g','Darjeeling first flush tea — 50g','Artisan fig & walnut preserve','Himalayan pink salt flakes','Cold-pressed olive oil — 100ml','Handmade shortbread — 8 pieces'], meta:{'Box Dimensions':'34 × 26 × 14 cm','Items Inside':'6 curated pieces','Dispatch':'2–3 business days','Customisation':'Note available'} },
-  { id:3, category:'gifting', badge:'Limited', name:'The Signature Box', price:'₹6,999', priceNum:6999, origPrice:null, rating:5, reviews:203, desc:'Our flagship. Eight extraordinary objects, hand-selected across categories — the definitive Box Craft Studios experience for those who deserve nothing less.', contents:['Handpoured soy candle — 300g','Crystal perfume bottle','Silk tassel bookmark','Single-origin chocolate — 120g','Artisan leather card holder','Handwoven stole','Pressed flower stationery set','Bespoke wax seal'], meta:{'Box Dimensions':'36 × 28 × 16 cm','Items Inside':'8 premium pieces','Dispatch':'3–4 business days','Customisation':'Full personalisation'} },
-  { id:4, category:'wellness', badge:'New', name:'Morning Alchemy', price:'₹129', priceNum:129, origPrice:null, rating:5, reviews:57, desc:'Transform your mornings. A precision-curated set built around the science and ritual of a powerful start.', contents:['Matcha ceremonial grade — 30g','Bamboo whisk set','Adaptogen blend sachets — 10 days','Mini jade roller','Morning affirmation journal','Mushroom coffee sachets — 5 pieces'], meta:{'Box Dimensions':'28 × 20 × 10 cm','Items Inside':'6 pieces','Dispatch':'2–3 business days','Customisation':'Note available'} },
-  { id:5, category:'gifting', badge:null, name:'Corporate Prestige', price:'₹4,999', priceNum:4999, origPrice:null, rating:5, reviews:38, desc:'When your brand\'s reputation depends on the gift. Fully brandable, minimum 10 units. Maximum impression, every time.', contents:['Custom-printed outer box','Premium desk accessory','Artisan leather notebook','Whisky chocolate — 120g','Handcrafted pen','Fine tea selection','Bespoke wax seal card'], meta:{'Minimum Order':'10 units','Lead Time':'7–10 business days','Branding':'Logo + custom note','Dispatch':'Pan-India courier'} },
-  { id:6, category:'gourmet', badge:'Fan Favourite', name:'The Tea Ceremony', price:'₹499', priceNum:499, origPrice:null, rating:5, reviews:116, desc:'A deep exploration of India\'s finest teas paired with the vessels and rituals to honour them.', contents:['Darjeeling first flush — 50g','Nilgiri green tea — 40g','Assam golden tips — 40g','Handthrown ceramic tea pot','Set of two ceramic cups','Bamboo tea tray'], meta:{'Box Dimensions':'30 × 26 × 14 cm','Items Inside':'6 pieces','Dispatch':'2–3 business days','Customisation':'Note available'} }
+  { id:2, category:'luxury', badge:null, name:'The Prestige Watch Vault',
+    images:['BCS_product_images/Watch/Gemini_Generated_Image_13kbp813kbp813kb.png','BCS_product_images/Watch/Gemini_Generated_Image_2hf8s62hf8s62hf8.png','BCS_product_images/Watch/Gemini_Generated_Image_kev12ykev12ykev1.png'],
+    story:'Born from the belief that a great timepiece deserves a home as extraordinary as itself. Each Watch Vault is hand-stitched by leather artisans, shaped around the contours of the watch, and finished in colours that command the room.',
+    desc:'The hand-crafted leather-finished premium watch box, available in exotic colours. A sanctuary for your timepieces — built for collectors who expect nothing less than extraordinary.',
+    materials:['Full-grain Italian leather exterior','Hand-stitched seams throughout','Plush suede microfibre lining','Brushed brass hinges & clasp hardware','Satin ribbon pull tab','Padded watch pillow insert'],
+    contents:['Leather-wrapped outer box','Suede-lined interior tray','Removable watch pillow','Dust drawstring pouch'],
+    meta:{'Material':'Full-grain leather','Colours':'6 exotic options','Holds':'1–2 timepieces','Customisation':'Monogram available','Dispatch':'4–6 business days'} },
+
+  { id:4, category:'luxury', badge:'Finest', name:'The Éclat Jewellery Box',
+    images:['BCS_product_images/jewellery/Good_stuff,_can_202604241622.jpeg','BCS_product_images/jewellery/Remove_the_text_202604241622.jpeg'],
+    story:'We asked ourselves: what does a piece of jewellery see before it meets the world? It should see velvet. It should see light in a mirror. It should feel like the treasure it is — before it is ever opened.',
+    desc:'The finest showcase for your treasured pieces. Crafted to give jewellery the stage it deserves — because exceptional jewellery deserves an equally exceptional home.',
+    materials:['Tri-wall MDF rigid board core','Premium velvet fabric lining','Crystal mirror glass panel on lid','Hot-foil stamped outer wrap','Precision-cut compartment dividers','Anti-tarnish interior treatment'],
+    contents:['Velvet-lined jewellery tray','Multi-section compartment layout','Mirror panel inside lid','Ring pillow roll insert'],
+    meta:{'Interior':'Premium velvet lined','Feature':'Integrated mirror lid','Compartments':'Multi-section','Exterior':'Foil-stamped','Customisation':'Monogram & colour'} },
+
+  { id:3, category:'gifting', badge:'Signature', name:'Signature Box',
+    images:['BCS_product_images/signature_box/IMG_3691.PNG','BCS_product_images/signature_box/IMG_3692.PNG'],
+    story:'The box that started it all. Designed to be the most versatile luxury packaging ever made — strong enough for corporate use, refined enough for your most intimate gifts. The magnetic click is the sound of a promise kept.',
+    desc:'Our iconic magnetic gift box — versatile, elegant, and endlessly customisable. The perfect vessel for any occasion, from corporate gifting to personal milestones.',
+    materials:['2400gsm premium rigid greyboard','Specialty Italian art paper wrap','Neodymium magnetic closure system','Satin ribbon pull','Custom tissue paper & shredded fill','Optional wax seal & ribbon'],
+    contents:['Rigid magnetic-lid outer box','Branded tissue paper wrap','Custom shredded fill bed','Personalised message card slot'],
+    meta:{'Closure':'Magnetic lid','Board':'2400gsm rigid','Sizes':'Multiple available','Customisation':'Full branding','Dispatch':'2–4 business days'} },
+
+  { id:1, category:'luxury', badge:null, name:'The Luminary',
+    images:['BCS_product_images/Candle/Gemini_Generated_Image_wgau7uwgau7uwgau.png'],
+    story:'Candlelight is one of humanity\'s oldest rituals. The Luminary was crafted to honour that — a vessel that builds anticipation before the first flame is ever struck. Open it slowly. That moment belongs to you.',
+    desc:'Hand-poured artisan candles in bespoke boxes designed to elevate every ambience. A ritual of light and fragrance, beautifully packaged for gifting or personal indulgence.',
+    materials:['Recycled premium rigid kraft board','UV-coated specialty exterior wrap','Satin ribbon closure','Custom foam cradle insert','Foil-stamped lid panel','Eco water-based interior ink'],
+    contents:['Premium hand-poured candle','Bespoke rigid outer box','Satin ribbon & branded seal','Personalised message card'],
+    meta:{'Finish':'Matte or gloss UV','Customisation':'Full personalisation','Dispatch':'3–5 business days','MOQ':'Enquire'} },
+
+  { id:5, category:'corporate', badge:'Best Seller', name:'Corporate Prestige Kit',
+    images:[],
+    story:'Your first impression as a company is often a gift. The Corporate Prestige Kit is engineered to make that moment unforgettable — every element brandable, every material selected to reflect standards as high as yours.',
+    desc:'Fully customisable and our best-selling corporate welcome kit. Premium branded gifting that speaks volumes about your company\'s values — maximum impression, every single time.',
+    materials:['Premium rigid outer shell box','Leather-textured specialty art paper','Custom-printed interior panels','Branded satin ribbon & wax seal','Modular foam & card insert system','Spot UV & foil finishing options'],
+    contents:['Custom-printed outer box','Premium branded inserts','Artisan leather notebook','Handcrafted pen & accessories','Bespoke wax seal card','Fine selection additions'],
+    meta:{'Minimum Order':'10 units','Lead Time':'7–10 business days','Branding':'Logo + full custom print','Finishing':'Foil, emboss, spot UV','Dispatch':'Pan-India courier'} },
+
+  { id:6, category:'luxury', badge:'Exclusive', name:'The Scentelier',
+    images:[],
+    story:'Fragrance is invisible — but the moment before it\'s revealed is everything. The Scentelier was designed for that ceremony: an opening that makes the scent feel sacred, the reveal feel earned, the gift feel eternal.',
+    desc:'A fragrance presentation box like nothing you\'ve encountered before. Exotic materials, premium construction, and a design that transforms the unboxing into an event in itself.',
+    materials:['Exotic grass-cloth & linen outer wrap','Satin-quilted interior lining','Precision-engineered magnetic reveal lid','24k gold foil detailing','Hand-cut bottle cradle in rigid foam','Matte anti-fingerprint lamination'],
+    contents:['Exotic-wrapped rigid outer box','Satin-quilted interior shell','Precision bottle cradle insert','Gold-foil branded ribbon'],
+    meta:{'Exterior':'Grass-cloth exotic wrap','Interior':'Satin quilted','Lid Mechanism':'Magnetic reveal','Finishing':'24k gold foil','Customisation':'Full personalisation'} }
 ];
 
 const boxBgs = ['#EDE8DC','#E8E0D0','#E4DDD0','#EAE2D5','#E2D9C8','#E8E2D8'];
@@ -1304,30 +1341,58 @@ function renderProducts(filter = 'all') {
   const grid = document.getElementById('productsGrid');
   const filtered = filter === 'all' ? products : products.filter(p => p.category === filter);
   grid.innerHTML = filtered.map((p,i) => `
-    <div class="product-card reveal" style="transition-delay:${i*.08}s">
+    <div class="product-card reveal" style="transition-delay:${i*.08}s" data-id="${p.id}">
       ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
-      <div class="product-img">
-        <div class="product-img-inner">
-          <div class="box-visual" style="background:${boxBgs[i%boxBgs.length]}">
-            <div class="box-visual-line"></div>
-            <span class="box-visual-label">${p.name.split(' ').pop().toUpperCase()}</span>
-            <div class="box-visual-line"></div>
-          </div>
+      <div class="product-img" onclick="window.location.href='product.html?id=${p.id}'">
+        <div class="product-img-inner" id="card-imgs-${p.id}">
+          ${p.images && p.images.length ? `<img src="${p.images[0]}" alt="${p.name}" class="product-photo">` : `<div class="box-visual" style="background:${boxBgs[i%boxBgs.length]}"><div class="box-visual-line"></div><span class="box-visual-label">${p.name.split(' ').pop().toUpperCase()}</span><div class="box-visual-line"></div></div>`}
         </div>
-        <div class="product-hover-bar" onclick="openModal(${p.id})">View Details</div>
+        ${p.images && p.images.length > 1 ? `
+        <div class="card-carousel-nav">
+          <button class="card-nav-btn" onclick="cardPrev(event,${p.id})">‹</button>
+          <button class="card-nav-btn" onclick="cardNext(event,${p.id})">›</button>
+        </div>
+        <div class="card-dots">
+          ${p.images.map((_,di) => `<span class="card-dot ${di===0?'active':''}" onclick="cardGoTo(event,${p.id},${di})"></span>`).join('')}
+        </div>` : ''}
+        <div class="product-hover-bar">View Details</div>
       </div>
       <div class="product-body">
         <div class="product-category">${p.category}</div>
         <div class="product-name">${p.name}</div>
         <div class="product-desc">${p.desc.slice(0,88)}…</div>
         <div class="product-footer">
-          <div><span class="product-price">${fmtPrice(p.priceNum)}</span></div>
-          <button class="add-btn" onclick="quickAdd(${p.id},event)">+</button>
+          <a class="enquire-btn" href="https://wa.me/919068370981?text=${encodeURIComponent('Hi, I am interested in the ' + p.name + '. Please share more details.')}" target="_blank" onclick="event.stopPropagation()">Enquire →</a>
         </div>
       </div>
     </div>
   `).join('');
   observeReveal();
+}
+
+const cardIndex = {};
+function cardGoTo(e, id, idx) {
+  e.stopPropagation();
+  const p = products.find(x => x.id === id);
+  if (!p || !p.images.length) return;
+  cardIndex[id] = idx;
+  const inner = document.getElementById('card-imgs-' + id);
+  inner.querySelector('img').src = p.images[idx];
+  inner.closest('.product-img').querySelectorAll('.card-dot').forEach((d,i) => d.classList.toggle('active', i === idx));
+}
+function cardNext(e, id) {
+  e.stopPropagation();
+  const p = products.find(x => x.id === id);
+  if (!p || !p.images.length) return;
+  const next = ((cardIndex[id] || 0) + 1) % p.images.length;
+  cardGoTo(e, id, next);
+}
+function cardPrev(e, id) {
+  e.stopPropagation();
+  const p = products.find(x => x.id === id);
+  if (!p || !p.images.length) return;
+  const prev = ((cardIndex[id] || 0) - 1 + p.images.length) % p.images.length;
+  cardGoTo(e, id, prev);
 }
 
 function filterProducts(filter, btn) {
@@ -1347,24 +1412,31 @@ function quickAdd(id, e) {
 function openModal(id) {
   const p = products.find(x => x.id === id);
   if (!p) return;
-  currentQty = 1;
-  document.getElementById('qtyNum').textContent = 1;
   document.getElementById('modalCategory').textContent = p.category.toUpperCase();
   document.getElementById('modalName').textContent = p.name;
-  document.getElementById('modalPrice').textContent = fmtPrice(p.priceNum);
+  document.getElementById('modalStory').textContent = p.story || '';
   document.getElementById('modalDesc').textContent = p.desc;
-  document.getElementById('modalBoxLabel').textContent = p.name.split(' ').pop().toUpperCase();
-  document.getElementById('modalContents').innerHTML = p.contents.map(c => `<div class="content-item"><span class="content-dot"></span>${c}</div>`).join('');
-  document.getElementById('modalMeta').innerHTML = Object.entries(p.meta).map(([k,v]) => `<div class="meta-row"><span class="meta-key">${k}</span><span class="meta-val">${v}</span></div>`).join('');
-  document.getElementById('galleryThumbs').innerHTML = ['Front','Open','Detail','Contents'].map((l,i) => `<div class="thumb ${i===0?'active':''}" onclick="selectThumb(this)"><div class="thumb-mini"><span class="thumb-mini-label">${l[0]}</span></div></div>`).join('');
+  document.getElementById('modalMaterials').innerHTML = (p.materials || []).map(m => `<div class="detail-material">${m}</div>`).join('');
+  document.getElementById('modalContents').innerHTML = (p.contents || []).map(c => `<div class="detail-content-item">${c}</div>`).join('');
+  document.getElementById('modalMeta').innerHTML = Object.entries(p.meta).map(([k,v]) => `<div class="detail-meta-row"><span class="detail-meta-key">${k}</span><span class="detail-meta-val">${v}</span></div>`).join('');
+  const waBase = 'https://wa.me/919068370981?text=';
+  document.getElementById('modalEnquireBtn').href = waBase + encodeURIComponent('Hi, I\'d like to enquire about the price of the ' + p.name + '. Please share more details.');
+  document.getElementById('modalDielineBtn').href = waBase + encodeURIComponent('Hi, I\'d like to request the die-line / template for the ' + p.name + '. Please share the file.');
+  const mainImg = document.getElementById('modalMainImg');
+  if (p.images && p.images.length) {
+    mainImg.src = p.images[0]; mainImg.alt = p.name; mainImg.style.display = 'block';
+  } else { mainImg.style.display = 'none'; }
+  document.getElementById('galleryThumbs').innerHTML = p.images && p.images.length > 1
+    ? p.images.map((src,i) => `<div class="detail-thumb ${i===0?'active':''}" onclick="selectThumb(this,'${src}')"><img src="${src}" alt=""></div>`).join('')
+    : '';
   document.getElementById('productModal').classList.add('open');
   document.body.style.overflow = 'hidden';
   window._cp = p;
 }
 
 function closeModal() { document.getElementById('productModal').classList.remove('open'); document.body.style.overflow = ''; }
-function selectThumb(el) { document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active')); el.classList.add('active'); }
-function changeQty(d) { currentQty = Math.max(1, currentQty + d); document.getElementById('qtyNum').textContent = currentQty; }
+function selectThumb(el, src) { document.querySelectorAll('.detail-thumb').forEach(t => t.classList.remove('active')); el.classList.add('active'); if (src) { const img = document.getElementById('modalMainImg'); img.src = src; } }
+function changeQty(d) { currentQty = Math.max(1, currentQty + d); }
 function addToCart() { if (!window._cp) return; cartCount += currentQty * 100; updateBagCount(); showToast('Added to Bag', `${currentQty} batch${currentQty>1?'es':''} of ${window._cp.name} added.`, true); closeModal(); }
 document.getElementById('productModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
 

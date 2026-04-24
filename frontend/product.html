@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Box Craft Studios — Product Detail</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:   #F5F0E8;
+  --cream2:  #EDE8DC;
+  --cream3:  #E4DDD0;
+  --warm:    #D4C9B0;
+  --brown:   #8B7355;
+  --brown2:  #6B5840;
+  --brown3:  #4A3D2C;
+  --dark:    #1C1510;
+  --text:    #2A2118;
+  --text2:   #5A4E3C;
+  --text3:   #8A7E6E;
+  --gold:    #A8884A;
+  --gold2:   #C9A85C;
+  --gold3:   #E8D4A0;
+  --maroon:  #6B1E2C;
+  --maroon2: #8B2A3A;
+  --border:  rgba(139,115,85,0.2);
+  --border2: rgba(139,115,85,0.4);
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--cream); color: var(--text); font-family: 'Jost', sans-serif; font-weight: 300; overflow-x: hidden; }
+
+body { cursor: none; }
+#cursor { position: fixed; width: 8px; height: 8px; background: var(--brown3); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .3s, height .3s, opacity .3s; }
+#cursor-ring { position: fixed; width: 32px; height: 32px; border: 1px solid rgba(74,61,44,0.4); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform .12s ease-out, width .3s, height .3s; }
+.cursor-expand #cursor { width: 44px; height: 44px; opacity: .1; }
+.cursor-expand #cursor-ring { width: 60px; height: 60px; opacity: 0; }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--cream2); }
+::-webkit-scrollbar-thumb { background: var(--maroon); }
+
+/* ── NAV ─────────────────────────────────────────────────────────────────── */
+.announcement { background: var(--dark); color: rgba(245,240,232,.65); text-align: center; padding: .55rem 1rem; font-size: .58rem; letter-spacing: .28em; text-transform: uppercase; }
+nav { position: sticky; top: 0; z-index: 900; background: var(--cream); border-bottom: 1px solid var(--border); }
+.nav-top { display: flex; align-items: center; justify-content: space-between; padding: .9rem 3rem; }
+.nav-logo { font-family: 'EB Garamond', serif; font-size: 1.45rem; letter-spacing: .08em; text-transform: uppercase; color: var(--dark); text-decoration: none; font-weight: 400; }
+.nav-utils { display: flex; align-items: center; gap: 1.8rem; }
+.nav-util-link { color: var(--text2); text-decoration: none; font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; transition: color .25s; }
+.nav-util-link:hover { color: var(--dark); }
+.nav-bottom { border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 3rem; padding: .7rem 3rem; }
+.nav-bottom a { color: var(--text2); text-decoration: none; font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; transition: color .25s; position: relative; padding-bottom: 2px; }
+.nav-bottom a::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: var(--dark); transform: scaleX(0); transform-origin: left; transition: transform .3s; }
+.nav-bottom a:hover { color: var(--dark); }
+.nav-bottom a:hover::after { transform: scaleX(1); }
+
+/* ── HERO IMAGE ──────────────────────────────────────────────────────────── */
+.pg-hero {
+  position: relative;
+  height: calc(100vh - 97px); /* full viewport minus nav */
+  background: #0f0d0b;
+  overflow: hidden;
+}
+
+.pg-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .9s cubic-bezier(.25,.46,.45,.94);
+}
+
+.pg-hero:hover .pg-hero-img { transform: scale(1.03); }
+
+/* Placeholder when no image */
+.pg-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.4rem;
+}
+.pg-placeholder-logo { font-family: 'EB Garamond', serif; font-size: 2rem; letter-spacing: .6em; color: rgba(245,240,232,.1); padding-left: .6em; }
+.pg-placeholder-line { width: 56px; height: 1px; background: rgba(168,136,74,.18); }
+
+/* Name overlay at bottom of hero */
+.pg-hero-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 8rem 5rem calc(90px + 2.5rem);
+  background: linear-gradient(to top, rgba(28,21,16,.85) 0%, rgba(28,21,16,.3) 60%, transparent 100%);
+  pointer-events: none;
+}
+.pg-hero-eyebrow {
+  font-size: .5rem;
+  letter-spacing: .45em;
+  text-transform: uppercase;
+  color: var(--gold2);
+  margin-bottom: .75rem;
+}
+.pg-hero-name {
+  font-family: 'EB Garamond', serif;
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  font-weight: 400;
+  line-height: 1.0;
+  color: var(--cream);
+}
+
+/* Carousel arrows */
+.pg-arrows {
+  position: absolute;
+  top: 50%;
+  left: 0; right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2rem;
+  z-index: 5;
+}
+.pg-arrow {
+  width: 52px; height: 52px;
+  background: rgba(28,21,16,.5);
+  border: 1px solid rgba(245,240,232,.15);
+  color: var(--cream);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: none;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s, border-color .25s;
+  backdrop-filter: blur(6px);
+}
+.pg-arrow:hover { background: rgba(28,21,16,.88); border-color: rgba(245,240,232,.4); }
+
+/* Dots */
+.pg-dots {
+  position: absolute;
+  bottom: 3.2rem;
+  right: 5rem;
+  display: flex;
+  gap: .5rem;
+  z-index: 5;
+}
+.pg-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(245,240,232,.3);
+  border: none;
+  cursor: none;
+  transition: background .25s, transform .25s;
+}
+.pg-dot.active { background: var(--cream); transform: scale(1.3); }
+
+/* Thumbnail strip — sits at very bottom of hero */
+.pg-thumbs {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 82px;
+  display: flex;
+  gap: 2px;
+  background: rgba(10,8,6,.7);
+  backdrop-filter: blur(8px);
+  padding: 2px;
+  z-index: 5;
+}
+.pg-thumb {
+  flex: 0 0 auto;
+  width: 82px;
+  overflow: hidden;
+  opacity: .45;
+  cursor: none;
+  transition: opacity .25s;
+  position: relative;
+}
+.pg-thumb.active { opacity: 1; }
+.pg-thumb.active::after { content: ''; position: absolute; inset: 0; border: 1px solid rgba(245,240,232,.5); pointer-events: none; }
+.pg-thumb:hover { opacity: .78; }
+.pg-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Scroll cue */
+.pg-scroll-cue {
+  position: absolute;
+  bottom: 1.1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+  z-index: 5;
+  pointer-events: none;
+  animation: scrollBob 2.2s ease-in-out infinite;
+}
+.pg-scroll-cue span { font-size: .44rem; letter-spacing: .3em; text-transform: uppercase; color: rgba(245,240,232,.35); }
+.pg-scroll-cue-line { width: 1px; height: 28px; background: linear-gradient(to bottom, rgba(245,240,232,.35), transparent); }
+@keyframes scrollBob { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(5px); } }
+
+/* ── INFO SECTION (below fold) ───────────────────────────────────────────── */
+.pg-info {
+  background: var(--cream);
+  border-top: 1px solid var(--border);
+}
+
+/* Back link */
+.pg-back-bar {
+  padding: 1.6rem 5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.pg-back {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .5rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--text3);
+  text-decoration: none;
+  transition: color .25s, gap .25s;
+  cursor: none;
+}
+.pg-back:hover { color: var(--dark); gap: .9rem; }
+.pg-badge {
+  font-size: .46rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  background: var(--maroon);
+  color: rgba(245,240,232,.85);
+  padding: .22rem .7rem;
+}
+
+/* Two-column layout */
+.pg-columns {
+  display: grid;
+  grid-template-columns: 45fr 55fr;
+  min-height: 70vh;
+  border-bottom: 1px solid var(--border);
+}
+
+.pg-col-left {
+  padding: 6rem 5rem 6rem 5rem;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: sticky;
+  top: 97px;
+  height: fit-content;
+}
+
+.pg-eyebrow {
+  font-size: .5rem;
+  letter-spacing: .45em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.2rem;
+}
+.pg-name {
+  font-family: 'EB Garamond', serif;
+  font-size: clamp(2.6rem, 3.5vw, 4rem);
+  font-weight: 400;
+  line-height: 1.02;
+  color: var(--dark);
+  margin-bottom: 2.5rem;
+}
+.pg-story {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 1.06rem;
+  line-height: 1.88;
+  color: var(--text2);
+  border-left: 2px solid var(--gold);
+  padding-left: 1.6rem;
+}
+
+.pg-col-right {
+  padding: 6rem 5.5rem 6rem 5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.pg-divider { height: 1px; background: var(--border); margin: 2.5rem 0; }
+
+.pg-desc {
+  font-size: .78rem;
+  color: var(--text2);
+  line-height: 2.15;
+  margin-bottom: 3rem;
+}
+
+.pg-section-label {
+  font-size: .48rem;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+}
+.pg-section-label::before { content: ''; width: 20px; height: 1px; background: var(--warm); }
+
+.pg-materials {
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+  margin-bottom: 3rem;
+}
+.pg-material {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  font-size: .74rem;
+  color: var(--text2);
+}
+.pg-material::before { content: ''; width: 5px; height: 5px; background: var(--gold2); border-radius: 50%; flex-shrink: 0; }
+
+.pg-contents {
+  display: flex;
+  flex-direction: column;
+  gap: .65rem;
+  margin-bottom: 3rem;
+}
+.pg-content-item {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+  font-size: .72rem;
+  color: var(--text3);
+}
+.pg-content-item::before { content: ''; width: 3px; height: 3px; background: var(--warm); border-radius: 50%; flex-shrink: 0; }
+
+.pg-ctas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+  margin-top: auto;
+}
+.pg-cta-wa {
+  padding: 1.05rem;
+  background: #25D366;
+  color: #fff;
+  font-family: 'Jost', sans-serif;
+  font-size: .55rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  cursor: none;
+  transition: background .3s;
+  display: block;
+}
+.pg-cta-wa:hover { background: #1db954; }
+.pg-cta-outline {
+  padding: 1.02rem;
+  background: none;
+  color: var(--dark);
+  border: 1px solid var(--border2);
+  font-family: 'Jost', sans-serif;
+  font-size: .55rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  cursor: none;
+  transition: all .3s;
+  display: block;
+}
+.pg-cta-outline:hover { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+
+/* Specs row */
+.pg-specs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+}
+.pg-spec-cell {
+  padding: 2rem 2.5rem;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.pg-spec-key {
+  font-size: .46rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: .5rem;
+}
+.pg-spec-val {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.15rem;
+  color: var(--dark);
+  font-weight: 400;
+}
+
+/* ── FOOTER ──────────────────────────────────────────────────────────────── */
+footer { background: var(--dark); }
+.footer-main { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 4rem; padding: 5rem 4rem 4rem; border-bottom: 1px solid rgba(245,240,232,.05); }
+.footer-brand-name { font-family: 'EB Garamond', serif; font-size: 1.5rem; letter-spacing: .1em; color: var(--cream); margin-bottom: .5rem; }
+.footer-brand-body { font-size: .65rem; color: rgba(245,240,232,.28); line-height: 1.9; max-width: 240px; }
+.footer-brand-sep { width: 32px; height: 1px; background: var(--gold); margin-top: 1.5rem; }
+.footer-col-title { font-size: .52rem; letter-spacing: .28em; text-transform: uppercase; color: rgba(245,240,232,.35); margin-bottom: 1.2rem; }
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: .7rem; }
+.footer-links a { color: rgba(245,240,232,.4); text-decoration: none; font-size: .65rem; transition: color .25s; }
+.footer-links a:hover { color: var(--cream); }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; padding: 1.8rem 4rem; }
+.footer-copy { font-size: .55rem; color: rgba(245,240,232,.2); letter-spacing: .1em; }
+.footer-legal { display: flex; gap: 1.8rem; }
+.footer-legal a { font-size: .52rem; color: rgba(245,240,232,.2); text-decoration: none; letter-spacing: .12em; text-transform: uppercase; transition: color .25s; }
+.footer-legal a:hover { color: rgba(245,240,232,.5); }
+.footer-socials { display: flex; gap: 1.5rem; }
+.social-link { font-size: .52rem; letter-spacing: .2em; text-transform: uppercase; color: rgba(245,240,232,.3); text-decoration: none; transition: color .25s; }
+.social-link:hover { color: var(--gold2); }
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
+@media (max-width: 960px) {
+  .pg-hero { height: 65vw; min-height: 420px; }
+  .pg-columns { grid-template-columns: 1fr; }
+  .pg-col-left { position: static; padding: 4rem 3rem 3rem; border-right: none; border-bottom: 1px solid var(--border); }
+  .pg-col-right { padding: 3.5rem 3rem 4rem; }
+  .pg-back-bar { padding: 1.4rem 3rem; }
+  .footer-main { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+}
+@media (max-width: 600px) {
+  .nav-top { padding: .8rem 1.2rem; }
+  .nav-bottom { display: none; }
+  .pg-hero { height: 80vw; min-height: 300px; }
+  .pg-hero-overlay { padding: 3rem 1.5rem 1.5rem; }
+  .pg-hero-name { font-size: 2.2rem; }
+  .pg-arrows { padding: 0 1rem; }
+  .pg-arrow { width: 40px; height: 40px; font-size: 1.2rem; }
+  .pg-back-bar { padding: 1.2rem 1.5rem; }
+  .pg-col-left { padding: 3rem 1.5rem 2.5rem; }
+  .pg-col-right { padding: 2.5rem 1.5rem 3.5rem; }
+  .pg-ctas { grid-template-columns: 1fr; }
+  .pg-specs { grid-template-columns: 1fr 1fr; }
+  .footer-main { grid-template-columns: 1fr; padding: 3rem 1.5rem; }
+  .footer-bottom { flex-direction: column; gap: .8rem; padding: 1.5rem; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<div class="announcement">Complimentary gift wrapping on all orders &nbsp;·&nbsp; Free shipping on bulk orders &nbsp;·&nbsp; New: The Diwali Edit</div>
+
+<nav>
+  <div class="nav-top">
+    <div style="width:120px"></div>
+    <div style="text-align:center">
+      <a href="index.html" class="nav-logo">Box Craft Studios</a>
+      <div style="font-size:.45rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-top:.2rem">If you can imagine it, we can build it.</div>
+    </div>
+    <div class="nav-utils">
+      <a href="https://wa.me/919068370981" target="_blank" class="nav-util-link">WhatsApp</a>
+      <a href="index.html#contact" class="nav-util-link">Contact</a>
+    </div>
+  </div>
+  <div class="nav-bottom">
+    <a href="index.html#collections">Collections</a>
+    <a href="index.html#philosophy">Our Story</a>
+    <a href="index.html#experience">How It Works</a>
+    <a href="index.html#testimonials">Reviews</a>
+    <a href="index.html#customize">Customize Your Box</a>
+    <a href="index.html#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- ── HERO: FULL-VIEWPORT IMAGE ─────────────────────────────────────────── -->
+<section class="pg-hero" id="pgHero">
+  <img class="pg-hero-img" id="pgMainImg" src="" alt="" style="display:none">
+  <div class="pg-placeholder" id="pgPlaceholder">
+    <div class="pg-placeholder-line"></div>
+    <div class="pg-placeholder-logo">BCS</div>
+    <div class="pg-placeholder-line"></div>
+  </div>
+
+  <!-- Name overlay -->
+  <div class="pg-hero-overlay">
+    <div class="pg-hero-eyebrow" id="pgHeroEyebrow"></div>
+    <div class="pg-hero-name" id="pgHeroName"></div>
+  </div>
+
+  <!-- Carousel arrows -->
+  <div class="pg-arrows" id="pgArrows" style="display:none">
+    <button class="pg-arrow" onclick="prevImg()">&#8249;</button>
+    <button class="pg-arrow" onclick="nextImg()">&#8250;</button>
+  </div>
+
+  <!-- Dots -->
+  <div class="pg-dots" id="pgDots"></div>
+
+  <!-- Thumbnail strip -->
+  <div class="pg-thumbs" id="pgThumbs" style="display:none"></div>
+
+  <!-- Scroll cue (hidden when thumbnails are shown) -->
+  <div class="pg-scroll-cue" id="pgScrollCue">
+    <span>Scroll</span>
+    <div class="pg-scroll-cue-line"></div>
+  </div>
+</section>
+
+<!-- ── INFO SECTION ───────────────────────────────────────────────────────── -->
+<div class="pg-info" id="pgInfo">
+
+  <div class="pg-back-bar">
+    <a href="index.html#collections" class="pg-back">&#8592; &nbsp; Back to Collections</a>
+    <span class="pg-badge" id="pgBadge" style="display:none"></span>
+  </div>
+
+  <div class="pg-columns">
+    <!-- LEFT: name + story -->
+    <div class="pg-col-left">
+      <div class="pg-eyebrow" id="pgCategory"></div>
+      <h1 class="pg-name" id="pgName"></h1>
+      <p class="pg-story" id="pgStory"></p>
+    </div>
+
+    <!-- RIGHT: desc + materials + contents + CTAs -->
+    <div class="pg-col-right">
+      <p class="pg-desc" id="pgDesc"></p>
+      <div class="pg-divider"></div>
+      <div class="pg-section-label">Crafted With</div>
+      <div class="pg-materials" id="pgMaterials"></div>
+      <div class="pg-section-label">What's Inside</div>
+      <div class="pg-contents" id="pgContents"></div>
+      <div class="pg-ctas">
+        <a class="pg-cta-wa" id="pgEnquireBtn" href="#" target="_blank">Enquire Price →</a>
+        <a class="pg-cta-outline" id="pgDielineBtn" href="#" target="_blank">Request Die-line →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPECS GRID — full width -->
+  <div class="pg-specs" id="pgSpecs"></div>
+
+</div>
+
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand-name">Box Craft Studios</div>
+      <p style="font-family:'EB Garamond',serif;font-style:italic;font-size:.95rem;color:rgba(245,240,232,.55);margin-bottom:.6rem;">If you can imagine it, we can build it.</p>
+      <p class="footer-brand-body">Premium curated boxes sourced from the world's finest artisans. Designed to be unwrapped slowly and remembered always.</p>
+      <div class="footer-brand-sep"></div>
+    </div>
+    <div>
+      <div class="footer-col-title">Collections</div>
+      <ul class="footer-links">
+        <li><a href="index.html#collections">Watch Vault</a></li>
+        <li><a href="index.html#collections">Jewellery Box</a></li>
+        <li><a href="index.html#collections">Signature Box</a></li>
+        <li><a href="index.html#collections">Corporate Kit</a></li>
+        <li><a href="index.html#collections">Fragrance Box</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links">
+        <li><a href="index.html#philosophy">Our Story</a></li>
+        <li><a href="index.html#experience">How It Works</a></li>
+        <li><a href="index.html#testimonials">Reviews</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Contact</div>
+      <ul class="footer-links">
+        <li><a href="https://wa.me/919068370981" target="_blank">WhatsApp Us</a></li>
+        <li><a href="https://www.instagram.com/boxcraftstudiocompany/" target="_blank">Instagram</a></li>
+        <li><a href="index.html#contact">Get In Touch</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 Box Craft Studios. All rights reserved.</p>
+    <div class="footer-legal">
+      <a href="index.html">Privacy</a>
+      <a href="index.html">Terms</a>
+    </div>
+    <div class="footer-socials">
+      <a href="https://www.instagram.com/boxcraftstudiocompany/" target="_blank" class="social-link">Instagram</a>
+      <a href="https://wa.me/919068370981" target="_blank" class="social-link">WhatsApp</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const products = [
+  { id:2, category:'luxury', badge:null, name:'The Prestige Watch Vault',
+    images:['BCS_product_images/Watch/Gemini_Generated_Image_13kbp813kbp813kb.png','BCS_product_images/Watch/Gemini_Generated_Image_2hf8s62hf8s62hf8.png','BCS_product_images/Watch/Gemini_Generated_Image_kev12ykev12ykev1.png'],
+    story:'Born from the belief that a great timepiece deserves a home as extraordinary as itself. Each Watch Vault is hand-stitched by leather artisans, shaped around the contours of the watch, and finished in colours that command the room.',
+    desc:'The hand-crafted leather-finished premium watch box, available in exotic colours. A sanctuary for your timepieces — built for collectors who expect nothing less than extraordinary.',
+    materials:['Full-grain Italian leather exterior','Hand-stitched seams throughout','Plush suede microfibre lining','Brushed brass hinges & clasp hardware','Satin ribbon pull tab','Padded watch pillow insert'],
+    contents:['Leather-wrapped outer box','Suede-lined interior tray','Removable watch pillow','Dust drawstring pouch'],
+    meta:{'Material':'Full-grain leather','Colours':'6 exotic options','Holds':'1–2 timepieces','Customisation':'Monogram available','Dispatch':'4–6 business days'} },
+
+  { id:4, category:'luxury', badge:'Finest', name:'The Éclat Jewellery Box',
+    images:['BCS_product_images/jewellery/Good_stuff,_can_202604241622.jpeg','BCS_product_images/jewellery/Remove_the_text_202604241622.jpeg'],
+    story:'We asked ourselves: what does a piece of jewellery see before it meets the world? It should see velvet. It should see light in a mirror. It should feel like the treasure it is — before it is ever opened.',
+    desc:'The finest showcase for your treasured pieces. Crafted to give jewellery the stage it deserves — because exceptional jewellery deserves an equally exceptional home.',
+    materials:['Tri-wall MDF rigid board core','Premium velvet fabric lining','Crystal mirror glass panel on lid','Hot-foil stamped outer wrap','Precision-cut compartment dividers','Anti-tarnish interior treatment'],
+    contents:['Velvet-lined jewellery tray','Multi-section compartment layout','Mirror panel inside lid','Ring pillow roll insert'],
+    meta:{'Interior':'Premium velvet lined','Feature':'Integrated mirror lid','Compartments':'Multi-section','Exterior':'Foil-stamped','Customisation':'Monogram & colour'} },
+
+  { id:3, category:'gifting', badge:'Signature', name:'Signature Box',
+    images:['BCS_product_images/signature_box/IMG_3691.PNG','BCS_product_images/signature_box/IMG_3692.PNG'],
+    story:'The box that started it all. Designed to be the most versatile luxury packaging ever made — strong enough for corporate use, refined enough for your most intimate gifts. The magnetic click is the sound of a promise kept.',
+    desc:'Our iconic magnetic gift box — versatile, elegant, and endlessly customisable. The perfect vessel for any occasion, from corporate gifting to personal milestones.',
+    materials:['2400gsm premium rigid greyboard','Specialty Italian art paper wrap','Neodymium magnetic closure system','Satin ribbon pull','Custom tissue paper & shredded fill','Optional wax seal & ribbon'],
+    contents:['Rigid magnetic-lid outer box','Branded tissue paper wrap','Custom shredded fill bed','Personalised message card slot'],
+    meta:{'Closure':'Magnetic lid','Board':'2400gsm rigid','Sizes':'Multiple available','Customisation':'Full branding','Dispatch':'2–4 business days'} },
+
+  { id:1, category:'luxury', badge:null, name:'The Luminary',
+    images:['BCS_product_images/Candle/Gemini_Generated_Image_wgau7uwgau7uwgau.png'],
+    story:'Candlelight is one of humanity\'s oldest rituals. The Luminary was crafted to honour that — a vessel that builds anticipation before the first flame is ever struck. Open it slowly. That moment belongs to you.',
+    desc:'Hand-poured artisan candles in bespoke boxes designed to elevate every ambience. A ritual of light and fragrance, beautifully packaged for gifting or personal indulgence.',
+    materials:['Recycled premium rigid kraft board','UV-coated specialty exterior wrap','Satin ribbon closure','Custom foam cradle insert','Foil-stamped lid panel','Eco water-based interior ink'],
+    contents:['Premium hand-poured candle','Bespoke rigid outer box','Satin ribbon & branded seal','Personalised message card'],
+    meta:{'Finish':'Matte or gloss UV','Customisation':'Full personalisation','Dispatch':'3–5 business days','MOQ':'Enquire'} },
+
+  { id:5, category:'corporate', badge:'Best Seller', name:'Corporate Prestige Kit',
+    images:[],
+    story:'Your first impression as a company is often a gift. The Corporate Prestige Kit is engineered to make that moment unforgettable — every element brandable, every material selected to reflect standards as high as yours.',
+    desc:'Fully customisable and our best-selling corporate welcome kit. Premium branded gifting that speaks volumes about your company\'s values — maximum impression, every single time.',
+    materials:['Premium rigid outer shell box','Leather-textured specialty art paper','Custom-printed interior panels','Branded satin ribbon & wax seal','Modular foam & card insert system','Spot UV & foil finishing options'],
+    contents:['Custom-printed outer box','Premium branded inserts','Artisan leather notebook','Handcrafted pen & accessories','Bespoke wax seal card','Fine selection additions'],
+    meta:{'Minimum Order':'10 units','Lead Time':'7–10 business days','Branding':'Logo + full custom print','Finishing':'Foil, emboss, spot UV','Dispatch':'Pan-India courier'} },
+
+  { id:6, category:'luxury', badge:'Exclusive', name:'The Scentelier',
+    images:[],
+    story:'Fragrance is invisible — but the moment before it\'s revealed is everything. The Scentelier was designed for that ceremony: an opening that makes the scent feel sacred, the reveal feel earned, the gift feel eternal.',
+    desc:'A fragrance presentation box like nothing you\'ve encountered before. Exotic materials, premium construction, and a design that transforms the unboxing into an event in itself.',
+    materials:['Exotic grass-cloth & linen outer wrap','Satin-quilted interior lining','Precision-engineered magnetic reveal lid','24k gold foil detailing','Hand-cut bottle cradle in rigid foam','Matte anti-fingerprint lamination'],
+    contents:['Exotic-wrapped rigid outer box','Satin-quilted interior shell','Precision bottle cradle insert','Gold-foil branded ribbon'],
+    meta:{'Exterior':'Grass-cloth exotic wrap','Interior':'Satin quilted','Lid Mechanism':'Magnetic reveal','Finishing':'24k gold foil','Customisation':'Full personalisation'} }
+];
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+const params = new URLSearchParams(window.location.search);
+const id = parseInt(params.get('id'));
+const p = products.find(x => x.id === id);
+if (!p) { window.location.href = 'index.html#collections'; }
+
+document.title = p.name + ' — Box Craft Studios';
+let currentIdx = 0;
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderPage() {
+  // Hero overlay
+  document.getElementById('pgHeroEyebrow').textContent = p.category.toUpperCase();
+  document.getElementById('pgHeroName').textContent = p.name;
+
+  // Info
+  document.getElementById('pgCategory').textContent = p.category.toUpperCase();
+  document.getElementById('pgName').textContent = p.name;
+  document.getElementById('pgStory').textContent = p.story || '';
+  document.getElementById('pgDesc').textContent = p.desc;
+  document.getElementById('pgMaterials').innerHTML = (p.materials || []).map(m => `<div class="pg-material">${m}</div>`).join('');
+  document.getElementById('pgContents').innerHTML = (p.contents || []).map(c => `<div class="pg-content-item">${c}</div>`).join('');
+  document.getElementById('pgSpecs').innerHTML = Object.entries(p.meta).map(([k,v]) => `<div class="pg-spec-cell"><div class="pg-spec-key">${k}</div><div class="pg-spec-val">${v}</div></div>`).join('');
+
+  const badgeEl = document.getElementById('pgBadge');
+  if (p.badge) { badgeEl.textContent = p.badge; badgeEl.style.display = 'inline'; } else { badgeEl.style.display = 'none'; }
+
+  const wa = 'https://wa.me/919068370981?text=';
+  document.getElementById('pgEnquireBtn').href = wa + encodeURIComponent('Hi, I\'d like to enquire about the price of the ' + p.name + '. Please share more details.');
+  document.getElementById('pgDielineBtn').href = wa + encodeURIComponent('Hi, I\'d like to request the die-line / template for the ' + p.name + '. Please share the file.');
+
+  renderGallery();
+}
+
+function renderGallery() {
+  const mainImg = document.getElementById('pgMainImg');
+  const placeholder = document.getElementById('pgPlaceholder');
+  const scrollCue = document.getElementById('pgScrollCue');
+  const hasImgs = p.images && p.images.length > 0;
+
+  if (hasImgs) {
+    mainImg.src = p.images[0];
+    mainImg.alt = p.name;
+    mainImg.style.display = 'block';
+    placeholder.style.display = 'none';
+  } else {
+    mainImg.style.display = 'none';
+    placeholder.style.display = 'flex';
+  }
+
+  const arrowsEl = document.getElementById('pgArrows');
+  arrowsEl.style.display = hasImgs && p.images.length > 1 ? 'flex' : 'none';
+
+  const dotsEl = document.getElementById('pgDots');
+  dotsEl.innerHTML = hasImgs && p.images.length > 1
+    ? p.images.map((_, i) => `<button class="pg-dot ${i === 0 ? 'active' : ''}" onclick="goTo(${i})"></button>`).join('')
+    : '';
+
+  const thumbsEl = document.getElementById('pgThumbs');
+  if (hasImgs && p.images.length > 1) {
+    thumbsEl.style.display = 'flex';
+    thumbsEl.innerHTML = p.images.map((src, i) => `<div class="pg-thumb ${i === 0 ? 'active' : ''}" onclick="goTo(${i})"><img src="${src}" alt=""></div>`).join('');
+    // Move scroll cue above thumbnail strip
+    scrollCue.style.bottom = '96px';
+    // Adjust dots above thumbnail strip
+    dotsEl.style.bottom = '98px';
+  } else {
+    thumbsEl.style.display = 'none';
+  }
+}
+
+// ── Carousel ─────────────────────────────────────────────────────────────────
+function goTo(idx) {
+  if (!p.images || !p.images.length) return;
+  currentIdx = ((idx % p.images.length) + p.images.length) % p.images.length;
+  document.getElementById('pgMainImg').src = p.images[currentIdx];
+  document.querySelectorAll('.pg-dot').forEach((d, i) => d.classList.toggle('active', i === currentIdx));
+  document.querySelectorAll('.pg-thumb').forEach((t, i) => t.classList.toggle('active', i === currentIdx));
+}
+
+function prevImg() { goTo(currentIdx - 1); }
+function nextImg() { goTo(currentIdx + 1); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft') prevImg();
+  if (e.key === 'ArrowRight') nextImg();
+});
+
+renderPage();
+
+// ── Cursor ────────────────────────────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx + 'px'; cursor.style.top = my + 'px'; });
+function animateRing() { rx += (mx - rx) * .12; ry += (my - ry) * .12; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; requestAnimationFrame(animateRing); }
+animateRing();
+document.querySelectorAll('a, button, .pg-thumb').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('cursor-expand'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-expand'));
+});
+</script>
+</body>
+</html>

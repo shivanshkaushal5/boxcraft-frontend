@@ -89,12 +89,12 @@ nav { position: sticky; top: 0; z-index: 900; background: var(--cream); border-b
 .pg-placeholder-logo { font-family: 'EB Garamond', serif; font-size: 2rem; letter-spacing: .6em; color: rgba(245,240,232,.1); padding-left: .6em; }
 .pg-placeholder-line { width: 56px; height: 1px; background: rgba(168,136,74,.18); }
 
-/* Name overlay at bottom of hero */
+/* Name overlay at top-left of hero */
 .pg-hero-overlay {
   position: absolute;
-  bottom: 0; left: 0; right: 0;
-  padding: 8rem 5rem calc(90px + 2.5rem);
-  background: linear-gradient(to top, rgba(28,21,16,.85) 0%, rgba(28,21,16,.3) 60%, transparent 100%);
+  top: 0; left: 0; right: 0;
+  padding: 2.5rem 5rem 6rem;
+  background: linear-gradient(to bottom, rgba(28,21,16,.75) 0%, rgba(28,21,16,.2) 60%, transparent 100%);
   pointer-events: none;
 }
 .pg-hero-eyebrow {
@@ -163,8 +163,8 @@ nav { position: sticky; top: 0; z-index: 900; background: var(--cream); border-b
   height: 82px;
   display: flex;
   gap: 2px;
-  background: rgba(10,8,6,.7);
-  backdrop-filter: blur(8px);
+  background: transparent;
+  backdrop-filter: none;
   padding: 2px;
   z-index: 5;
 }
@@ -604,13 +604,14 @@ const products = [
     contents:['Leather-wrapped outer box','Suede-lined interior tray','Removable watch pillow','Dust drawstring pouch'],
     meta:{'Material':'Full-grain leather','Colours':'6 exotic options','Holds':'1–2 timepieces','Customisation':'Monogram available','Dispatch':'4–6 business days'} },
 
-  { id:4, category:'luxury', badge:'Finest', name:'The Éclat Jewellery Box',
-    images:['BCS_product_images/jewellery/Good_stuff,_can_202604241622.jpeg','BCS_product_images/jewellery/Remove_the_text_202604241622.jpeg'],
-    story:'We asked ourselves: what does a piece of jewellery see before it meets the world? It should see velvet. It should see light in a mirror. It should feel like the treasure it is — before it is ever opened.',
-    desc:'The finest showcase for your treasured pieces. Crafted to give jewellery the stage it deserves — because exceptional jewellery deserves an equally exceptional home.',
-    materials:['Tri-wall MDF rigid board core','Premium velvet fabric lining','Crystal mirror glass panel on lid','Hot-foil stamped outer wrap','Precision-cut compartment dividers','Anti-tarnish interior treatment'],
-    contents:['Velvet-lined jewellery tray','Multi-section compartment layout','Mirror panel inside lid','Ring pillow roll insert'],
-    meta:{'Interior':'Premium velvet lined','Feature':'Integrated mirror lid','Compartments':'Multi-section','Exterior':'Foil-stamped','Customisation':'Monogram & colour'} },
+  { id:5, category:'corporate', badge:'Best Seller', name:'Corporate Prestige Kit',
+    heroFit:'contain',
+    images:['BCS_product_images/WelcomeKit/wc_1.jpeg','BCS_product_images/WelcomeKit/wc2.jpeg','BCS_product_images/WelcomeKit/wc3.jpeg'],
+    story:'Your first impression as a company is often a gift. The Corporate Prestige Kit is engineered to make that moment unforgettable — every element brandable, every material selected to reflect standards as high as yours.',
+    desc:'Fully customisable and our best-selling corporate welcome kit. Premium branded gifting that speaks volumes about your company\'s values — maximum impression, every single time.',
+    materials:['Premium rigid outer shell box','Leather-textured specialty art paper','Custom-printed interior panels','Branded satin ribbon & wax seal','Modular foam & card insert system','Spot UV & foil finishing options'],
+    contents:['Custom-printed outer box','Premium branded inserts','Artisan leather notebook','Handcrafted pen & accessories','Bespoke wax seal card','Fine selection additions'],
+    meta:{'Minimum Order':'10 units','Lead Time':'7–10 business days','Branding':'Logo + full custom print','Finishing':'Foil, emboss, spot UV','Dispatch':'Pan-India courier'} },
 
   { id:3, category:'gifting', badge:'Signature', name:'Signature Box',
     images:['BCS_product_images/signature_box/IMG_3691.PNG','BCS_product_images/signature_box/IMG_3692.PNG'],
@@ -628,21 +629,21 @@ const products = [
     contents:['Premium hand-poured candle','Bespoke rigid outer box','Satin ribbon & branded seal','Personalised message card'],
     meta:{'Finish':'Matte or gloss UV','Customisation':'Full personalisation','Dispatch':'3–5 business days','MOQ':'Enquire'} },
 
-  { id:5, category:'corporate', badge:'Best Seller', name:'Corporate Prestige Kit',
-    images:[],
-    story:'Your first impression as a company is often a gift. The Corporate Prestige Kit is engineered to make that moment unforgettable — every element brandable, every material selected to reflect standards as high as yours.',
-    desc:'Fully customisable and our best-selling corporate welcome kit. Premium branded gifting that speaks volumes about your company\'s values — maximum impression, every single time.',
-    materials:['Premium rigid outer shell box','Leather-textured specialty art paper','Custom-printed interior panels','Branded satin ribbon & wax seal','Modular foam & card insert system','Spot UV & foil finishing options'],
-    contents:['Custom-printed outer box','Premium branded inserts','Artisan leather notebook','Handcrafted pen & accessories','Bespoke wax seal card','Fine selection additions'],
-    meta:{'Minimum Order':'10 units','Lead Time':'7–10 business days','Branding':'Logo + full custom print','Finishing':'Foil, emboss, spot UV','Dispatch':'Pan-India courier'} },
-
   { id:6, category:'luxury', badge:'Exclusive', name:'The Scentelier',
     images:[],
     story:'Fragrance is invisible — but the moment before it\'s revealed is everything. The Scentelier was designed for that ceremony: an opening that makes the scent feel sacred, the reveal feel earned, the gift feel eternal.',
     desc:'A fragrance presentation box like nothing you\'ve encountered before. Exotic materials, premium construction, and a design that transforms the unboxing into an event in itself.',
     materials:['Exotic grass-cloth & linen outer wrap','Satin-quilted interior lining','Precision-engineered magnetic reveal lid','24k gold foil detailing','Hand-cut bottle cradle in rigid foam','Matte anti-fingerprint lamination'],
     contents:['Exotic-wrapped rigid outer box','Satin-quilted interior shell','Precision bottle cradle insert','Gold-foil branded ribbon'],
-    meta:{'Exterior':'Grass-cloth exotic wrap','Interior':'Satin quilted','Lid Mechanism':'Magnetic reveal','Finishing':'24k gold foil','Customisation':'Full personalisation'} }
+    meta:{'Exterior':'Grass-cloth exotic wrap','Interior':'Satin quilted','Lid Mechanism':'Magnetic reveal','Finishing':'24k gold foil','Customisation':'Full personalisation'} },
+
+  { id:4, category:'luxury', badge:'Finest', name:'The Éclat Jewellery Box',
+    images:['BCS_product_images/jewellery/Good_stuff,_can_202604241622.jpeg','BCS_product_images/jewellery/Remove_the_text_202604241622.jpeg'],
+    story:'We asked ourselves: what does a piece of jewellery see before it meets the world? It should see velvet. It should see light in a mirror. It should feel like the treasure it is — before it is ever opened.',
+    desc:'The finest showcase for your treasured pieces. Crafted to give jewellery the stage it deserves — because exceptional jewellery deserves an equally exceptional home.',
+    materials:['Tri-wall MDF rigid board core','Premium velvet fabric lining','Crystal mirror glass panel on lid','Hot-foil stamped outer wrap','Precision-cut compartment dividers','Anti-tarnish interior treatment'],
+    contents:['Velvet-lined jewellery tray','Multi-section compartment layout','Mirror panel inside lid','Ring pillow roll insert'],
+    meta:{'Interior':'Premium velvet lined','Feature':'Integrated mirror lid','Compartments':'Multi-section','Exterior':'Foil-stamped','Customisation':'Monogram & colour'} }
 ];
 
 // ── Init ─────────────────────────────────────────────────────────────────────
@@ -679,40 +680,69 @@ function renderPage() {
   renderGallery();
 }
 
+function isVideo(src) { return src.toLowerCase().endsWith('.mp4'); }
+
 function renderGallery() {
-  const mainImg = document.getElementById('pgMainImg');
+  const mainWrap = document.getElementById('pgMain');
   const placeholder = document.getElementById('pgPlaceholder');
   const scrollCue = document.getElementById('pgScrollCue');
-  const hasImgs = p.images && p.images.length > 0;
+  const hasMedia = p.images && p.images.length > 0;
 
-  if (hasImgs) {
-    mainImg.src = p.images[0];
-    mainImg.alt = p.name;
-    mainImg.style.display = 'block';
+  if (hasMedia) {
     placeholder.style.display = 'none';
+    showSlide(0);
   } else {
-    mainImg.style.display = 'none';
+    document.getElementById('pgMainImg').style.display = 'none';
     placeholder.style.display = 'flex';
   }
 
   const arrowsEl = document.getElementById('pgArrows');
-  arrowsEl.style.display = hasImgs && p.images.length > 1 ? 'flex' : 'none';
+  arrowsEl.style.display = hasMedia && p.images.length > 1 ? 'flex' : 'none';
 
   const dotsEl = document.getElementById('pgDots');
-  dotsEl.innerHTML = hasImgs && p.images.length > 1
+  dotsEl.innerHTML = hasMedia && p.images.length > 1
     ? p.images.map((_, i) => `<button class="pg-dot ${i === 0 ? 'active' : ''}" onclick="goTo(${i})"></button>`).join('')
     : '';
 
   const thumbsEl = document.getElementById('pgThumbs');
-  if (hasImgs && p.images.length > 1) {
+  if (hasMedia && p.images.length > 1) {
     thumbsEl.style.display = 'flex';
-    thumbsEl.innerHTML = p.images.map((src, i) => `<div class="pg-thumb ${i === 0 ? 'active' : ''}" onclick="goTo(${i})"><img src="${src}" alt=""></div>`).join('');
-    // Move scroll cue above thumbnail strip
+    thumbsEl.innerHTML = p.images.map((src, i) => isVideo(src)
+      ? `<div class="pg-thumb ${i === 0 ? 'active' : ''}" onclick="goTo(${i})" style="display:flex;align-items:center;justify-content:center;background:#1a1410;"><span style="font-size:1.4rem;color:rgba(245,240,232,.6);">▶</span></div>`
+      : `<div class="pg-thumb ${i === 0 ? 'active' : ''}" onclick="goTo(${i})"><img src="${src}" alt=""></div>`
+    ).join('');
     scrollCue.style.bottom = '96px';
-    // Adjust dots above thumbnail strip
     dotsEl.style.bottom = '98px';
   } else {
     thumbsEl.style.display = 'none';
+  }
+}
+
+function showSlide(idx) {
+  const src = p.images[idx];
+  const mainWrap = document.getElementById('pgHero');
+
+  // Remove any existing video element
+  const oldVideo = mainWrap.querySelector('video');
+  if (oldVideo) oldVideo.remove();
+
+  const mainImg = document.getElementById('pgMainImg');
+
+  if (isVideo(src)) {
+    mainImg.style.display = 'none';
+    const vid = document.createElement('video');
+    vid.src = src;
+    vid.autoplay = true;
+    vid.muted = true;
+    vid.loop = true;
+    vid.playsInline = true;
+    vid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:' + (p.heroFit || 'cover') + ';display:block;';
+    mainWrap.appendChild(vid);
+  } else {
+    mainImg.src = src;
+    mainImg.alt = p.name;
+    mainImg.style.objectFit = p.heroFit || 'cover';
+    mainImg.style.display = 'block';
   }
 }
 
@@ -720,7 +750,7 @@ function renderGallery() {
 function goTo(idx) {
   if (!p.images || !p.images.length) return;
   currentIdx = ((idx % p.images.length) + p.images.length) % p.images.length;
-  document.getElementById('pgMainImg').src = p.images[currentIdx];
+  showSlide(currentIdx);
   document.querySelectorAll('.pg-dot').forEach((d, i) => d.classList.toggle('active', i === currentIdx));
   document.querySelectorAll('.pg-thumb').forEach((t, i) => t.classList.toggle('active', i === currentIdx));
 }

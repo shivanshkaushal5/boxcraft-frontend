@@ -612,43 +612,157 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
 .reveal-delay-2 { transition-delay: .2s; }
 .reveal-delay-3 { transition-delay: .3s; }
 
+/* HAMBURGER */
+.hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; background: none; border: none; cursor: pointer; padding: .3rem; z-index: 10; }
+.hamburger span { display: block; width: 22px; height: 1.5px; background: var(--dark); transition: all .3s; }
+.hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+/* MOBILE MENU */
+.mobile-menu-overlay { display: none; position: fixed; inset: 0; background: rgba(28,21,16,.55); z-index: 1800; }
+.mobile-menu-overlay.open { display: block; }
+.mobile-menu { position: fixed; top: 0; right: -100%; width: min(320px, 85vw); height: 100vh; background: var(--cream); z-index: 1900; display: flex; flex-direction: column; transition: right .35s cubic-bezier(.25,.46,.45,.94); box-shadow: -8px 0 40px rgba(28,21,16,.18); overflow-y: auto; }
+.mobile-menu.open { right: 0; }
+.mobile-menu-header { display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 1.6rem; border-bottom: 1px solid var(--border); }
+.mobile-menu-logo { font-family: 'EB Garamond', serif; font-size: 1.15rem; letter-spacing: .06em; color: var(--dark); }
+.mobile-menu-close { background: none; border: 1px solid var(--border2); color: var(--text3); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: .8rem; }
+.mobile-menu-links { display: flex; flex-direction: column; padding: 1.2rem 0; flex: 1; }
+.mobile-menu-links a { padding: 1rem 1.6rem; font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; color: var(--text2); text-decoration: none; border-bottom: 1px solid var(--border); transition: color .2s; }
+.mobile-menu-links a:hover { color: var(--dark); }
+.mobile-menu-actions { padding: 1.6rem; display: flex; flex-direction: column; gap: .7rem; border-top: 1px solid var(--border); }
+.mobile-menu-btn { padding: .85rem; background: none; border: 1px solid var(--border2); color: var(--text2); font-family: 'Jost', sans-serif; font-size: .58rem; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; transition: all .25s; }
+.mobile-menu-btn.filled { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+
 /* RESPONSIVE */
 @media (max-width: 1024px) {
   .hero { grid-template-columns: 1fr; }
   .hero-right { display: none; }
   .hero-left { padding: 5rem 3rem 4rem; min-height: 80vh; }
   .editorial { grid-template-columns: 1fr; }
-  .editorial-visual { min-height: 280px; }
+  .editorial-visual { min-height: 320px; }
   .editorial-text { padding: 4rem 3rem; }
   .products-grid { grid-template-columns: repeat(2, 1fr); }
   .process-steps { grid-template-columns: repeat(2, 1fr); }
   .process-steps::before { display: none; }
   .story-split { grid-template-columns: 1fr; }
+  .story-visual { min-height: 320px; }
   .testi-grid { grid-template-columns: repeat(2, 1fr); }
   .trust-inner { grid-template-columns: repeat(2, 1fr); }
   .footer-main { grid-template-columns: 1fr 1fr; gap: 3rem; }
-  .detail-gallery { width: 100%; height: 50vh; } .product-modal { flex-direction: column; overflow-y: auto; }
+  .detail-gallery { width: 100%; height: 50vh; }
+  .product-modal { flex-direction: column; overflow-y: auto; }
   .nav-top { padding: .8rem 2rem; }
-  .nav-bottom { gap: 1.5rem; padding: .7rem 2rem; }
+  .nav-bottom { gap: 1.5rem; padding: .7rem 2rem; font-size: .56rem; }
   .collections { padding: 5rem 2.5rem; }
+  .collections-header { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
+  .checkout-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .form-grid-2 { grid-template-columns: 1fr; }
 }
-@media (max-width: 640px) {
-  .nav-bottom { display: none; }
-  .hero-left { padding: 4rem 1.5rem 3.5rem; }
-  .hero-stats { position: static; margin-top: 2.5rem; flex-direction: row; gap: 2rem; flex-wrap: wrap; }
-  .products-grid { grid-template-columns: 1fr; }
-  .process-steps { grid-template-columns: 1fr; }
+
+@media (max-width: 768px) {
+  .info-overlay.open { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .info-left { padding: 2.5rem 2rem; min-height: auto; }
+  .info-right { padding: 2rem 1.5rem; max-height: 60vh; }
+  .detail-ctas { grid-template-columns: 1fr; }
+  .pillars-grid { grid-template-columns: 1fr; gap: 1.4rem; }
   .testi-grid { grid-template-columns: 1fr; }
-  .trust-inner { grid-template-columns: 1fr; }
-  .footer-main { grid-template-columns: 1fr; padding: 4rem 1.5rem; }
-  .footer-bottom { flex-direction: column; gap: 1rem; padding: 1.5rem; text-align: center; }
-  .detail-info { padding: 3rem 1.5rem 4rem; }
-  .collections { padding: 4rem 1.5rem; }
-  .editorial-text { padding: 3.5rem 1.5rem; }
-  .process { padding: 5rem 1.5rem; }
-  .newsletter { padding: 5rem 1.5rem; }
-  .nl-form { flex-direction: column; }
-  .story-panel { padding: 4rem 2rem; }
+  .story-split { grid-template-columns: 1fr; }
+  .story-visual { min-height: 260px; }
+}
+
+@media (max-width: 640px) {
+  /* Nav */
+  .nav-bottom { display: none; }
+  .nav-top { padding: .75rem 1.2rem; }
+  .hamburger { display: flex; }
+  .nav-utils .nav-auth-btn { display: none; }
+  .nav-utils { gap: 1rem; }
+
+  /* Cursor off on touch */
+  body { cursor: auto; }
+  #cursor, #cursor-ring { display: none; }
+
+  /* Announcement */
+  .announcement { font-size: .5rem; letter-spacing: .12em; padding: .5rem .8rem; }
+
+  /* Hero */
+  .hero { grid-template-columns: 1fr; }
+  .hero-right { display: none; }
+  .hero-left { padding: 3.5rem 1.4rem 3rem; min-height: auto; }
+  .hero-title { font-size: clamp(2.4rem, 10vw, 3.5rem); margin-bottom: 1.6rem; }
+  .hero-sub { font-size: .75rem; margin-bottom: 2rem; }
+  .hero-ctas { gap: 1rem; }
+  .hero-stats { position: static; margin-top: 2.5rem; flex-direction: row; gap: 1.5rem 2rem; flex-wrap: wrap; }
+
+  /* Editorial */
+  .editorial { grid-template-columns: 1fr; }
+  .editorial-visual { min-height: 260px; }
+  .editorial-text { padding: 3rem 1.4rem; }
+  .section-heading { font-size: clamp(1.8rem, 8vw, 2.8rem); }
+  .pillars-grid { grid-template-columns: 1fr; gap: 1.2rem; margin-top: 2rem; }
+
+  /* Collections */
+  .collections { padding: 3.5rem 1.4rem; }
+  .collections-header { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
+  .filter-row { flex-wrap: wrap; }
+  .filter-btn { flex: 1 0 auto; }
+  .products-grid { grid-template-columns: 1fr; }
+
+  /* Process */
+  .process { padding: 4rem 1.4rem; }
+  .process-steps { grid-template-columns: 1fr; gap: 2.5rem; }
+  .process-steps::before { display: none; }
+  .process-step { padding: 0; }
+
+  /* Story split */
+  .story-split { grid-template-columns: 1fr; }
+  .story-visual { min-height: 240px; }
+  .story-panel { padding: 3rem 1.4rem; }
+
+  /* Testimonials */
+  .testimonials { padding: 4rem 1.4rem; }
+  .testi-grid { grid-template-columns: 1fr; }
+
+  /* Trust */
+  .trust-inner { grid-template-columns: repeat(2, 1fr); }
+
+  /* Newsletter */
+  .newsletter { padding: 4rem 1.4rem; }
+  .nl-form { flex-direction: column; border: none; gap: .6rem; }
+  .nl-input { border: 1px solid rgba(245,240,232,.2); }
+  .nl-btn { width: 100%; }
+
+  /* Footer */
+  .footer-main { grid-template-columns: 1fr; padding: 3.5rem 1.4rem; gap: 2.5rem; }
+  .footer-bottom { flex-direction: column; gap: .8rem; padding: 1.4rem; text-align: center; }
+  .footer-legal { justify-content: center; }
+  .footer-socials { justify-content: center; }
+
+  /* Product modal */
+  .product-modal { flex-direction: column; overflow-y: auto; }
+  .detail-gallery { width: 100%; height: 55vw; min-height: 240px; flex-shrink: 0; }
+  .detail-info { padding: 2rem 1.4rem 4rem; }
+  .detail-name { font-size: clamp(1.8rem, 7vw, 2.4rem); }
+  .detail-ctas { grid-template-columns: 1fr; }
+  .modal-close { top: 1rem; right: 1rem; width: 36px; height: 36px; }
+
+  /* Auth modal */
+  .auth-box { padding: 2rem 1.4rem; }
+
+  /* Address modal */
+  .addr-box { padding: 2rem 1.4rem; }
+  .form-grid-2 { grid-template-columns: 1fr; }
+
+  /* Checkout modal */
+  .checkout-box { padding: 2rem 1.4rem; }
+  .checkout-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+
+  /* Cart drawer */
+  .cart-drawer { width: 100%; right: -100%; }
+
+  /* Toast */
+  .toast { left: 1rem; right: 1rem; min-width: unset; bottom: 1rem; }
 }
 </style>
 </head>
@@ -684,6 +798,9 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
       <button class="cart-trigger" onclick="openCartDrawer()">
         Bag <span id="cartCount"></span>
       </button>
+      <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
   <div class="nav-bottom">
@@ -695,6 +812,26 @@ footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
     <a href="#contact">Contact</a>
   </div>
 </nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-header">
+    <span class="mobile-menu-logo">Box Craft Studios</span>
+    <button class="mobile-menu-close" onclick="toggleMobileMenu()">✕</button>
+  </div>
+  <nav class="mobile-menu-links">
+    <a href="#collections" onclick="toggleMobileMenu()">Collections</a>
+    <a href="#philosophy" onclick="toggleMobileMenu()">Our Story</a>
+    <a href="#experience" onclick="toggleMobileMenu()">How It Works</a>
+    <a href="#testimonials" onclick="toggleMobileMenu()">Reviews</a>
+    <a href="#contact" onclick="toggleMobileMenu()">Contact</a>
+  </nav>
+  <div class="mobile-menu-actions">
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu();openAuth('login')">Sign In</button>
+    <button class="mobile-menu-btn filled" onclick="toggleMobileMenu();openAuth('register')">Register</button>
+  </div>
+</div>
 
 <section class="hero" id="home">
   <div class="hero-left">
@@ -1418,6 +1555,16 @@ function showToast(title, body, showViewCart = false) {
 function updateBagCount() {
   const batches = cartCount / 100;
   document.getElementById('cartCount').textContent = batches > 0 ? `(${batches})` : '';
+}
+
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const overlay = document.getElementById('mobileMenuOverlay');
+  const btn = document.getElementById('hamburger');
+  const open = menu.classList.toggle('open');
+  overlay.classList.toggle('open', open);
+  btn.classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
 }
 
 async function handleNewsletter(e) {

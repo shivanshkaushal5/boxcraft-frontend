@@ -213,6 +213,7 @@ nav { position: sticky; top: 0; z-index: 900; background: var(--cream); border-b
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
 }
 .pg-back {
   display: inline-flex;
@@ -287,6 +288,26 @@ nav { position: sticky; top: 0; z-index: 900; background: var(--cream); border-b
 }
 
 .pg-divider { height: 1px; background: var(--border); margin: 2.5rem 0; }
+
+/* Colour swatches */
+.pg-colors { display: flex; align-items: center; gap: 1rem; margin-bottom: 2.5rem; }
+.pg-colors-label { font-size: .48rem; letter-spacing: .35em; text-transform: uppercase; color: var(--text3); }
+.pg-swatch-wrap { display: flex; gap: .6rem; align-items: center; }
+.pg-swatch {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 1px solid rgba(74,61,44,.15);
+  cursor: none;
+  position: relative;
+  transition: transform .2s;
+}
+.pg-swatch:hover { transform: scale(1.15); }
+.pg-swatch.active::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid var(--dark);
+}
 
 .pg-desc {
   font-size: .78rem;
@@ -515,6 +536,7 @@ footer { background: var(--dark); }
 
   <div class="pg-back-bar">
     <a href="index.html#collections" class="pg-back">&#8592; &nbsp; Back to Collections</a>
+    <div class="pg-swatch-wrap" id="pgSwatches" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)"></div>
     <span class="pg-badge" id="pgBadge" style="display:none"></span>
   </div>
 
@@ -603,6 +625,10 @@ const products = [
     desc:'The premium Rexine watch box, available in exotic colours. A sanctuary for your timepieces, built for collectors who expect nothing less than extraordinary.',
     materials:['Premium Rexine exterior','Plush suede microfibre lining','Brushed brass hinges & clasp hardware','Padded watch pillow insert'],
     contents:['Rexine outer box','Suede-lined interior tray','Removable watch pillow'],
+    colors:[
+      {name:'Maroon', hex:'#ac474f', images:['BCS_product_images/Watch/colors/maroon/Gemini_Generated_Image_13kbp813kbp813kb.png','BCS_product_images/Watch/colors/maroon/Gemini_Generated_Image_2hf8s62hf8s62hf8.png']},
+      {name:'Peach', hex:'#E8B89A', images:['BCS_product_images/Watch/colors/peach/Gemini_Generated_Image_bj57lgbj57lgbj57.png','BCS_product_images/Watch/colors/peach/watch corousell.png']},
+    ],
     meta:{'Material':'Rexine','Customisation':'Fully customisable','Dispatch':'5–7 business days','MOQ':'250 units (can be enquired)'} },
 
   { id:5, category:'corporate', badge:'Best Seller', name:'Corporate Prestige Kit',
@@ -611,6 +637,7 @@ const products = [
     desc:'Fully customisable and our best-selling corporate welcome kit. Premium branded gifting that speaks volumes about your company\'s values. Maximum impression, every single time.',
     materials:['Premium rigid outer shell box','Specialty art paper wrap','Custom-printed interior panels','Branded satin ribbon & wax seal','Modular foam & card insert system','Spot UV & foil finishing options'],
     contents:['Custom-printed outer box','Premium branded inserts','Bespoke wax seal card'],
+    colors:[{name:'Black',hex:'#211f1c', images:['BCS_product_images/WelcomeKit/colors/black/wc1.JPG','BCS_product_images/WelcomeKit/colors/black/wc2.JPG','BCS_product_images/WelcomeKit/colors/black/wc3.JPG']}],
     meta:{'Material':'Premium rigid board','Customisation':'Fully customisable','Dispatch':'5–7 business days','MOQ':'500 units (can be enquired)'} },
 
   { id:3, category:'gifting', badge:'Signature', name:'Signature Box',
@@ -620,6 +647,7 @@ const products = [
     desc:'Our iconic magnetic gift box. Versatile, elegant, and endlessly customisable. The perfect vessel for birthdays, weddings, celebrations, or simply because.',
     materials:['Premium rigid greyboard','Specialty art paper wrap','Magnetic closure system','Custom tissue paper & shredded fill','Optional wax seal & ribbon'],
     contents:['Rigid magnetic-lid outer box','Branded tissue paper wrap','Custom shredded fill bed','Personalised message card slot'],
+    colors:[{name:'Maroon',hex:'#743230', images:['BCS_product_images/signature_box/colors/maroon/sig1.jpeg','BCS_product_images/signature_box/colors/maroon/sig2.jpeg']}],
     meta:{'Material':'Rigid greyboard','Customisation':'Fully customisable','Dispatch':'5–7 business days','MOQ':'500 units (can be enquired)'} },
 
   { id:1, category:'luxury', badge:null, name:'The Luminary',
@@ -628,6 +656,7 @@ const products = [
     desc:'Hand-poured artisan candles in bespoke boxes designed to elevate every ambience. A ritual of light and fragrance, beautifully packaged for gifting or personal indulgence.',
     materials:['Recycled premium rigid kraft board','UV-coated specialty exterior wrap','Custom foam cradle insert','Foil-stamped lid panel','Eco water-based interior ink'],
     contents:['Bespoke rigid outer box','Personalised message card'],
+    colors:[{name:'Red',hex:'#dc5e5c', images:['BCS_product_images/Candle/colors/red/Gemini_Generated_Image_wgau7uwgau7uwgau.png']}],
     meta:{'Material':'Kraft rigid board','Customisation':'Fully customisable','Dispatch':'5–7 business days','MOQ':'250 units (can be enquired)'} },
 
   { id:6, category:'luxury', badge:'Exclusive', name:'The Scentelier',
@@ -636,6 +665,7 @@ const products = [
     desc:'A fragrance presentation box like nothing you\'ve encountered before. Exotic materials, premium construction, and a design that transforms the unboxing into an event in itself.',
     materials:['Exotic grass-cloth & linen outer wrap','Satin-quilted interior lining','Precision-engineered magnetic reveal lid','Hand-cut bottle cradle in rigid foam','Matte anti-fingerprint lamination'],
     contents:['Exotic-wrapped rigid outer box','Satin-quilted interior shell','Precision bottle cradle insert'],
+    colors:[{name:'Teal',hex:'#2b8c98', images:['BCS_product_images/perfume/colors/teal/Gemini_Generated_Image_335i42335i42335i.jpeg','BCS_product_images/perfume/colors/teal/Gemini_Generated_Image_ndjq6ondjq6ondjq.jpeg','BCS_product_images/perfume/colors/teal/Gemini_Generated_Image_ysab93ysab93ysab.jpeg']}],
     meta:{'Material':'Grass-cloth exotic wrap','Customisation':'Fully customisable','Dispatch':'5–7 business days','MOQ':'500 units (can be enquired)'} },
 
   { id:4, category:'luxury', badge:'Finest', name:'The Éclat Jewellery Box',
@@ -644,6 +674,7 @@ const products = [
     desc:'The finest showcase for your treasured pieces. Crafted to give jewellery the stage it deserves, because exceptional jewellery deserves an equally exceptional home.',
     materials:['Tri-wall MDF rigid board core','Premium velvet fabric lining','Crystal mirror glass panel on lid','Hot-foil stamped outer wrap','Precision-cut compartment dividers','Anti-tarnish interior treatment'],
     contents:['Velvet-lined jewellery tray','Multi-section compartment layout','Ring pillow roll insert'],
+    colors:[{name:'Ivory',hex:'#e3d1c9', images:['BCS_product_images/jewellery/colors/ivory/jew_1.jpeg','BCS_product_images/jewellery/colors/ivory/jew_2.jpeg','BCS_product_images/jewellery/colors/ivory/jew_3.jpeg']}],
     meta:{'Material':'Velvet lined MDF','Customisation':'Fully customisable','Dispatch':'5–7 business days','MOQ':'500 units (can be enquired)'} }
 ];
 
@@ -658,6 +689,11 @@ let currentIdx = 0;
 
 // ── Render ────────────────────────────────────────────────────────────────────
 function renderPage() {
+  // Load first color's images as default if colors exist
+  if (p.colors && p.colors.length && p.colors[0].images) {
+    p.images = p.colors[0].images;
+  }
+
   // Hero overlay
   document.getElementById('pgHeroEyebrow').textContent = p.category.toUpperCase();
   document.getElementById('pgHeroName').textContent = p.name;
@@ -671,6 +707,14 @@ function renderPage() {
   document.getElementById('pgContents').innerHTML = (p.contents || []).map(c => `<div class="pg-content-item">${c}</div>`).join('');
   document.getElementById('pgSpecs').innerHTML = Object.entries(p.meta).map(([k,v]) => `<div class="pg-spec-cell"><div class="pg-spec-key">${k}</div><div class="pg-spec-val">${v}</div></div>`).join('');
 
+  // Colour swatches
+  const swatchesEl = document.getElementById('pgSwatches');
+  if (p.colors && p.colors.length) {
+    swatchesEl.innerHTML = p.colors.map((c, i) => `<div class="pg-swatch${i===0?' active':''}" style="background:${c.hex}" title="${c.name}" onclick="selectColor(this,${i})"></div>`).join('');
+  } else {
+    swatchesEl.innerHTML = '';
+  }
+
   const badgeEl = document.getElementById('pgBadge');
   if (p.badge) { badgeEl.textContent = p.badge; badgeEl.style.display = 'inline'; } else { badgeEl.style.display = 'none'; }
 
@@ -679,6 +723,17 @@ function renderPage() {
   document.getElementById('pgDielineBtn').href = wa + encodeURIComponent('Hi, I\'d like to request the die-line / template for the ' + p.name + '. Please share the file.');
 
   renderGallery();
+}
+
+function selectColor(el, colorIndex) {
+  document.querySelectorAll('.pg-swatch').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  const color = p.colors[colorIndex];
+  if (color && color.images && color.images.length) {
+    p.images = color.images;
+    currentIdx = 0;
+    renderGallery();
+  }
 }
 
 function isVideo(src) { return src.toLowerCase().endsWith('.mp4'); }

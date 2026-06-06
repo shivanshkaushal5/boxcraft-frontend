@@ -172,6 +172,7 @@ nav { position: sticky; top: 0; z-index: 900; background: var(--cream); border-b
 .modal-enquire-btn:hover { background: #1ebe5a; }
 .card-carousel-nav { position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%); display: flex; justify-content: space-between; padding: 0 .5rem; z-index: 3; opacity: 0; transition: opacity .25s; pointer-events: none; }
 .product-card:hover .card-carousel-nav { opacity: 1; pointer-events: all; }
+@media (max-width: 768px) { .card-carousel-nav { opacity: 1; pointer-events: all; } }
 .card-nav-btn { background: rgba(28,21,16,.55); color: var(--cream); border: none; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: none; transition: background .2s; line-height: 1; }
 .card-nav-btn:hover { background: rgba(28,21,16,.85); }
 .card-dots { position: absolute; bottom: .6rem; left: 0; right: 0; display: flex; justify-content: center; gap: .35rem; z-index: 3; }
@@ -1450,14 +1451,6 @@ function renderProducts(filter = 'all') {
         <div class="product-img-inner" id="card-imgs-${p.id}">
           ${p.images && p.images.length ? `<img src="${p.cover || p.images[0]}" alt="${p.name}" class="product-photo" style="object-fit:${p.heroFit||'cover'}">` : `<div class="box-visual" style="background:${boxBgs[i%boxBgs.length]}"><div class="box-visual-line"></div><span class="box-visual-label">${p.name.split(' ').pop().toUpperCase()}</span><div class="box-visual-line"></div></div>`}
         </div>
-        ${p.images && p.images.length > 1 ? `
-        <div class="card-carousel-nav">
-          <button class="card-nav-btn" onclick="cardPrev(event,${p.id})">‹</button>
-          <button class="card-nav-btn" onclick="cardNext(event,${p.id})">›</button>
-        </div>
-        <div class="card-dots">
-          ${p.images.map((_,di) => `<span class="card-dot ${di===0?'active':''}" onclick="cardGoTo(event,${p.id},${di})"></span>`).join('')}
-        </div>` : ''}
         <div class="product-hover-bar">View Details</div>
       </div>
       <div class="product-body">
@@ -1478,10 +1471,11 @@ function cardGoTo(e, id, idx) {
   e.stopPropagation();
   const p = products.find(x => x.id === id);
   if (!p || !p.images.length) return;
+  const allImgs = p.cover ? [p.cover, ...p.images.slice(1)] : p.images;
   cardIndex[id] = idx;
   const inner = document.getElementById('card-imgs-' + id);
   const img = inner.querySelector('img');
-  img.src = p.images[idx];
+  img.src = allImgs[idx];
   img.style.objectFit = p.heroFit || 'cover';
   inner.closest('.product-img').querySelectorAll('.card-dot').forEach((d,i) => d.classList.toggle('active', i === idx));
 }
@@ -1489,14 +1483,16 @@ function cardNext(e, id) {
   e.stopPropagation();
   const p = products.find(x => x.id === id);
   if (!p || !p.images.length) return;
-  const next = ((cardIndex[id] || 0) + 1) % p.images.length;
+  const len = p.cover ? p.images.length : p.images.length;
+  const next = ((cardIndex[id] || 0) + 1) % len;
   cardGoTo(e, id, next);
 }
 function cardPrev(e, id) {
   e.stopPropagation();
   const p = products.find(x => x.id === id);
   if (!p || !p.images.length) return;
-  const prev = ((cardIndex[id] || 0) - 1 + p.images.length) % p.images.length;
+  const len = p.cover ? p.images.length : p.images.length;
+  const prev = ((cardIndex[id] || 0) - 1 + len) % len;
   cardGoTo(e, id, prev);
 }
 

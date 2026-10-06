@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collections — Box Craft Studios</title>
+<meta name="description" content="Browse all Box Craft Studios collections. Premium curated gift boxes, corporate gifting, and bespoke luxury packaging.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="favicon.ico">
+<style>
+:root {
+  --cream:   #F5F0E8;
+  --cream2:  #EDE8DC;
+  --cream3:  #E4DDD0;
+  --brown:   #8B7355;
+  --brown2:  #6B5840;
+  --brown3:  #4A3D2C;
+  --dark:    #1C1510;
+  --text:    #2A2118;
+  --text2:   #5A4E3C;
+  --text3:   #8A7E6E;
+  --gold:    #A8884A;
+  --gold2:   #C9A85C;
+  --maroon:  #6B1E2C;
+  --border:  rgba(139,115,85,0.2);
+  --warm:    rgba(168,136,74,.4);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--cream); color: var(--text); font-family: 'Jost', sans-serif; font-weight: 300; overflow-x: hidden; }
+
+/* ── CURSOR ── */
+#cursor { position: fixed; width: 8px; height: 8px; background: var(--brown3); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .3s, height .3s, opacity .3s; }
+#cursor-ring { position: fixed; width: 32px; height: 32px; border: 1px solid rgba(74,61,44,0.4); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform .12s ease-out, width .3s, height .3s; }
+.cursor-expand #cursor { width: 44px; height: 44px; opacity: .1; }
+.cursor-expand #cursor-ring { width: 60px; height: 60px; opacity: 0; }
+@media (pointer: coarse) { #cursor, #cursor-ring { display: none; } }
+
+/* ── NAV ── */
+nav { position: sticky; top: 0; z-index: 100; background: var(--cream); border-bottom: 1px solid var(--border); }
+.nav-top { display: flex; align-items: center; justify-content: space-between; padding: .9rem 3rem; }
+.nav-logo { font-family: 'EB Garamond', serif; font-size: 1.45rem; letter-spacing: .08em; text-transform: uppercase; color: var(--dark); text-decoration: none; font-weight: 400; }
+.nav-utils { display: flex; align-items: center; gap: 1.8rem; }
+.nav-util-link { font-size: .55rem; letter-spacing: .2em; text-transform: uppercase; color: var(--text3); text-decoration: none; transition: color .25s; cursor: none; }
+.nav-util-link:hover { color: var(--dark); }
+.nav-bottom { border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 3rem; padding: .7rem 3rem; }
+.nav-bottom a { color: var(--text2); text-decoration: none; font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; transition: color .25s; position: relative; padding-bottom: 2px; cursor: none; }
+.nav-bottom a::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: var(--dark); transform: scaleX(0); transform-origin: left; transition: transform .3s; }
+.nav-bottom a:hover { color: var(--dark); }
+.nav-bottom a:hover::after { transform: scaleX(1); }
+.nav-bottom a.active { color: var(--dark); }
+.nav-bottom a.active::after { transform: scaleX(1); }
+
+/* ── HEADER ── */
+.page-header {
+  padding: 5rem 5rem 3rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+}
+.page-header-left h1 {
+  font-family: 'EB Garamond', serif;
+  font-size: clamp(2.8rem, 4vw, 4.5rem);
+  font-weight: 400;
+  line-height: 1.0;
+  color: var(--dark);
+  margin-bottom: .6rem;
+}
+.page-header-left p {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--text3);
+}
+.page-header-count {
+  font-size: .5rem;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--text3);
+  padding-bottom: .5rem;
+}
+
+/* ── FILTERS ── */
+.filters-bar {
+  padding: 1.4rem 5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.filter-btn {
+  font-family: 'Jost', sans-serif;
+  font-size: .52rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--text3);
+  background: none;
+  border: 1px solid var(--border);
+  padding: .45rem 1.2rem;
+  cursor: none;
+  transition: all .25s;
+}
+.filter-btn:hover { color: var(--dark); border-color: var(--dark); }
+.filter-btn.active { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+
+/* ── GRID ── */
+.collections-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-left: 1px solid var(--border);
+}
+.collection-card {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  cursor: none;
+  transition: background .3s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.collection-card:hover { background: var(--cream2); }
+.card-img-wrap {
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  background: var(--cream3);
+  position: relative;
+}
+.card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .7s cubic-bezier(.25,.46,.45,.94);
+}
+.collection-card:hover .card-img-wrap img { transform: scale(1.04); }
+.card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: .8rem;
+}
+.card-placeholder-logo {
+  font-family: 'EB Garamond', serif;
+  font-size: 2rem;
+  color: rgba(139,115,85,.2);
+  letter-spacing: .2em;
+}
+.card-body {
+  padding: 1.6rem 2rem 2rem;
+  border-top: 1px solid var(--border);
+}
+.card-category {
+  font-size: .46rem;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: .5rem;
+}
+.card-name {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--dark);
+  line-height: 1.1;
+  margin-bottom: .5rem;
+}
+.card-moq {
+  font-size: .5rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.card-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  font-size: .42rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  background: var(--maroon);
+  color: rgba(245,240,232,.85);
+  padding: .2rem .65rem;
+  z-index: 2;
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  grid-column: 1/-1;
+  padding: 6rem;
+  text-align: center;
+  color: var(--text3);
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 1.2rem;
+}
+
+/* ── FOOTER ── */
+footer { background: var(--dark); border-top: 1px solid rgba(245,240,232,.05); }
+.footer-main { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; padding: 4rem 5rem; border-bottom: 1px solid rgba(245,240,232,.07); }
+.footer-brand-name { font-family: 'EB Garamond', serif; font-size: 1.3rem; letter-spacing: .06em; text-transform: uppercase; color: rgba(245,240,232,.85); margin-bottom: .5rem; }
+.footer-brand-body { font-size: .6rem; color: rgba(245,240,232,.35); line-height: 2; }
+.footer-brand-sep { width: 28px; height: 1px; background: rgba(168,136,74,.3); margin: 1.2rem 0; }
+.footer-col-title { font-size: .48rem; letter-spacing: .3em; text-transform: uppercase; color: rgba(245,240,232,.4); margin-bottom: 1.2rem; }
+.footer-links { list-style: none; }
+.footer-links li { margin-bottom: .7rem; }
+.footer-links a { font-size: .6rem; color: rgba(245,240,232,.55); text-decoration: none; transition: color .25s; cursor: none; }
+.footer-links a:hover { color: rgba(245,240,232,.9); }
+.footer-bottom { display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 5rem; }
+.footer-copy { font-size: .5rem; color: rgba(245,240,232,.25); letter-spacing: .1em; }
+.footer-legal { display: flex; gap: 1.8rem; }
+.footer-legal a { font-size: .5rem; color: rgba(245,240,232,.25); text-decoration: none; cursor: none; }
+.footer-socials { display: flex; gap: 1.5rem; }
+.social-link { font-size: .5rem; letter-spacing: .15em; text-transform: uppercase; color: rgba(245,240,232,.35); text-decoration: none; transition: color .25s; cursor: none; }
+.social-link:hover { color: rgba(245,240,232,.7); }
+
+/* ── REVEAL ── */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+
+/* ── MOBILE ── */
+@media (max-width: 900px) {
+  .collections-grid { grid-template-columns: repeat(2, 1fr); }
+  .page-header { padding: 3rem 1.5rem 2rem; flex-direction: column; align-items: flex-start; }
+  .filters-bar { padding: 1rem 1.5rem; flex-wrap: wrap; }
+  .footer-main { grid-template-columns: 1fr 1fr; padding: 3rem 1.5rem; }
+  .footer-bottom { flex-direction: column; gap: 1rem; padding: 1.5rem; text-align: center; }
+  .nav-top { padding: .9rem 1.5rem; }
+  .nav-bottom { gap: 1.5rem; padding: .7rem 1.5rem; flex-wrap: wrap; }
+}
+@media (max-width: 600px) {
+  .collections-grid { grid-template-columns: 1fr; }
+}
+
+/* DIWALI BAR */
+.diwali-bar { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 1rem; padding: .62rem 1.2rem; background: linear-gradient(90deg,#3d0b14 0%,#6B1E2C 32%,#8B2A3A 50%,#6B1E2C 68%,#3d0b14 100%); border-bottom: 1px solid rgba(201,168,92,.45); }
+.diwali-bar::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(232,212,160,.12), transparent 70%); pointer-events: none; }
+.diwali-link { display: flex; align-items: center; gap: .9rem; text-decoration: none; z-index: 3; }
+.diwali-text { font-family: 'Jost', sans-serif; font-size: .64rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold3); text-align: center; line-height: 1.5; }
+.diwali-text b { font-family: 'EB Garamond', serif; font-style: italic; text-transform: none; letter-spacing: .02em; color: var(--gold2); font-size: .98rem; font-weight: 500; }
+.diwali-cta { color: #fff; border-bottom: 1px solid var(--gold2); padding-bottom: 1px; transition: color .25s, border-color .25s; }
+.diwali-link:hover .diwali-cta { color: var(--gold3); border-color: var(--gold3); }
+
+/* Diya lamp */
+.diya { width: 40px; height: 34px; flex-shrink: 0; z-index: 3; overflow: visible; }
+.diya-flame { transform-origin: 20px 20px; animation: flameFlicker 1.5s ease-in-out infinite; }
+.diya-glow { transform-origin: 20px 16px; animation: glowPulse 1.5s ease-in-out infinite; }
+@keyframes flameFlicker {
+  0%,100% { transform: scale(1) rotate(-1deg); }
+  25% { transform: scale(1.06,1.14) rotate(1.5deg); }
+  50% { transform: scale(.94,1.04) rotate(-2deg); }
+  75% { transform: scale(1.04,.98) rotate(1deg); }
+}
+@keyframes glowPulse { 0%,100% { opacity: .45; transform: scale(1); } 50% { opacity: .8; transform: scale(1.18); } }
+
+/* Fireworks */
+.fw { position: absolute; top: 50%; width: 3px; height: 3px; border-radius: 50%; background: transparent; opacity: 0; z-index: 1; pointer-events: none; animation: fwBurst 3.2s ease-out infinite; }
+.fw1 { left: 10%; animation-delay: 0s; box-shadow: 16px 0 0 #E8D4A0,-16px 0 0 #E8D4A0,0 16px 0 #E8D4A0,0 -16px 0 #E8D4A0,11px 11px 0 #E8D4A0,-11px 11px 0 #E8D4A0,11px -11px 0 #E8D4A0,-11px -11px 0 #E8D4A0; }
+.fw2 { left: 26%; animation-delay: 1.1s; box-shadow: 15px 0 0 #ff7aa8,-15px 0 0 #ff7aa8,0 15px 0 #ff7aa8,0 -15px 0 #ff7aa8,10px 10px 0 #ff7aa8,-10px 10px 0 #ff7aa8,10px -10px 0 #ff7aa8,-10px -10px 0 #ff7aa8; }
+.fw3 { right: 24%; animation-delay: .5s; box-shadow: 15px 0 0 #6fd3c1,-15px 0 0 #6fd3c1,0 15px 0 #6fd3c1,0 -15px 0 #6fd3c1,10px 10px 0 #6fd3c1,-10px 10px 0 #6fd3c1,10px -10px 0 #6fd3c1,-10px -10px 0 #6fd3c1; }
+.fw4 { right: 9%; animation-delay: 1.8s; box-shadow: 16px 0 0 #9db8ff,-16px 0 0 #9db8ff,0 16px 0 #9db8ff,0 -16px 0 #9db8ff,11px 11px 0 #9db8ff,-11px 11px 0 #9db8ff,11px -11px 0 #9db8ff,-11px -11px 0 #9db8ff; }
+.fw5 { left: 44%; animation-delay: 2.4s; box-shadow: 14px 0 0 #ffcf5c,-14px 0 0 #ffcf5c,0 14px 0 #ffcf5c,0 -14px 0 #ffcf5c,10px 10px 0 #ffcf5c,-10px 10px 0 #ffcf5c,10px -10px 0 #ffcf5c,-10px -10px 0 #ffcf5c; }
+@keyframes fwBurst {
+  0% { transform: scale(.15); opacity: 0; }
+  8% { opacity: 1; }
+  45% { opacity: .85; }
+  70% { transform: scale(1.25); opacity: 0; }
+  100% { transform: scale(1.25); opacity: 0; }
+}
+@media (max-width: 640px) {
+  .diwali-text { font-size: .55rem; letter-spacing: .12em; }
+  .diwali-text b { font-size: .82rem; }
+  .diya { width: 32px; height: 28px; }
+  .fw { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .diya-flame, .diya-glow, .fw { animation: none; }
+  .fw { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav>
+  <div class="nav-top">
+    <div></div>
+    <div style="text-align:center">
+      <a href="index.html" class="nav-logo">Box Craft Studios</a>
+      <div style="font-size:.45rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-top:.2rem">If you can imagine it, we can build it.</div>
+    </div>
+    <div class="nav-utils">
+      <a href="https://wa.me/919068370981" target="_blank" class="nav-util-link">WhatsApp</a>
+      <a href="index.html#contact" class="nav-util-link">Contact</a>
+    </div>
+  </div>
+  <div class="nav-bottom">
+    <a href="index.html#collections">Home</a>
+    <a href="collections.html" class="active">Collections</a>
+    <a href="index.html#philosophy">Our Story</a>
+    <a href="index.html#experience">How It Works</a>
+    <a href="index.html#testimonials">Reviews</a>
+    <a href="index.html#customize">Customize Your Box</a>
+    <a href="index.html#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- Diwali Bar -->
+<div class="diwali-bar" role="region" aria-label="Diwali offer">
+  <span class="fw fw1"></span><span class="fw fw2"></span><span class="fw fw3"></span><span class="fw fw4"></span><span class="fw fw5"></span>
+  <a href="collections.html" class="diwali-link">
+    <svg class="diya" viewBox="0 0 40 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <ellipse class="diya-glow" cx="20" cy="15" rx="9" ry="11" fill="#E8D4A0" opacity="0.5"/>
+      <path class="diya-flame" d="M20 6 C16.5 11 17 15.5 20 19 C23 15.5 23.5 11 20 6 Z" fill="#F6B63C"/>
+      <path class="diya-flame" d="M20 9.5 C18.2 12.5 18.5 15 20 17.5 C21.5 15 21.8 12.5 20 9.5 Z" fill="#FFF0B8"/>
+      <path d="M6 23 C6 23 11 27 20 27 C29 27 34 23 34 23 C34 23 31 31 20 31 C9 31 6 23 6 23 Z" fill="#B5703A"/>
+      <path d="M6 23 C6 23 11 25.5 20 25.5 C29 25.5 34 23 34 23 L33 24.5 C33 24.5 28 26.5 20 26.5 C12 26.5 7 24.5 7 24.5 Z" fill="#8A5228"/>
+    </svg>
+    <span class="diwali-text">This <b>Diwali</b>, gift your employees something they'll remember — <span class="diwali-cta">Explore Corporate Gifting</span></span>
+  </a>
+</div>
+
+<!-- HEADER -->
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>Our Collections</h1>
+    <p>Every box, a statement. Every detail, intentional.</p>
+  </div>
+  <div class="page-header-count" id="productCount"></div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters-bar">
+  <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
+  <button class="filter-btn" onclick="filterProducts('luxury', this)">Luxury</button>
+  <button class="filter-btn" onclick="filterProducts('corporate', this)">Corporate</button>
+  <button class="filter-btn" onclick="filterProducts('gifting', this)">Gifting</button>
+</div>
+
+<!-- GRID -->
+<div class="collections-grid" id="collectionsGrid"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand-name">Box Craft Studios</div>
+      <p style="font-family:'EB Garamond',serif;font-style:italic;font-size:.95rem;color:rgba(245,240,232,.55);margin-bottom:.6rem;">If you can imagine it, we can build it.</p>
+      <p class="footer-brand-body">Premium curated boxes sourced from the world's finest artisans. Designed to be unwrapped slowly and remembered always.</p>
+      <div class="footer-brand-sep"></div>
+    </div>
+    <div>
+      <div class="footer-col-title">Collections</div>
+      <ul class="footer-links">
+        <li><a href="collections.html">All Products</a></li>
+        <li><a href="collections.html?filter=luxury">Luxury</a></li>
+        <li><a href="collections.html?filter=corporate">Corporate</a></li>
+        <li><a href="collections.html?filter=gifting">Gifting</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links">
+        <li><a href="index.html#philosophy">Our Story</a></li>
+        <li><a href="index.html#experience">How It Works</a></li>
+        <li><a href="index.html#testimonials">Reviews</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Get In Touch</div>
+      <ul class="footer-links">
+        <li><a href="https://wa.me/919068370981" target="_blank">WhatsApp Us</a></li>
+        <li><a href="https://www.instagram.com/boxcraftstudiocompany/" target="_blank">Instagram</a></li>
+        <li><a href="index.html#contact">Get In Touch</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 Box Craft Studios. All rights reserved.</p>
+    <div class="footer-legal">
+      <a href="index.html">Privacy</a>
+      <a href="index.html">Terms</a>
+    </div>
+    <div class="footer-socials">
+      <a href="https://www.instagram.com/boxcraftstudiocompany/" target="_blank" class="social-link">Instagram</a>
+      <a href="https://wa.me/919068370981" target="_blank" class="social-link">WhatsApp</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const products = [
+  { id:2, category:'luxury', badge:null, name:'The Prestige Watch Vault',
+    cover:'BCS_product_images/Watch/cover/Gemini_Generated_Image_2hf8s62hf8s62hf8.png',
+    meta:{'MOQ':'250 units (can be enquired)'} },
+  { id:5, category:'corporate', badge:'Best Seller', name:'Corporate Prestige Kit',
+    cover:'BCS_product_images/WelcomeKit/cover/IMG_4876.png',
+    meta:{'MOQ':'500 units (can be enquired)'} },
+  { id:3, category:'gifting', badge:'Signature', name:'Signature Box',
+    cover:'BCS_product_images/signature_box/cover/IMG_3691.PNG',
+    heroFit:'contain',
+    meta:{'MOQ':'500 units (can be enquired)'} },
+  { id:1, category:'luxury', badge:null, name:'The Luminary',
+    cover:'BCS_product_images/Candle/cover/Gemini_Generated_Image_wgau7uwgau7uwgau.png',
+    meta:{'MOQ':'250 units (can be enquired)'} },
+  { id:6, category:'luxury', badge:'Exclusive', name:'The Scentelier',
+    cover:'BCS_product_images/perfume/cover/Gemini_Generated_Image_vkb3fbvkb3fbvkb3.png',
+    meta:{'MOQ':'500 units (can be enquired)'} },
+  { id:4, category:'luxury', badge:'Finest', name:'The Éclat Jewellery Box',
+    cover:'BCS_product_images/jewellery/cover/jew.png',
+    meta:{'MOQ':'500 units (can be enquired)'} },
+];
+
+let activeFilter = 'all';
+
+function filterProducts(filter, btn) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Save filter + scroll to sessionStorage
+  sessionStorage.setItem('col_filter', filter);
+  renderGrid();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('collectionsGrid');
+  const filtered = activeFilter === 'all' ? products : products.filter(p => p.category === activeFilter);
+  document.getElementById('productCount').textContent = filtered.length + ' product' + (filtered.length !== 1 ? 's' : '');
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty-state">No products in this category yet.</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(p => `
+    <a class="collection-card reveal" href="product.html?id=${p.id}">
+      <div class="card-img-wrap">
+        ${p.badge ? `<div class="card-badge">${p.badge}</div>` : ''}
+        ${p.cover
+          ? `<img src="${p.cover}" alt="${p.name}" style="object-fit:${p.heroFit||'cover'}">`
+          : `<div class="card-placeholder"><div class="card-placeholder-logo">BCS</div></div>`}
+      </div>
+      <div class="card-body">
+        <div class="card-category">${p.category}</div>
+        <div class="card-name">${p.name}</div>
+        <div class="card-moq">${p.meta.MOQ}</div>
+      </div>
+    </a>
+  `).join('');
+
+  observeReveal();
+}
+
+function observeReveal() {
+  const els = document.querySelectorAll('.reveal:not(.visible)');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  els.forEach(el => io.observe(el));
+}
+
+// Restore filter + scroll on refresh
+window.addEventListener('DOMContentLoaded', () => {
+  const savedFilter = sessionStorage.getItem('col_filter') || 'all';
+  const savedScroll = sessionStorage.getItem('col_scroll') || 0;
+  activeFilter = savedFilter;
+  const btn = [...document.querySelectorAll('.filter-btn')].find(b => b.textContent.toLowerCase() === savedFilter);
+  if (btn) { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+  renderGrid();
+  setTimeout(() => window.scrollTo(0, parseInt(savedScroll)), 50);
+});
+
+window.addEventListener('beforeunload', () => {
+  sessionStorage.setItem('col_scroll', window.scrollY);
+  sessionStorage.setItem('col_filter', activeFilter);
+});
+
+// Cursor
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px';
+  ring.style.left = e.clientX + 'px'; ring.style.top = e.clientY + 'px';
+});
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('cursor-expand'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-expand'));
+});
+
+// URL filter param support (e.g. collections.html?filter=luxury)
+const urlFilter = new URLSearchParams(window.location.search).get('filter');
+if (urlFilter) {
+  sessionStorage.setItem('col_filter', urlFilter);
+}
+</script>
+</body>
+</html>
